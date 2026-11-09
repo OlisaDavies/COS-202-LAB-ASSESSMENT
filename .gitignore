@@ -1,0 +1,17 @@
+# Build artifacts
+*.obj
+*.ilk
+*.pdb
+*.stash
+*.exp
+*.lib
+Makefile*
+
+# Output binaries
+*.exe
+release/
+debug/
+
+# VS Code & Cache
+.vscode/ipch/
+.vscode/.browse*
