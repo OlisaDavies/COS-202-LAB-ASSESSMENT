@@ -58,23 +58,23 @@ void MainWindow::setupUI() {
     resize(1120, 740);
 
     setStyleSheet(
-        "QMainWindow { background-color: #f8fafc; font-family: 'Segoe UI', Arial, sans-serif; }"
-        "QTabWidget::pane { border: 1px solid #e2e8f0; background: #ffffff; border-radius: 8px; margin-top: -1px; }"
-        "QTabBar::tab { background: #edf2f7; color: #4a5568; font-weight: 600; padding: 10px 20px; border-top-left-radius: 6px; border-top-right-radius: 6px; margin-right: 4px; }"
-        "QTabBar::tab:selected { background: #ffffff; color: #2b6cb0; border-top: 3px solid #3182ce; border-bottom: 1px solid #ffffff; }"
-        "QTabBar::tab:hover:!selected { background: #e2e8f0; color: #2d3748; }"
-        "QGroupBox { font-weight: 600; color: #2d3748; border: 1px solid #e2e8f0; border-radius: 8px; margin-top: 18px; padding-top: 14px; background: #ffffff; }"
-        "QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; left: 14px; padding: 0 6px; color: #2b6cb0; }"
-        "QLineEdit, QComboBox { background: #ffffff; border: 1px solid #cbd5e1; border-radius: 6px; padding: 7px 10px; font-size: 13px; color: #1e293b; selection-background-color: #3b82f6; }"
-        "QLineEdit:focus, QComboBox:focus { border: 1.5px solid #3b82f6; background: #f8fafc; }"
-        "QTableWidget { background-color: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; gridline-color: #f1f5f9; font-size: 13px; color: #334155; }"
-        "QTableWidget::item { padding: 6px; border-bottom: 1px solid #f1f5f9; }"
-        "QTableWidget::item:selected { background-color: #e0f2fe; color: #0369a1; }"
-        "QHeaderView::section { background-color: #f8fafc; color: #475569; font-weight: 600; font-size: 12px; padding: 8px; border: none; border-bottom: 2px solid #e2e8f0; }"
-        "QListWidget { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 6px; font-size: 13px; color: #1e293b; }"
-        "QListWidget::item { padding: 8px 12px; margin-bottom: 4px; border-radius: 4px; background: #f8fafc; border-left: 3px solid #3b82f6; }"
-        "QStatusBar { background: #f1f5f9; color: #475569; font-weight: 500; font-size: 12px; border-top: 1px solid #e2e8f0; }"
-        "QTextEdit { background: #ffffff; border: 1px solid #e2e8f0; border-radius: 6px; padding: 12px; color: #1e293b; font-family: 'Consolas', monospace; }"
+        "QMainWindow { background-color: #f7f8fa; font-family: 'Segoe UI', Arial, sans-serif; }"
+        "QTabWidget::pane { border: 1px solid #dde1e7; background: #ffffff; border-radius: 8px; margin-top: -1px; }"
+        "QTabBar::tab { background: #e9edf2; color: #5b636e; font-weight: 600; padding: 10px 20px; border-top-left-radius: 6px; border-top-right-radius: 6px; margin-right: 4px; }"
+        "QTabBar::tab:selected { background: #ffffff; color: #35618f; border-top: 3px solid #35618f; border-bottom: 1px solid #ffffff; }"
+        "QTabBar::tab:hover:!selected { background: #dde1e7; color: #25292f; }"
+        "QGroupBox { font-weight: 600; color: #25292f; border: 1px solid #dde1e7; border-radius: 8px; margin-top: 18px; padding-top: 14px; background: #ffffff; }"
+        "QGroupBox::title { subcontrol-origin: margin; subcontrol-position: top left; left: 14px; padding: 0 6px; color: #35618f; }"
+        "QLineEdit, QComboBox { background: #ffffff; border: 1px solid #c4ccd6; border-radius: 6px; padding: 7px 10px; font-size: 13px; color: #25292f; selection-background-color: #35618f; }"
+        "QLineEdit:focus, QComboBox:focus { border: 1.5px solid #35618f; background: #f7f8fa; }"
+        "QTableWidget { background-color: #ffffff; border: 1px solid #dde1e7; border-radius: 6px; gridline-color: #eef1f4; font-size: 13px; color: #5b636e; }"
+        "QTableWidget::item { padding: 6px; border-bottom: 1px solid #eef1f4; }"
+        "QTableWidget::item:selected { background-color: #e6ecf3; color: #2a4d72; }"
+        "QHeaderView::section { background-color: #f7f8fa; color: #5b636e; font-weight: 600; font-size: 12px; padding: 8px; border: none; border-bottom: 2px solid #dde1e7; }"
+        "QListWidget { background: #ffffff; border: 1px solid #dde1e7; border-radius: 6px; padding: 6px; font-size: 13px; color: #25292f; }"
+        "QListWidget::item { padding: 8px 12px; margin-bottom: 4px; border-radius: 4px; background: #f7f8fa; border-left: 3px solid #35618f; }"
+        "QStatusBar { background: #eef1f4; color: #5b636e; font-weight: 500; font-size: 12px; border-top: 1px solid #dde1e7; }"
+        "QTextEdit { background: #ffffff; border: 1px solid #dde1e7; border-radius: 6px; padding: 12px; color: #25292f; font-family: 'Consolas', monospace; }"
     );
 
     tabWidget = new QTabWidget(this);
@@ -83,7 +83,7 @@ void MainWindow::setupUI() {
     tabWidget->addTab(createPatientRecordsPanel(), "Patient Records");
     tabWidget->addTab(createAppointmentsPanel(), "Appointments");
     tabWidget->addTab(createWaitingQueuePanel(), "Waiting Queue");
-    tabWidget->addTab(createSearchSortPanel(), "Search & Sort");
+    tabWidget->addTab(createSearchSortPanel(), "Search && Sort");
     tabWidget->addTab(createReportsPanel(), "Clinic Reports");
 
     statusBar()->showMessage("Ready");
@@ -91,7 +91,6 @@ void MainWindow::setupUI() {
 
 void MainWindow::setupMenuBar() {
     QMenuBar* bar = menuBar();
-    bar->setStyleSheet("QMenuBar { background: #ffffff; border-bottom: 1px solid #e2e8f0; } QMenuBar::item { padding: 6px 12px; } QMenuBar::item:selected { background: #f1f5f9; }");
 
     QMenu* fileMenu = bar->addMenu("&File");
 
@@ -185,21 +184,17 @@ QWidget* MainWindow::createPatientFormBox(QWidget* parent) {
     formLayout->addRow(lblTypeField2, txtTypeField2);
 
     btnRegister = new QPushButton("Register Patient", grpForm);
-    btnRegister->setStyleSheet("background-color: #0f766e; color: white; font-weight: 600; padding: 10px; border-radius: 6px; border: none; font-size: 13px;");
     connect(btnRegister, &QPushButton::clicked, this, &MainWindow::onRegisterPatient);
 
     btnSaveChanges = new QPushButton("Save Changes", grpForm);
-    btnSaveChanges->setStyleSheet("background-color: #b45309; color: white; font-weight: 600; padding: 10px; border-radius: 6px; border: none; font-size: 13px;");
     connect(btnSaveChanges, &QPushButton::clicked, this, &MainWindow::onUpdatePatient);
     btnSaveChanges->setVisible(false);
 
     btnCancelEdit = new QPushButton("Cancel Edit", grpForm);
-    btnCancelEdit->setStyleSheet("background-color: #f1f5f9; color: #475569; font-weight: 600; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 12px;");
     connect(btnCancelEdit, &QPushButton::clicked, this, &MainWindow::onCancelEdit);
     btnCancelEdit->setVisible(false);
 
     QPushButton* btnUndo = new QPushButton("Undo (Ctrl+Z)", grpForm);
-    btnUndo->setStyleSheet("background-color: #f1f5f9; color: #475569; font-weight: 600; padding: 8px; border-radius: 6px; border: 1px solid #cbd5e1; font-size: 12px;");
     connect(btnUndo, &QPushButton::clicked, this, &MainWindow::onUndoAction);
 
     formLayout->addRow(btnRegister);
@@ -218,9 +213,9 @@ QWidget* MainWindow::createPatientTableBox(QWidget* parent) {
     tableVBox->setSpacing(10);
 
     QLabel* lblLegend = new QLabel(
-        "<span style='color:#ad3838;'>&#9679; Emergency Patient</span> &nbsp;&nbsp; "
-        "<span style='color:#2c7a52;'>&#9679; General Outpatient</span> &nbsp;&nbsp; "
-        "<span style='color:#2a4d72;'>&#9679; Follow-Up Patient</span>", grpTable);
+        "<span style='color:#b71c1c;'>Emergency</span> &nbsp;&nbsp; "
+        "<span style='color:#1b5e20;'>General</span> &nbsp;&nbsp; "
+        "<span style='color:#0d47a1;'>Follow-Up</span>", grpTable);
     tableVBox->addWidget(lblLegend);
 
     tablePatients = new QTableWidget(grpTable);
@@ -233,11 +228,9 @@ QWidget* MainWindow::createPatientTableBox(QWidget* parent) {
 
     QHBoxLayout* tblBtnRow = new QHBoxLayout();
     btnEdit = new QPushButton("Edit", grpTable);
-    btnEdit->setStyleSheet("background-color: #fef3c7; color: #92400e; font-weight: 600; padding: 8px 16px; border-radius: 6px; border: 1px solid #fde68a;");
     connect(btnEdit, &QPushButton::clicked, this, &MainWindow::onEditSelectedPatient);
 
     QPushButton* btnDelete = new QPushButton("Delete", grpTable);
-    btnDelete->setStyleSheet("background-color: #fee2e2; color: #991b1b; font-weight: 600; padding: 8px 16px; border-radius: 6px; border: 1px solid #fecaca;");
     connect(btnDelete, &QPushButton::clicked, this, &MainWindow::onDeleteSelectedPatient);
 
     tblBtnRow->addWidget(btnEdit);
@@ -572,7 +565,6 @@ QWidget* MainWindow::createAppointmentsPanel() {
     form->addRow("Doctor:", txtAptDoctor);
 
     QPushButton* btnBook = new QPushButton("Book Appointment", grpForm);
-    btnBook->setStyleSheet("background-color: #35618f; color: white; font-weight: 600; padding: 10px; border-radius: 6px; border: none; font-size: 13px;");
     connect(btnBook, &QPushButton::clicked, this, &MainWindow::onScheduleAppointment);
     form->addRow(btnBook);
 
@@ -594,7 +586,6 @@ QWidget* MainWindow::createAppointmentsPanel() {
 
     QHBoxLayout* actRow = new QHBoxLayout();
     QPushButton* btnCancel = new QPushButton("Cancel Appointment", grpTable);
-    btnCancel->setStyleSheet("background-color: #f9ebeb; color: #ad3838; font-weight: 600; padding: 8px 16px; border-radius: 6px; border: 1px solid #ecc6c6;");
     connect(btnCancel, &QPushButton::clicked, this, &MainWindow::onCancelSelectedAppointment);
     actRow->addStretch();
     actRow->addWidget(btnCancel);
@@ -709,19 +700,16 @@ QWidget* MainWindow::createWaitingQueuePanel() {
     vCtrl->addWidget(cmbQueuePatientID);
 
     QPushButton* btnEnqueue = new QPushButton("Add to Queue", grpQueueCtrl);
-    btnEnqueue->setStyleSheet("background-color: #1d6a85; color: white; font-weight: 600; padding: 10px; border-radius: 6px; border: none; font-size: 13px;");
     connect(btnEnqueue, &QPushButton::clicked, this, &MainWindow::onEnqueuePatient);
     vCtrl->addWidget(btnEnqueue);
 
     vCtrl->addSpacing(20);
 
     QPushButton* btnCallNext = new QPushButton("Call Next", grpQueueCtrl);
-    btnCallNext->setStyleSheet("background-color: #2a4d72; color: white; font-weight: 700; padding: 14px; border-radius: 8px; font-size: 14px; border: none;");
     connect(btnCallNext, &QPushButton::clicked, this, &MainWindow::onCallNextPatient);
     vCtrl->addWidget(btnCallNext);
 
     lblQueueCount = new QLabel("<b>Waiting: 0</b>", grpQueueCtrl);
-    lblQueueCount->setStyleSheet("color: #7e8794; font-size: 13px; padding-top: 8px;");
     vCtrl->addWidget(lblQueueCount);
     vCtrl->addStretch();
 
@@ -808,7 +796,6 @@ QWidget* MainWindow::createSearchSortPanel() {
     cmbSearchAlgorithm->addItem("Recursive search by name (O(n))");
 
     QPushButton* btnSearch = new QPushButton("Search", grpSearch);
-    btnSearch->setStyleSheet("background-color: #1d6a85; color: white; font-weight: 600; padding: 8px; border-radius: 6px; border: none; font-size: 13px;");
     connect(btnSearch, &QPushButton::clicked, this, &MainWindow::onExecuteSearch);
 
     fSearch->addRow("Query:", txtSearchQuery);
@@ -831,7 +818,6 @@ QWidget* MainWindow::createSearchSortPanel() {
     cmbSortField->addItem("Patient Age");
 
     QPushButton* btnSort = new QPushButton("Sort", grpSort);
-    btnSort->setStyleSheet("background-color: #96701d; color: white; font-weight: 600; padding: 8px; border-radius: 6px; border: none; font-size: 13px;");
     connect(btnSort, &QPushButton::clicked, this, &MainWindow::onExecuteSort);
 
     fSort->addRow("Algorithm:", cmbSortAlgorithm);
@@ -844,7 +830,6 @@ QWidget* MainWindow::createSearchSortPanel() {
     lblAlgorithmExplanation = new QLabel(
         "<b>Selection sort:</b> O(n^2) comparisons, sorts in place.<br>"
         "<b>Merge sort:</b> O(n log n) comparisons, needs an extra array.", panel);
-    lblAlgorithmExplanation->setStyleSheet("background-color: #f7f8fa; color: #5b636e; padding: 10px 14px; border: 1px solid #dde1e7; border-radius: 6px; font-size: 12px;");
     mainVBox->addWidget(lblAlgorithmExplanation);
 
     connect(cmbSortAlgorithm, QOverload<int>::of(&QComboBox::currentIndexChanged), this, &MainWindow::onSortAlgorithmChanged);
@@ -956,7 +941,6 @@ QWidget* MainWindow::createReportsPanel() {
     topRow->addWidget(cmbReportType, 1);
 
     QPushButton* btnGenerate = new QPushButton("Generate", panel);
-    btnGenerate->setStyleSheet("background-color: #35618f; color: white; font-weight: 600; padding: 8px 16px; border-radius: 6px; border: none; font-size: 13px;");
     connect(btnGenerate, &QPushButton::clicked, this, &MainWindow::onGenerateSelectedReport);
     topRow->addWidget(btnGenerate);
 
