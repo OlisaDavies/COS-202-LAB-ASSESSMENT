@@ -1,0 +1,24 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Build Qt GUI Application",
+            "type": "process",
+            "command": "${workspaceFolder}/build_gui.bat",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": "$msCompile",
+            "detail": "Compile Qt GUI into release/SCAPMS_GUI.exe"
+        },
+        {
+            "label": "Build Console Application",
+            "type": "process",
+            "command": "${workspaceFolder}/build.bat",
+            "group": "build",
+            "problemMatcher": "$msCompile",
+            "detail": "Compile console application into SCAPMS.exe"
+        }
+    ]
+}
