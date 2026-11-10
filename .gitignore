@@ -15,3 +15,7 @@ debug/
 # VS Code & Cache
 .vscode/ipch/
 .vscode/.browse*
+
+# Agent work directories
+.kilo/
+.kilocode/
