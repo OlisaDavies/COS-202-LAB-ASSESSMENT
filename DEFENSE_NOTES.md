@@ -18,7 +18,7 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 > 
 > For data storage and flow control, it implements four distinct data structures: **`std::vector`** for main patient storage, **`std::queue`** for a First-In, First-Out waiting room, **`std::stack`** for an administrative Undo rollback engine, and a **fixed-size array** for caching recently accessed records. 
 > 
-> All searching routines (Linear, Binary, Recursive) and sorting algorithms (Selection Sort and Merge Sort) are **implemented manually from scratch**. The entire application is backed by CSV file persistence and a custom exception hierarchy and handles invalid input through the exception classes."*
+> All searching routines (Linear, Binary, Recursive, Category) and sorting algorithms (Selection Sort and Merge Sort) are **implemented manually from scratch**. The entire application is backed by CSV file persistence and a custom exception hierarchy and handles invalid input through the exception classes."*
 
 ---
 
@@ -28,7 +28,7 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 **Model Answer:**
 > *"Because in a real hospital, nobody is just a generic 'Patient'. A patient who walks into a clinic is specifically a General Outpatient, an Emergency Case, or a Follow-Up Consultation. 
 > 
-> By declaring `displayPatient()` and `getSpecialDetail()` as **pure virtual functions (`= 0`)**, I made `PatientRecord` an **abstract class**. This prevents anyone from instantiating an incomplete generic patient object directly, while enforcing that every subclass must implement its own specific display and detail logic."*
+> By declaring `displayPatient()`, `getSpecialDetail()`, `getTypeLabel()` and `clone()` as **pure virtual functions (`= 0`)**, I made `PatientRecord` an **abstract class**. This prevents anyone from instantiating an incomplete generic patient object directly, while enforcing that every subclass must implement its own specific display and detail logic."*
 
 ---
 
@@ -48,7 +48,13 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 
 ---
 
-### Question 4: "Why did you implement both Selection Sort and Merge Sort? How do their time complexities compare?"
+### Question 4: "What is `ScheduledPatient` and why did you add another class?"
+**Model Answer:**
+> *"Both `GeneralPatient` and `FollowUpPatient` have to answer the `Appointable` interface in exactly the same way, because a booking is a date, a time and a booked flag. Instead of writing that code twice, I put it once in the abstract class **`ScheduledPatient`**, which inherits from `PatientRecord` and implements `Appointable`. The two subclasses then only add what makes them different: the consultation fee, and the previous visit with the assigned doctor. It removes duplicated code and it shows that I can design an inheritance hierarchy, not just copy a class three times."*
+
+---
+
+### Question 5: "Why did you implement both Selection Sort and Merge Sort? How do their time complexities compare?"
 **Model Answer:**
 > *"I implemented both to demonstrate the contrast between basic and optimal sorting paradigms:
 > 
@@ -57,23 +63,25 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 
 ---
 
-### Question 5: "What is the golden rule / precondition before running Binary Search?"
+### Question 6: "What is the golden rule / precondition before running Binary Search?"
 **Model Answer:**
 > *"The collection **must be sorted** prior to execution! If the records are not sorted, Binary Search will discard the wrong half of the array and fail to find the patient. 
 > 
-> In my GUI implementation, before executing `SearchEngine::binarySearchByID`, the program defensively sorts the records by Patient ID using Merge Sort."*
+> In my GUI implementation, before executing `SearchEngine::binarySearchByID`, the program defensively sorts the records by Patient ID using Merge Sort on a copy of the list."*
 
 ---
 
-### Question 6: "Explain how your Undo feature works using `std::stack`."
+### Question 7: "Explain how your Undo feature works using `std::stack`."
 **Model Answer:**
-> *"A stack operates on the **LIFO (Last-In, First-Out)** principle. Whenever an administrator deletes a patient or adds a record, an `AdminAction` object containing the operation type and a backup pointer is pushed onto `std::stack<AdminAction> undoStack`.
+> *"A stack operates on the **LIFO (Last-In, First-Out)** principle. Whenever an administrator deletes a patient, changes a record or books an appointment, an `AdminAction` object containing the operation type and a **copy** of the record is pushed onto `std::stack<AdminAction> undoStack`.
 > 
-> When the user presses the 'Undo' button or `Ctrl+Z`, the system calls `undoStack.top()`, reverses that specific action (for example, re-inserting the deleted patient pointer back into the vector), and then calls `undoStack.pop()`. This allows multi-level undo operations."*
+> When the user presses the 'Undo' button or `Ctrl+Z`, the program takes the top entry, reverses that specific action (for example, putting the deleted patient back into the vector), and then calls `undoStack.pop()`. This allows multi-level undo operations.
+> 
+> The important detail is that the stack owns a **copy**, so the copy is never the same memory as the live record. That is what keeps the program from freeing the same record twice."*
 
 ---
 
-### Question 7: "Why did you declare `virtual ~PatientRecord()` with a virtual destructor?"
+### Question 8: "Why did you declare `virtual ~PatientRecord()` with a virtual destructor?"
 **Model Answer:**
 > *"This is critical for preventing memory leaks in C++ when using polymorphism. When we store pointers as `PatientRecord*` and later call `delete patientPtr`, if the destructor was not virtual, C++ would only execute the base class destructor and fail to call the derived class destructor (like `GeneralPatient` or `EmergencyPatient`). 
 > 
@@ -81,7 +89,7 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 
 ---
 
-### Question 8: "Why did you use layout managers (`QVBoxLayout`, `QHBoxLayout`, `QFormLayout`) instead of fixed pixel positioning?"
+### Question 9: "Why did you use layout managers (`QVBoxLayout`, `QHBoxLayout`, `QFormLayout`) instead of fixed pixel positioning?"
 **Model Answer:**
 > *"Fixed pixel coordinates break whenever the window is resized, maximized, or opened on monitors with different DPI scalings. 
 > 
@@ -89,14 +97,25 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 
 ---
 
+### Question 10: "How is your program organised?"
+**Model Answer:**
+> *"It is split into four layers, and each layer has its own namespace so that the names cannot clash: `scapms::model`, `scapms::controller`, `scapms::gui` and `scapms::utils`. Every class is a header file with the declarations and a source file with the implementation.
+> 
+> The **model** layer holds the patient classes and the database, the **controller** layer holds the searching, sorting and reporting routines, the **GUI** layer has one panel class per tab, and the **utilities** hold the exception classes, the file reader and the ID generator.
+> 
+> The model, controller and utility layers do not use Qt at all, so the same code also runs in the console demonstration, which is how I tested the algorithms."*
+
+---
+
 ## 3. Live Defense Modification Exercises
 
 Sometimes a lecturer will say: *"Make a small change right now in front of me to prove you understand your code."*
+
 Here are 3 common requests and exactly how to solve them:
 
 ### Exercise 1: Change the age validation range from `0-120` to `0-130`
-**Where to go:** Open `ClinicDatabase.h`.  
-Find lines 58-63:
+**Where to go:** Open `model/ClinicDatabase.cpp`.  
+Find line 49:
 ```cpp
 // Change:
 if (patient->getAge() < 0 || patient->getAge() > 120)
@@ -107,19 +126,18 @@ if (patient->getAge() < 0 || patient->getAge() > 130)
 ---
 
 ### Exercise 2: Add a new sort order (e.g. descending order instead of ascending)
-**Where to go:** Open `SortEngine.h`.  
-Look at `comparePatients`:
+**Where to go:** Open `controller/SortEngine.cpp`.  
+Look at `comparePatients` (line 17 onwards):
 ```cpp
-// To sort by Age Oldest-to-Youngest:
-case SORT_BY_AGE:
+case SortField::PatientAge:
     return a->getAge() > b->getAge(); // Simply flip '<' to '>'!
 ```
 
 ---
 
 ### Exercise 3: Add a new shortcut to the Menu Bar
-**Where to go:** Open `MainWindow.cpp`.  
-Inside `setupMenuBar()`:
+**Where to go:** Open `gui/MainWindow.cpp`.  
+Inside `setupMenuBar()` (line 99):
 ```cpp
 QAction* actSearch = fileMenu->addAction("&Quick Search");
 actSearch->setShortcut(QKeySequence("Ctrl+F"));

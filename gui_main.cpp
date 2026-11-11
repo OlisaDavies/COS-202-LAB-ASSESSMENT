@@ -3,12 +3,12 @@
 
 #include <QApplication>
 
-#include "MainWindow.h"
+#include "gui/MainWindow.h"
 
 int main(int argc, char* argv[]) {
     QApplication app(argc, argv);
 
-    MainWindow mainWindow;
+    scapms::gui::MainWindow mainWindow;
     mainWindow.show();
 
     return app.exec();
