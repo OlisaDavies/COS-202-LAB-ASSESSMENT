@@ -1,7 +1,6 @@
 #include "GeneralPatient.h"
 
 #include <iomanip>
-#include <iostream>
 #include <sstream>
 
 namespace scapms {
@@ -18,27 +17,40 @@ std::string formatFee(double fee) {
 
 } // namespace
 
-void GeneralPatient::displayPatient() const {
-    std::cout << "-------------------------------------" << std::endl;
-    std::cout << "[Category: General Outpatient]" << std::endl;
-    std::cout << "Patient ID:       " << patientID << std::endl;
-    std::cout << "Name:             " << name << std::endl;
-    std::cout << "Age:              " << age << std::endl;
-    std::cout << "Contact:          " << contactNumber << std::endl;
-    std::cout << "Consultation Fee: " << formatFee(consultationFee) << std::endl;
-    std::cout << "Appointment:      " << getAppointmentDetails() << std::endl;
-    std::cout << "-------------------------------------" << std::endl;
+std::string GeneralPatient::getPatientReport() const {
+    std::ostringstream out;
+    out << "-------------------------------------\n";
+    out << "[Category: General Outpatient]\n";
+    out << "Patient ID:       " << patientID << "\n";
+    out << "Name:             " << name << "\n";
+    out << "Age:              " << age << "\n";
+    out << "Contact:          " << contactNumber << "\n";
+    out << "Consultation Fee: " << formatFee(consultationFee) << "\n";
+    out << "Appointment:      " << getAppointmentDetails() << "\n";
+    out << "-------------------------------------";
+    return out.str();
 }
 
 std::string GeneralPatient::getSpecialDetail() const {
     return "Fee: " + formatFee(consultationFee);
 }
 
+double GeneralPatient::getBillAmount() const {
+    return consultationFee;
+}
+
+std::string GeneralPatient::describeBill() const {
+    return "Consultation fee: " + formatFee(consultationFee);
+}
+
 void GeneralPatient::restoreFrom(const PatientRecord& previous) {
     ScheduledPatient::restoreFrom(previous);
 
-    const GeneralPatient& snapshot = static_cast<const GeneralPatient&>(previous);
-    consultationFee = snapshot.consultationFee;
+    // The dynamic cast checks that the snapshot really is a general patient.
+    // A static cast would be undefined behaviour when it is not.
+    if (const GeneralPatient* snapshot = dynamic_cast<const GeneralPatient*>(&previous)) {
+        consultationFee = snapshot->consultationFee;
+    }
 }
 
 } // namespace model

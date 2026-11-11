@@ -5,7 +5,7 @@
 #include <QPushButton>
 #include <QTextEdit>
 
-#include "../model/ClinicDatabase.h"
+#include "../controller/ClinicManager.h"
 
 namespace scapms {
 namespace gui {
@@ -16,7 +16,7 @@ class ReportPanel : public QWidget {
     Q_OBJECT
 
 public:
-    explicit ReportPanel(model::ClinicDatabase& database, QWidget* parent = nullptr);
+    explicit ReportPanel(controller::ClinicManager& manager, QWidget* parent = nullptr);
 
     void refresh();
 
@@ -27,7 +27,7 @@ private slots:
     void onGenerateReport();
 
 private:
-    model::ClinicDatabase& database;
+    controller::ClinicManager& manager;
 
     QComboBox* cmbReportType;
     QTextEdit* txtReportOutput;

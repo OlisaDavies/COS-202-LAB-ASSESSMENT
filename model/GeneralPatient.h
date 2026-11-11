@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <utility>
 
 #include "ScheduledPatient.h"
 
@@ -28,10 +27,18 @@ public:
 
     std::string getTypeLabel() const override { return "General Outpatient"; }
 
-    void displayPatient() const override;
+    // The full record of the patient as text.
+    std::string getPatientReport() const override;
+
     std::string getSpecialDetail() const override;
 
-    PatientRecord* clone() const override { return new GeneralPatient(*this); }
+    // A general outpatient visit is billed for the consultation fee.
+    double getBillAmount() const override;
+    std::string describeBill() const override;
+
+    // The covariant return type hands back a GeneralPatient, so the caller
+    // does not have to cast the copy back down.
+    GeneralPatient* clone() const override { return new GeneralPatient(*this); }
 
     void restoreFrom(const PatientRecord& previous) override;
 };

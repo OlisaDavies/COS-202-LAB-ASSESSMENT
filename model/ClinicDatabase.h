@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <queue>
 #include <stack>
 #include <string>
@@ -13,8 +14,12 @@
 namespace scapms {
 namespace model {
 
-// The clinic database. It holds every patient record, every appointment, the
-// waiting room and the administrative undo history.
+// The store of the clinic. It holds every patient record, every appointment,
+// the waiting room and the administrative undo history.
+//
+// The class only stores and finds. The rules of the clinic - what age a
+// patient may have, whether a booking is allowed - are not decided here but
+// in the controller layer, so that the data and the rules stay apart.
 //
 // Ownership rules, so that the memory handling stays clear:
 //   * the database owns the records in its patient list and deletes them,
@@ -26,8 +31,10 @@ public:
     static constexpr int CACHE_SIZE = 10;
 
 private:
-    std::vector<PatientRecord*> patients;
-    std::vector<Appointment> appointments;
+    // The database owns every patient record. The unique pointers make sure
+    // that a record is freed exactly once, even when the database is
+    // cleared or an action is undone.
+    std::vector<std::unique_ptr<PatientRecord>> patients;
     std::queue<PatientRecord*> waitingQueue;
     std::stack<AdminAction> undoStack;
 
@@ -36,20 +43,22 @@ private:
     int recentCount;
 
     // Adds one patient, with or without an entry on the undo stack.
-    void addPatientInternal(PatientRecord* patient, bool trackUndo);
+    void addPatientInternal(std::unique_ptr<PatientRecord> patient, bool trackUndo);
 
-    // Adds one appointment, with or without an entry on the undo stack.
+    // Adds one appointment to the patient that owns it, with or without an
+    // entry on the undo stack.
     void addAppointmentInternal(const Appointment& appointment, bool trackUndo);
 
     // Removes a record without touching the undo history. When backupOut is
     // given it receives a copy of the removed record.
-    bool removePatientInternal(const std::string& id, PatientRecord** backupOut);
+    bool removePatientInternal(const std::string& id,
+                               std::unique_ptr<PatientRecord>* backupOut);
 
-    // Refreshes the booking summary of a patient from the appointment list.
-    void syncPatientBooking(const std::string& patientID);
+    // The patient that holds the given appointment, or nullptr.
+    PatientRecord* findOwnerOfAppointment(const std::string& appointmentID);
 
-    // The earliest pending appointment of a patient, or nullptr.
-    const Appointment* nextPendingAppointment(const std::string& patientID) const;
+    // True when an appointment with that identifier is already booked.
+    bool appointmentIDIsTaken(const std::string& appointmentID) const;
 
     void touchRecentPatient(PatientRecord* patient);
     void removeRecentPatient(PatientRecord* patient);
@@ -63,15 +72,14 @@ public:
     ClinicDatabase(const ClinicDatabase&) = delete;
     ClinicDatabase& operator=(const ClinicDatabase&) = delete;
 
-    // Registers a new patient. The database takes over the pointer, also when
-    // the record is rejected, so the caller never has to delete it.
-    void addPatient(PatientRecord* patient);
+    // Registers a patient and remembers the step, so that it can be undone.
+    // The record is only stored when its identifier is still free.
+    void addPatient(std::unique_ptr<PatientRecord> patient);
 
-    // Registers several patients at once, for example after a file was read.
-    // The records are not put on the undo stack. Records that break a rule are
-    // skipped and described in the warnings list.
-    void addPatients(const std::vector<PatientRecord*>& newPatients,
-                     std::vector<std::string>* warnings = nullptr);
+    // Registers a patient without remembering the step. This is used when a
+    // whole file is read, because the load itself is one administrative step
+    // and not one step per record.
+    void addPatientWithoutUndo(std::unique_ptr<PatientRecord> patient);
 
     // Deletes a patient and keeps a copy on the undo stack.
     // Returns false when no patient has that ID.
@@ -79,23 +87,21 @@ public:
 
     // Stores a copy of a record so that the change can be undone later.
     // The database takes over the snapshot, which must not be a live record.
-    void pushPatientSnapshot(PatientRecord* snapshot);
+    void pushPatientSnapshot(std::unique_ptr<PatientRecord> snapshot);
 
     // Looks a patient up by ID. The fixed size cache is checked first.
     PatientRecord* findPatientByID(const std::string& id);
 
     // Looks a patient up by ID without touching the cache. Used by the
     // reports, which work on a read only database.
-    PatientRecord* findPatientByID(const std::string& id) const;
+    const PatientRecord* findPatientByID(const std::string& id) const;
 
-    const std::vector<PatientRecord*>& getAllPatients() const { return patients; }
+    // The registered records. The pointers are owned by the database.
+    std::vector<PatientRecord*> getAllPatients() const;
     std::size_t getPatientCount() const { return patients.size(); }
 
-    // Every appointment that belongs to a patient.
-    std::vector<Appointment> getAppointmentsFor(const std::string& patientID) const;
-
-    // How many of the appointments of a patient are still pending.
-    std::size_t getPendingCountFor(const std::string& patientID) const;
+    // Every appointment of every patient, gathered into one list.
+    std::vector<Appointment> getAllAppointments() const;
 
     // Waiting room.
     void enqueuePatient(PatientRecord* patient);
@@ -106,13 +112,10 @@ public:
     // Appointments.
     void addAppointment(const Appointment& appointment);
 
-    // Adds several appointments at once. The appointments are not put on the
-    // undo stack.
-    void addAppointments(const std::vector<Appointment>& newAppointments,
-                         std::vector<std::string>* warnings = nullptr);
+    // Adds an appointment without remembering the step on the undo stack.
+    void addAppointmentWithoutUndo(const Appointment& appointment);
 
     bool cancelAppointment(const std::string& appointmentID);
-    const std::vector<Appointment>& getAllAppointments() const { return appointments; }
 
     // Reverses the last administrative operation.
     // Returns the description of the operation, or an empty string when

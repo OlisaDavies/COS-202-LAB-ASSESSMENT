@@ -1,6 +1,6 @@
 #include "EmergencyPatient.h"
 
-#include <iostream>
+#include <sstream>
 
 namespace scapms {
 namespace model {
@@ -13,16 +13,19 @@ std::string EmergencyPatient::getUrgencyDescription() const {
     }
 }
 
-void EmergencyPatient::displayPatient() const {
-    std::cout << "-------------------------------------" << std::endl;
-    std::cout << "[CATEGORY: EMERGENCY - HIGH PRIORITY]" << std::endl;
-    std::cout << "Patient ID:     " << patientID << std::endl;
-    std::cout << "Name:           " << name << std::endl;
-    std::cout << "Age:            " << age << std::endl;
-    std::cout << "Contact:        " << contactNumber << std::endl;
-    std::cout << "Severity (1-3): " << severityLevel << " (" << getUrgencyDescription() << ")" << std::endl;
-    std::cout << "Triage Note:    " << triageNote << std::endl;
-    std::cout << "-------------------------------------" << std::endl;
+std::string EmergencyPatient::getPatientReport() const {
+    std::ostringstream out;
+    out << "-------------------------------------\n";
+    out << "[CATEGORY: EMERGENCY - HIGH PRIORITY]\n";
+    out << "Patient ID:     " << patientID << "\n";
+    out << "Name:           " << name << "\n";
+    out << "Age:            " << age << "\n";
+    out << "Contact:        " << contactNumber << "\n";
+    out << "Severity (1-3): " << severityLevel
+        << " (" << getUrgencyDescription() << ")\n";
+    out << "Triage Note:    " << triageNote << "\n";
+    out << "-------------------------------------";
+    return out.str();
 }
 
 std::string EmergencyPatient::getSpecialDetail() const {
@@ -32,9 +35,12 @@ std::string EmergencyPatient::getSpecialDetail() const {
 void EmergencyPatient::restoreFrom(const PatientRecord& previous) {
     PatientRecord::restoreFrom(previous);
 
-    const EmergencyPatient& snapshot = static_cast<const EmergencyPatient&>(previous);
-    severityLevel = snapshot.severityLevel;
-    triageNote = snapshot.triageNote;
+    // The dynamic cast checks that the snapshot really is an emergency
+    // patient. A static cast would be undefined behaviour when it is not.
+    if (const EmergencyPatient* snapshot = dynamic_cast<const EmergencyPatient*>(&previous)) {
+        severityLevel = snapshot->severityLevel;
+        triageNote = snapshot->triageNote;
+    }
 }
 
 } // namespace model

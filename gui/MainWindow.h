@@ -9,14 +9,15 @@
 #include "QueuePanel.h"
 #include "SearchPanel.h"
 #include "ReportPanel.h"
-#include "../model/ClinicDatabase.h"
+#include "AdminPanel.h"
+#include "../controller/ClinicManager.h"
 
 namespace scapms {
 namespace gui {
 
 // The main window of the clinic application.
 //
-// It owns the database and the panels, puts the panels into the tabs and
+// It owns the controller and the panels, puts the panels into the tabs and
 // keeps them in step with each other. The panels themselves do the work, so
 // this class stays small.
 class MainWindow : public QMainWindow {
@@ -40,12 +41,10 @@ private slots:
     // The undo of the last administrative operation.
     void onUndoAction();
 
-    void onSaveData();
-    void onLoadData();
     void onAbout();
 
 private:
-    model::ClinicDatabase database;
+    controller::ClinicManager manager;
 
     QTabWidget* tabWidget;
     QTimer* dashboardTimer;
@@ -62,6 +61,7 @@ private:
     QueuePanel* queuePanel;
     SearchPanel* searchPanel;
     ReportPanel* reportPanel;
+    AdminPanel* adminPanel;
 
     void setupUI();
     void setupMenuBar();

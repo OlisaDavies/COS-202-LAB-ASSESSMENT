@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <utility>
 
 #include "PatientRecord.h"
 
@@ -11,7 +10,7 @@ namespace model {
 // An urgent case that is treated as soon as it arrives.
 //
 // It deliberately does not implement Appointable: a trauma case is never
-// booked for a future slot, it goes straight into the waiting room.
+// booked in advance, it goes straight into the waiting room.
 class EmergencyPatient : public PatientRecord {
 private:
     int severityLevel;      // 1 = Critical, 2 = Urgent, 3 = Moderate
@@ -38,10 +37,13 @@ public:
 
     std::string getTypeLabel() const override { return "Emergency Patient"; }
 
-    void displayPatient() const override;
+    // The full record of the patient as text.
+    std::string getPatientReport() const override;
+
     std::string getSpecialDetail() const override;
 
-    PatientRecord* clone() const override { return new EmergencyPatient(*this); }
+    // The covariant return type hands back an EmergencyPatient.
+    EmergencyPatient* clone() const override { return new EmergencyPatient(*this); }
 
     void restoreFrom(const PatientRecord& previous) override;
 };

@@ -57,12 +57,12 @@ std::string ReportBuilder::header(const std::string& title) {
     return out;
 }
 
-std::string ReportBuilder::categoryDistribution(const model::ClinicDatabase& database) {
+std::string ReportBuilder::categoryDistribution(const ClinicManager& manager) {
     int generalCount = 0;
     int emergencyCount = 0;
     int followUpCount = 0;
 
-    for (const model::PatientRecord* patient : database.getAllPatients()) {
+    for (const model::PatientRecord* patient : manager.getAllPatients()) {
         if (patient == nullptr) {
             continue;
         }
@@ -75,7 +75,7 @@ std::string ReportBuilder::categoryDistribution(const model::ClinicDatabase& dat
         }
     }
 
-    const int total = static_cast<int>(database.getPatientCount());
+    const int total = static_cast<int>(manager.getPatientCount());
 
     std::string out = header("Patient Category Distribution");
     out += line("General Outpatient:", generalCount);
@@ -87,19 +87,19 @@ std::string ReportBuilder::categoryDistribution(const model::ClinicDatabase& dat
     return out;
 }
 
-std::string ReportBuilder::pendingAppointments(const model::ClinicDatabase& database) {
+std::string ReportBuilder::pendingAppointments(const ClinicManager& manager) {
     std::string out = header("Patients with Pending Appointments");
     out += pad("ID", -12) + pad("Patient", -24) + pad("Date / Time", -24) + pad("Doctor", -16) + "\n";
     out += RULE;
     out += "\n";
 
     int pendingCount = 0;
-    for (const model::Appointment& appointment : database.getAllAppointments()) {
+    for (const model::Appointment& appointment : manager.getAllAppointments()) {
         if (appointment.getStatus() != model::Appointment::STATUS_PENDING) {
             continue;
         }
 
-        const model::PatientRecord* patient = database.findPatientByID(appointment.getPatientID());
+        const model::PatientRecord* patient = manager.findPatientByID(appointment.getPatientID());
         const std::string patientName = (patient != nullptr) ? patient->getName() : "Unknown";
 
         out += pad(appointment.getAppointmentID(), -12)
@@ -116,12 +116,12 @@ std::string ReportBuilder::pendingAppointments(const model::ClinicDatabase& data
     return out;
 }
 
-std::string ReportBuilder::dailySummary(const model::ClinicDatabase& database) {
+std::string ReportBuilder::dailySummary(const ClinicManager& manager) {
     int completed = 0;
     int pending = 0;
     int cancelled = 0;
 
-    for (const model::Appointment& appointment : database.getAllAppointments()) {
+    for (const model::Appointment& appointment : manager.getAllAppointments()) {
         if (appointment.getStatus() == model::Appointment::STATUS_COMPLETED) {
             ++completed;
         } else if (appointment.getStatus() == model::Appointment::STATUS_PENDING) {
@@ -131,7 +131,7 @@ std::string ReportBuilder::dailySummary(const model::ClinicDatabase& database) {
         }
     }
 
-    const std::size_t total = database.getAllAppointments().size();
+    const std::size_t total = manager.getAllAppointments().size();
     const double completionRate = (total == 0) ? 0.0 : (completed * 100.0 / total);
 
     std::string out = header("Daily Appointment Summary");
@@ -149,10 +149,10 @@ std::string ReportBuilder::dailySummary(const model::ClinicDatabase& database) {
 }
 
 std::vector<std::pair<std::string, int>> ReportBuilder::completedVisitCounts(
-    const model::ClinicDatabase& database) {
+    const ClinicManager& manager) {
     std::map<std::string, int> counts;
 
-    for (const model::Appointment& appointment : database.getAllAppointments()) {
+    for (const model::Appointment& appointment : manager.getAllAppointments()) {
         if (appointment.getStatus() == model::Appointment::STATUS_COMPLETED) {
             ++counts[appointment.getPatientID()];
         }
@@ -166,8 +166,8 @@ std::vector<std::pair<std::string, int>> ReportBuilder::completedVisitCounts(
     return ranked;
 }
 
-std::string ReportBuilder::frequentPatients(const model::ClinicDatabase& database) {
-    std::vector<std::pair<std::string, int>> ranked = completedVisitCounts(database);
+std::string ReportBuilder::frequentPatients(const ClinicManager& manager) {
+    std::vector<std::pair<std::string, int>> ranked = completedVisitCounts(manager);
 
     // Selection sort on the visit count, best first. The list is short, so the
     // simple routine is enough.
@@ -191,7 +191,7 @@ std::string ReportBuilder::frequentPatients(const model::ClinicDatabase& databas
 
     int rank = 1;
     for (const auto& entry : ranked) {
-        const model::PatientRecord* patient = database.findPatientByID(entry.first);
+        const model::PatientRecord* patient = manager.findPatientByID(entry.first);
         const std::string patientName = (patient != nullptr) ? patient->getName() : "Unknown";
 
         out += padNumber(rank++, -8)
@@ -207,12 +207,12 @@ std::string ReportBuilder::frequentPatients(const model::ClinicDatabase& databas
     return out;
 }
 
-std::string ReportBuilder::dashboardSummary(const model::ClinicDatabase& database) {
+std::string ReportBuilder::dashboardSummary(const ClinicManager& manager) {
     int completed = 0;
     int pending = 0;
     int cancelled = 0;
 
-    for (const model::Appointment& appointment : database.getAllAppointments()) {
+    for (const model::Appointment& appointment : manager.getAllAppointments()) {
         if (appointment.getStatus() == model::Appointment::STATUS_COMPLETED) {
             ++completed;
         } else if (appointment.getStatus() == model::Appointment::STATUS_PENDING) {
@@ -223,9 +223,9 @@ std::string ReportBuilder::dashboardSummary(const model::ClinicDatabase& databas
     }
 
     std::string out;
-    out += line("Registered patients:", static_cast<int>(database.getPatientCount()));
-    out += line("Patients waiting:", static_cast<int>(database.getQueueSize()));
-    out += line("Appointments booked:", static_cast<int>(database.getAllAppointments().size()));
+    out += line("Registered patients:", static_cast<int>(manager.getPatientCount()));
+    out += line("Patients waiting:", static_cast<int>(manager.getQueueSize()));
+    out += line("Appointments booked:", static_cast<int>(manager.getAllAppointments().size()));
     out += line("  Completed:", completed);
     out += line("  Pending:", pending);
     out += line("  Cancelled:", cancelled);

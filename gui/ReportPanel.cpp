@@ -9,8 +9,8 @@
 namespace scapms {
 namespace gui {
 
-ReportPanel::ReportPanel(model::ClinicDatabase& database, QWidget* parent)
-    : QWidget(parent), database(database) {
+ReportPanel::ReportPanel(controller::ClinicManager& manager, QWidget* parent)
+    : QWidget(parent), manager(manager) {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(16, 16, 16, 16);
     layout->setSpacing(12);
@@ -47,13 +47,13 @@ void ReportPanel::onGenerateReport() {
 
     std::string report;
     if (reportIndex == 0) {
-        report = controller::ReportBuilder::categoryDistribution(database);
+        report = controller::ReportBuilder::categoryDistribution(manager);
     } else if (reportIndex == 1) {
-        report = controller::ReportBuilder::pendingAppointments(database);
+        report = controller::ReportBuilder::pendingAppointments(manager);
     } else if (reportIndex == 2) {
-        report = controller::ReportBuilder::dailySummary(database);
+        report = controller::ReportBuilder::dailySummary(manager);
     } else {
-        report = controller::ReportBuilder::frequentPatients(database);
+        report = controller::ReportBuilder::frequentPatients(manager);
     }
 
     txtReportOutput->setPlainText(QString::fromStdString(report));

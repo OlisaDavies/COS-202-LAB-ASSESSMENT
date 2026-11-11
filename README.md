@@ -38,34 +38,41 @@ console demonstration (`main.cpp`) and in the graphical program (`gui_main.cpp`)
 ## Folder layout
 
 ```
-model/       PatientRecord, Appointable, ScheduledPatient, GeneralPatient,
+model/       PatientRecord, Appointable, Billable, ScheduledPatient, GeneralPatient,
              EmergencyPatient, FollowUpPatient, Appointment, AdminAction, ClinicDatabase
-controller/  SearchEngine, SortEngine, ReportBuilder
+controller/  ClinicManager, AppointmentController, SearchEngine, SortEngine, ReportBuilder
 gui/         MainWindow, PatientPanel, AppointmentPanel, QueuePanel,
-             SearchPanel, ReportPanel, style.qss
+             SearchPanel, ReportPanel, AdminPanel, style.qss
 utils/       ClinicExceptions, DateUtil, FileHandler, IDGenerator, StringUtil
 main.cpp     the console demonstration
 gui_main.cpp the entry point of the graphical program
 ```
 
+The program is built in three layers. The **model** layer holds the data and
+the rules that keep it consistent, the **controller** layer holds the rules of
+the clinic and coordinates the work, and the **GUI** layer draws the screens
+and asks the controller to do the work. The screens never touch the database
+directly: every panel holds a `ClinicManager&` and asks it to do the work.
+
 ## Where each requirement is implemented
 
 | Requirement | Implementation |
 | --- | --- |
-| 1.a Abstract base class | `model/PatientRecord.h` - `displayPatient()`, `getSpecialDetail()`, `getTypeLabel()` and `clone()` are pure virtual |
+| 1.a Abstract base class | `model/PatientRecord.h` - `getTypeLabel()`, `getPatientReport()`, `getSpecialDetail()` and `clone()` are pure virtual; `displayPatient()` and `restoreFrom()` are concrete methods shared by every category |
 | 1.b Subclasses | `model/GeneralPatient.h`, `model/EmergencyPatient.h`, `model/FollowUpPatient.h` |
-| 1.c Interface | `model/Appointable.h` - `scheduleAppointment()` and `cancelAppointment()`, called through a `dynamic_cast` in `model/ClinicDatabase.cpp` |
-| 1.d Runtime polymorphism | `main.cpp` walks the records through a `PatientRecord*` and calls `displayPatient()`; `utils/FileHandler.cpp` picks the type specific fields with `dynamic_cast` |
-| 1.e Composition | `model/ClinicDatabase.h` holds the patient and appointment collections |
-| 1.f / 2 Organisation | The four layers above, each with its own namespace, every class split into a header and a source file |
-| 3.a Vector | `model/ClinicDatabase.h` - `std::vector<PatientRecord*> patients` |
+| 1.c Interface | `model/Appointable.h` - `scheduleAppointment()`, `cancelAppointment()` and the overloaded `cancelAppointment(id)`; `model/Billable.h` is a second interface, so a class can implement more than one |
+| 1.d Runtime polymorphism | `main.cpp` walks the records through a `PatientRecord*` and calls `displayPatient()`, which dispatches to the version of the category; `gui/PatientPanel.cpp` shows the same report through the base pointer |
+| 1.e Composition | `model/PatientRecord.h` owns the `std::vector<Appointment> appointments` collection, so a patient holds one or more appointments; `model/ClinicDatabase.h` owns the patient records |
+| 1.f / 2 Organisation | The four layers above, each with its own namespace; every class with behaviour is split into a header and a source file |
+| 2 Separation of responsibilities | `controller/ClinicManager.h` is the only class the GUI talks to. `controller/AppointmentController.h` holds the rules of a booking. `model/ClinicDatabase.h` only stores and finds. The GUI never calls the database directly. |
+| 3.a Vector | `model/PatientRecord.h` - `std::vector<Appointment> appointments`; `model/ClinicDatabase.h` - `std::vector<std::unique_ptr<PatientRecord>> patients` |
 | 3.b Queue | `model/ClinicDatabase.h` - `std::queue<PatientRecord*> waitingQueue` |
 | 3.c Stack | `model/ClinicDatabase.h` - `std::stack<AdminAction> undoStack`, with `model/AdminAction.h` holding the copy of the record that is put back |
-| 3.d Fixed-size array | `model/ClinicDatabase.h` - `PatientRecord* recentPatients[10]` |
+| 3.d Fixed-size array | `model/ClinicDatabase.h` - `PatientRecord* recentPatients[10]`, shown in the Administration panel |
 | 4 Searching | `controller/SearchEngine.h` - linear by ID, binary by ID on sorted records, recursive by name, linear by category |
 | 5 Sorting | `controller/SortEngine.h` - selection sort and merge sort, chosen from a combo box on the Search & Sort panel |
 | 6 Events | `gui/MainWindow.cpp` and the panels - button clicks, menu actions, combo box changes and a `QTimer` that refreshes the status bar |
-| 7 Panels | Patient Records, Appointments, Waiting Queue, Search & Sort, Clinic Reports |
+| 7 Panels | Patient Records, Appointments, Waiting Queue, Search & Sort, Clinic Reports, Administration |
 | 8 Layout | `QFormLayout` for the forms, `QHBoxLayout` and `QVBoxLayout` for the panels |
 | 9 Advanced GUI | 9.a colour coded rows, 9.b fields that change with the patient type, 9.c file dialogs, 9.d status bar timer, 9.e validation messages, 9.f shortcuts, 9.g tooltips |
 | 10 Exceptions | `utils/ClinicExceptions.h` - `DuplicateIDException`, `InvalidPatientDataException`, `InvalidAppointmentException`, `FileIOException` |

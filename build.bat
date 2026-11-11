@@ -18,7 +18,10 @@ cl /nologo /EHsc /std:c++17 /W3 /D_CRT_SECURE_NO_WARNINGS /Fe:build\SCAPMS.exe ^
    model\EmergencyPatient.cpp ^
    model\FollowUpPatient.cpp ^
    model\Appointment.cpp ^
+   model\AdminAction.cpp ^
    model\ClinicDatabase.cpp ^
+   controller\ClinicManager.cpp ^
+   controller\AppointmentController.cpp ^
    controller\SearchEngine.cpp ^
    controller\SortEngine.cpp ^
    controller\ReportBuilder.cpp ^

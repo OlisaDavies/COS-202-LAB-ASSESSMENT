@@ -4,28 +4,9 @@
 #include <iostream>
 
 #include "../utils/ClinicExceptions.h"
-#include "../utils/DateUtil.h"
 
 namespace scapms {
 namespace model {
-
-namespace {
-
-// True when the first appointment happens before the second one.
-bool happensEarlier(const Appointment& first, const Appointment& second) {
-    if (first.getDate() != second.getDate()) {
-        return first.getDate() < second.getDate();
-    }
-
-    int firstMinutes = utils::timeToMinutes(first.getTime());
-    int secondMinutes = utils::timeToMinutes(second.getTime());
-    if (firstMinutes < 0 || secondMinutes < 0) {
-        return first.getTime() < second.getTime();
-    }
-    return firstMinutes < secondMinutes;
-}
-
-} // namespace
 
 ClinicDatabase::ClinicDatabase() : recentCount(0) {
     for (int i = 0; i < CACHE_SIZE; ++i) {
@@ -37,102 +18,87 @@ ClinicDatabase::~ClinicDatabase() {
     clearAll();
 }
 
-void ClinicDatabase::addPatient(PatientRecord* patient) {
-    addPatientInternal(patient, true);
+void ClinicDatabase::addPatient(std::unique_ptr<PatientRecord> patient) {
+    addPatientInternal(std::move(patient), true);
 }
 
-void ClinicDatabase::addPatientInternal(PatientRecord* patient, bool trackUndo) {
+void ClinicDatabase::addPatientWithoutUndo(std::unique_ptr<PatientRecord> patient) {
+    addPatientInternal(std::move(patient), false);
+}
+
+void ClinicDatabase::addPatientInternal(std::unique_ptr<PatientRecord> patient, bool trackUndo) {
     if (patient == nullptr) {
         throw utils::InvalidPatientDataException("Cannot register a null patient record.");
     }
 
-    if (patient->getAge() < 0 || patient->getAge() > 120) {
-        const int badAge = patient->getAge();
-        delete patient;
-        throw utils::InvalidPatientDataException(
-            "Patient age (" + std::to_string(badAge) + ") must be between 0 and 120 years.");
-    }
-
-    if (patient->getName().empty()) {
-        delete patient;
-        throw utils::InvalidPatientDataException("Patient name cannot be empty.");
-    }
-
-    if (patient->getPatientID().empty()) {
-        delete patient;
-        throw utils::InvalidPatientDataException("Patient ID cannot be empty.");
-    }
-
+    // The rule that a patient identifier is used only once belongs to the
+    // data itself, so it is kept here. The other rules of the clinic are
+    // checked by the controller before it calls this method.
     if (findPatientByID(patient->getPatientID()) != nullptr) {
-        const std::string duplicateID = patient->getPatientID();
-        delete patient;
-        throw utils::DuplicateIDException(duplicateID);
+        throw utils::DuplicateIDException(patient->getPatientID());
     }
 
-    patients.push_back(patient);
-    touchRecentPatient(patient);
+    const std::string patientID = patient->getPatientID();
+    patients.push_back(std::move(patient));
+    touchRecentPatient(patients.back().get());
 
     if (trackUndo) {
         // Undoing this removes the record again, so no copy is needed here.
         undoStack.push(AdminAction(AdminAction::Type::AddPatient,
-                                   "Add Patient " + patient->getPatientID(),
-                                   patient->getPatientID()));
+                                   "Add Patient " + patientID,
+                                   patientID));
     }
 }
 
-void ClinicDatabase::addPatients(const std::vector<PatientRecord*>& newPatients,
-                                 std::vector<std::string>* warnings) {
-    for (PatientRecord* patient : newPatients) {
-        try {
-            addPatientInternal(patient, false);
-        } catch (const utils::ClinicException& error) {
-            if (warnings != nullptr) {
-                warnings->push_back(std::string("a patient was skipped: ") + error.what());
-            }
-        }
-    }
-}
-
-bool ClinicDatabase::removePatientInternal(const std::string& id, PatientRecord** backupOut) {
+bool ClinicDatabase::removePatientInternal(const std::string& id,
+                                           std::unique_ptr<PatientRecord>* backupOut) {
     for (auto it = patients.begin(); it != patients.end(); ++it) {
         if ((*it)->getPatientID() != id) {
             continue;
         }
 
-        PatientRecord* target = *it;
+        PatientRecord* target = it->get();
 
         if (backupOut != nullptr) {
-            *backupOut = target->clone();       // the undo stack owns this copy
+            // The undo stack owns this copy.
+            backupOut->reset(target->clone());
         }
 
         removeRecentPatient(target);
         removeFromWaitingQueue(target);
 
+        // The unique pointer frees the record when it leaves the vector.
         patients.erase(it);
-        delete target;                          // the database owned this record
         return true;
     }
     return false;
 }
 
 bool ClinicDatabase::removePatient(const std::string& id) {
-    PatientRecord* backup = nullptr;
+    std::unique_ptr<PatientRecord> backup;
     if (!removePatientInternal(id, &backup)) {
         return false;
     }
 
     undoStack.push(AdminAction(AdminAction::Type::DeletePatient,
-                               "Delete Patient " + id, id, backup));
+                               "Delete Patient " + id, id, std::move(backup)));
     return true;
 }
 
-void ClinicDatabase::pushPatientSnapshot(PatientRecord* snapshot) {
+void ClinicDatabase::pushPatientSnapshot(std::unique_ptr<PatientRecord> snapshot) {
     if (snapshot == nullptr) {
         return;
     }
+
+    // The identifier is read into a local variable before the snapshot is
+    // moved away. The order in which the arguments of a call are evaluated
+    // is not fixed by the standard, so the move must not be written in the
+    // same call as the reads.
+    const std::string patientID = snapshot->getPatientID();
+
     undoStack.push(AdminAction(AdminAction::Type::UpdatePatient,
-                               "Update Patient " + snapshot->getPatientID(),
-                               snapshot->getPatientID(), snapshot));
+                               "Update Patient " + patientID,
+                               patientID, std::move(snapshot)));
 }
 
 PatientRecord* ClinicDatabase::findPatientByID(const std::string& id) {
@@ -142,43 +108,40 @@ PatientRecord* ClinicDatabase::findPatientByID(const std::string& id) {
         }
     }
 
-    for (PatientRecord* patient : patients) {
+    for (std::unique_ptr<PatientRecord>& patient : patients) {
         if (patient->getPatientID() == id) {
-            touchRecentPatient(patient);
-            return patient;
+            touchRecentPatient(patient.get());
+            return patient.get();
         }
     }
     return nullptr;
 }
 
-PatientRecord* ClinicDatabase::findPatientByID(const std::string& id) const {
-    for (PatientRecord* patient : patients) {
+const PatientRecord* ClinicDatabase::findPatientByID(const std::string& id) const {
+    for (const std::unique_ptr<PatientRecord>& patient : patients) {
         if (patient->getPatientID() == id) {
-            return patient;
+            return patient.get();
         }
     }
     return nullptr;
 }
 
-std::vector<Appointment> ClinicDatabase::getAppointmentsFor(const std::string& patientID) const {
-    std::vector<Appointment> result;
-    for (const Appointment& appointment : appointments) {
-        if (appointment.getPatientID() == patientID) {
-            result.push_back(appointment);
-        }
+std::vector<PatientRecord*> ClinicDatabase::getAllPatients() const {
+    std::vector<PatientRecord*> records;
+    records.reserve(patients.size());
+    for (const std::unique_ptr<PatientRecord>& patient : patients) {
+        records.push_back(patient.get());
     }
-    return result;
+    return records;
 }
 
-std::size_t ClinicDatabase::getPendingCountFor(const std::string& patientID) const {
-    std::size_t pending = 0;
-    for (const Appointment& appointment : appointments) {
-        if (appointment.getPatientID() == patientID &&
-            appointment.getStatus() == Appointment::STATUS_PENDING) {
-            ++pending;
-        }
+std::vector<Appointment> ClinicDatabase::getAllAppointments() const {
+    std::vector<Appointment> all;
+    for (const std::unique_ptr<PatientRecord>& patient : patients) {
+        const std::vector<Appointment>& owned = patient->getAppointments();
+        all.insert(all.end(), owned.begin(), owned.end());
     }
-    return pending;
+    return all;
 }
 
 void ClinicDatabase::enqueuePatient(PatientRecord* patient) {
@@ -206,31 +169,67 @@ std::vector<PatientRecord*> ClinicDatabase::getWaitingQueue() const {
     return order;
 }
 
+PatientRecord* ClinicDatabase::findOwnerOfAppointment(const std::string& appointmentID) {
+    for (std::unique_ptr<PatientRecord>& patient : patients) {
+        if (patient->hasAppointment(appointmentID)) {
+            return patient.get();
+        }
+    }
+    return nullptr;
+}
+
+bool ClinicDatabase::appointmentIDIsTaken(const std::string& appointmentID) const {
+    for (const std::unique_ptr<PatientRecord>& patient : patients) {
+        if (patient->hasAppointment(appointmentID)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 void ClinicDatabase::addAppointment(const Appointment& appointment) {
     addAppointmentInternal(appointment, true);
 }
 
+void ClinicDatabase::addAppointmentWithoutUndo(const Appointment& appointment) {
+    addAppointmentInternal(appointment, false);
+}
+
 void ClinicDatabase::addAppointmentInternal(const Appointment& appointment, bool trackUndo) {
+    // The rules of the clinic are checked by the controller before it calls
+    // this method. What is left here are the rules that follow from the
+    // shape of the data itself.
     if (appointment.getAppointmentID().empty() || appointment.getPatientID().empty() ||
         appointment.getDate().empty() || appointment.getTime().empty()) {
         throw utils::InvalidAppointmentException(
             "An appointment needs an ID, a patient, a date and a time.");
     }
 
-    for (const Appointment& existing : appointments) {
-        if (existing.getAppointmentID() == appointment.getAppointmentID()) {
-            throw utils::InvalidAppointmentException(
-                "Appointment ID [" + appointment.getAppointmentID() + "] is already booked.");
-        }
+    if (appointmentIDIsTaken(appointment.getAppointmentID())) {
+        throw utils::InvalidAppointmentException(
+            "Appointment ID [" + appointment.getAppointmentID() + "] is already booked.");
     }
 
-    if (findPatientByID(appointment.getPatientID()) == nullptr) {
+    PatientRecord* patient = findPatientByID(appointment.getPatientID());
+    if (patient == nullptr) {
         throw utils::InvalidAppointmentException(
             "No patient with ID [" + appointment.getPatientID() + "] is registered.");
     }
 
-    appointments.push_back(appointment);
-    syncPatientBooking(appointment.getPatientID());
+    // Only the categories that answer the Appointable interface can hold a
+    // booking. The controller checks this rule first and reports it to the
+    // staff, so reaching this point means the booking is allowed.
+    Appointable* bookable = dynamic_cast<Appointable*>(patient);
+    if (bookable == nullptr) {
+        throw utils::InvalidAppointmentException(
+            "A patient of the category [" + patient->getTypeLabel() +
+            "] is not booked in advance. Please use the waiting room instead.");
+    }
+
+    if (!bookable->scheduleAppointment(appointment)) {
+        throw utils::InvalidAppointmentException(
+            "The appointment [" + appointment.getAppointmentID() + "] could not be booked.");
+    }
 
     if (trackUndo) {
         undoStack.push(AdminAction(AdminAction::Type::AddAppointment,
@@ -239,65 +238,33 @@ void ClinicDatabase::addAppointmentInternal(const Appointment& appointment, bool
     }
 }
 
-void ClinicDatabase::addAppointments(const std::vector<Appointment>& newAppointments,
-                                     std::vector<std::string>* warnings) {
-    for (const Appointment& appointment : newAppointments) {
-        try {
-            addAppointmentInternal(appointment, false);
-        } catch (const utils::ClinicException& error) {
-            if (warnings != nullptr) {
-                warnings->push_back(std::string("an appointment was skipped: ") + error.what());
-            }
-        }
-    }
-}
-
 bool ClinicDatabase::cancelAppointment(const std::string& appointmentID) {
-    for (Appointment& appointment : appointments) {
-        if (appointment.getAppointmentID() != appointmentID) {
-            continue;
-        }
-
-        const Appointment previous = appointment;
-        appointment.setStatus(Appointment::STATUS_CANCELLED);
-        syncPatientBooking(appointment.getPatientID());
-
-        undoStack.push(AdminAction(AdminAction::Type::CancelAppointment,
-                                   "Cancel Appointment " + appointmentID,
-                                   appointment.getPatientID(), previous));
-        return true;
+    PatientRecord* owner = findOwnerOfAppointment(appointmentID);
+    if (owner == nullptr) {
+        return false;
     }
-    return false;
-}
 
-const Appointment* ClinicDatabase::nextPendingAppointment(const std::string& patientID) const {
-    const Appointment* earliest = nullptr;
-
-    for (const Appointment& appointment : appointments) {
-        if (appointment.getPatientID() != patientID ||
-            appointment.getStatus() != Appointment::STATUS_PENDING) {
-            continue;
-        }
-        if (earliest == nullptr || happensEarlier(appointment, *earliest)) {
-            earliest = &appointment;
-        }
-    }
-    return earliest;
-}
-
-void ClinicDatabase::syncPatientBooking(const std::string& patientID) {
-    PatientRecord* patient = findPatientByID(patientID);
-    Appointable* bookable = dynamic_cast<Appointable*>(patient);
+    Appointable* bookable = dynamic_cast<Appointable*>(owner);
     if (bookable == nullptr) {
-        return;                                 // this category cannot be booked
+        return false;
     }
 
-    const Appointment* next = nextPendingAppointment(patientID);
-    if (next != nullptr) {
-        bookable->scheduleAppointment(next->getDate(), next->getTime());
-    } else {
-        bookable->cancelAppointment();
+    // The state before the cancellation is kept, so that the step can be
+    // undone later.
+    const Appointment* current = owner->findAppointment(appointmentID);
+    if (current == nullptr) {
+        return false;
     }
+    const Appointment previous = *current;
+
+    if (!bookable->cancelAppointment(appointmentID)) {
+        return false;
+    }
+
+    undoStack.push(AdminAction(AdminAction::Type::CancelAppointment,
+                               "Cancel Appointment " + appointmentID,
+                               owner->getPatientID(), previous));
+    return true;
 }
 
 std::string ClinicDatabase::undoLastAction() {
@@ -305,7 +272,9 @@ std::string ClinicDatabase::undoLastAction() {
         return "";
     }
 
-    AdminAction lastAction = undoStack.top();
+    // The entry is moved out of the stack, because it owns a record and
+    // cannot be copied.
+    AdminAction lastAction = std::move(undoStack.top());
     undoStack.pop();
 
     switch (lastAction.type) {
@@ -323,11 +292,9 @@ std::string ClinicDatabase::undoLastAction() {
                 return "";
             }
             // The copy on the stack becomes a live record again.
-            PatientRecord* restored = lastAction.patientBackup;
-            lastAction.patientBackup = nullptr;
-            patients.push_back(restored);
+            PatientRecord* restored = lastAction.patientBackup.get();
+            patients.push_back(std::move(lastAction.patientBackup));
             touchRecentPatient(restored);
-            syncPatientBooking(restored->getPatientID());
             return lastAction.description;
         }
 
@@ -339,56 +306,39 @@ std::string ClinicDatabase::undoLastAction() {
             if (current != nullptr) {
                 current->restoreFrom(*lastAction.patientBackup);
             }
-            delete lastAction.patientBackup;
-            lastAction.patientBackup = nullptr;
             return lastAction.description;
         }
 
         case AdminAction::Type::AddAppointment: {
             const std::string appointmentID = lastAction.appointmentBackup.getAppointmentID();
-            for (auto it = appointments.begin(); it != appointments.end(); ++it) {
-                if (it->getAppointmentID() == appointmentID) {
-                    const std::string patientID = it->getPatientID();
-                    appointments.erase(it);
-                    syncPatientBooking(patientID);
-                    return lastAction.description;
-                }
+            PatientRecord* owner = findOwnerOfAppointment(appointmentID);
+            if (owner != nullptr) {
+                owner->removeAppointment(appointmentID);
             }
-            return "";
+            return lastAction.description;
         }
 
         case AdminAction::Type::CancelAppointment: {
             const Appointment& previous = lastAction.appointmentBackup;
-            for (Appointment& appointment : appointments) {
-                if (appointment.getAppointmentID() == previous.getAppointmentID()) {
-                    appointment.setStatus(previous.getStatus());
-                    syncPatientBooking(previous.getPatientID());
-                    return lastAction.description;
-                }
+            PatientRecord* owner = findOwnerOfAppointment(previous.getAppointmentID());
+            if (owner != nullptr) {
+                owner->restoreAppointment(previous);
             }
-            return "";
+            return lastAction.description;
         }
     }
     return "";
 }
 
 void ClinicDatabase::clearAll() {
+    // The undo entries own their copies of the records, so popping them off
+    // the stack frees those copies.
     while (!undoStack.empty()) {
-        AdminAction action = undoStack.top();
         undoStack.pop();
-
-        // The stack holds a copy of every record it can undo.
-        if (action.patientBackup != nullptr) {
-            delete action.patientBackup;
-        }
     }
 
-    for (PatientRecord* patient : patients) {
-        delete patient;
-    }
+    // The unique pointers free the records when the vector is cleared.
     patients.clear();
-
-    appointments.clear();
 
     while (!waitingQueue.empty()) {
         waitingQueue.pop();
@@ -472,19 +422,22 @@ void ClinicDatabase::displayAllPatients() const {
         std::cout << "No patients registered in the database." << std::endl;
         return;
     }
-    for (const PatientRecord* patient : patients) {
+    for (const std::unique_ptr<PatientRecord>& patient : patients) {
+        // The call goes through the base class pointer, so the right
+        // category answers it at run time.
         patient->displayPatient();
     }
 }
 
 void ClinicDatabase::displayAllAppointments() const {
+    const std::vector<Appointment> all = getAllAppointments();
     std::cout << "\n========== CLINIC APPOINTMENTS SCHEDULE ("
-              << appointments.size() << ") ==========" << std::endl;
-    if (appointments.empty()) {
+              << all.size() << ") ==========" << std::endl;
+    if (all.empty()) {
         std::cout << "No appointments currently scheduled." << std::endl;
         return;
     }
-    for (const Appointment& appointment : appointments) {
+    for (const Appointment& appointment : all) {
         appointment.displayAppointment();
     }
 }

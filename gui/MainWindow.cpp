@@ -3,8 +3,6 @@
 #include <QAction>
 #include <QApplication>
 #include <QDateTime>
-#include <QDir>
-#include <QFile>
 #include <QFile>
 #include <QFileDialog>
 #include <QFileInfo>
@@ -17,8 +15,10 @@
 #include <QShowEvent>
 #include <QStatusBar>
 
+#include <memory>
+#include <vector>
+
 #include "../utils/ClinicExceptions.h"
-#include "../utils/FileHandler.h"
 #include "../model/GeneralPatient.h"
 #include "../model/EmergencyPatient.h"
 #include "../model/FollowUpPatient.h"
@@ -69,17 +69,19 @@ void MainWindow::setupUI() {
     tabWidget = new QTabWidget(this);
     setCentralWidget(tabWidget);
 
-    patientPanel = new PatientPanel(database, this);
-    appointmentPanel = new AppointmentPanel(database, this);
-    queuePanel = new QueuePanel(database, this);
-    searchPanel = new SearchPanel(database, this);
-    reportPanel = new ReportPanel(database, this);
+    patientPanel = new PatientPanel(manager, this);
+    appointmentPanel = new AppointmentPanel(manager, this);
+    queuePanel = new QueuePanel(manager, this);
+    searchPanel = new SearchPanel(manager, this);
+    reportPanel = new ReportPanel(manager, this);
+    adminPanel = new AdminPanel(manager, this);
 
     tabWidget->addTab(patientPanel, "Patient Records");
     tabWidget->addTab(appointmentPanel, "Appointments");
     tabWidget->addTab(queuePanel, "Waiting Queue");
     tabWidget->addTab(searchPanel, "Search && Sort");
     tabWidget->addTab(reportPanel, "Clinic Reports");
+    tabWidget->addTab(adminPanel, "Administration");
 
     // Every panel tells the window when it changed the data.
     connect(patientPanel, &PatientPanel::dataChanged, this, &MainWindow::onDataChanged);
@@ -87,6 +89,7 @@ void MainWindow::setupUI() {
     connect(queuePanel, &QueuePanel::dataChanged, this, &MainWindow::onDataChanged);
     connect(searchPanel, &SearchPanel::dataChanged, this, &MainWindow::onDataChanged);
     connect(reportPanel, &ReportPanel::dataChanged, this, &MainWindow::onDataChanged);
+    connect(adminPanel, &AdminPanel::dataChanged, this, &MainWindow::onDataChanged);
     connect(patientPanel, &PatientPanel::undoRequested, this, &MainWindow::onUndoAction);
 
     // The window is sized after the panels are in place, so that it is big
@@ -104,12 +107,12 @@ void MainWindow::setupMenuBar() {
     QAction* actSave = fileMenu->addAction("&Save as...");
     actSave->setShortcut(QKeySequence("Ctrl+S"));
     actSave->setToolTip("Write the patients and the appointments to CSV files.");
-    connect(actSave, &QAction::triggered, this, &MainWindow::onSaveData);
+    connect(actSave, &QAction::triggered, this, [this]() { adminPanel->saveData(); });
 
     QAction* actLoad = fileMenu->addAction("&Load...");
     actLoad->setShortcut(QKeySequence("Ctrl+O"));
     actLoad->setToolTip("Read the patients and the appointments from CSV files.");
-    connect(actLoad, &QAction::triggered, this, &MainWindow::onLoadData);
+    connect(actLoad, &QAction::triggered, this, [this]() { adminPanel->loadData(); });
 
     fileMenu->addSeparator();
 
@@ -150,36 +153,41 @@ void MainWindow::onTimerTick() {
     const QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
     statusBar()->showMessage(QString("%1   |   Patients: %2   |   Waiting: %3")
                              .arg(time)
-                             .arg(database.getPatientCount())
-                             .arg(database.getQueueSize()));
+                             .arg(manager.getPatientCount())
+                             .arg(manager.getQueueSize()));
 }
 
 void MainWindow::loadSampleData() {
-    database.addPatient(new model::GeneralPatient("GEN-101", "Amaka Okonkwo", 28,
-                                                  "+2348073451298", 4500.00));
-    database.addPatient(new model::EmergencyPatient("EMG-999", "Davies Johnson", 22,
-                                                    "+2348034874562", 1, "Acute trauma"));
-    database.addPatient(new model::FollowUpPatient("FOL-205", "Babatunde Alabi", 45,
-                                                   "+2348067624513", "2026-10-20", "Dr. Funke"));
-    database.addPatient(new model::GeneralPatient("GEN-005", "Chioma Eze", 19,
-                                                  "+2348091837465", 5000.00));
-    database.addPatient(new model::EmergencyPatient("EMG-102", "Zainab Bello", 32,
-                                                    "+2348019283756", 2, "Fracture"));
-    database.addPatient(new model::FollowUpPatient("FOL-206", "Ngozi Emeka", 61,
-                                                   "+2348075192648", "2026-11-02", "Dr. Okafor"));
+    manager.registerPatient(
+        std::make_unique<model::GeneralPatient>("GEN-101", "Amaka Okonkwo", 28,
+                                                "+2348073451298", 4500.00));
+    manager.registerPatient(
+        std::make_unique<model::EmergencyPatient>("EMG-999", "Davies Johnson", 22,
+                                                  "+2348034874562", 1, "Acute trauma"));
+    manager.registerPatient(
+        std::make_unique<model::FollowUpPatient>("FOL-205", "Babatunde Alabi", 45,
+                                                 "+2348067624513",
+                                                 "2026-10-20", "Dr. Funke"));
+    manager.registerPatient(
+        std::make_unique<model::GeneralPatient>("GEN-005", "Chioma Eze", 19,
+                                                "+2348091837465", 5000.00));
+    manager.registerPatient(
+        std::make_unique<model::EmergencyPatient>("EMG-102", "Zainab Bello", 32,
+                                                  "+2348019283756", 2, "Fracture"));
+    manager.registerPatient(
+        std::make_unique<model::FollowUpPatient>("FOL-206", "Ngozi Emeka", 61,
+                                                 "+2348075192648",
+                                                 "2026-11-02", "Dr. Okafor"));
 
-    database.addAppointment(model::Appointment("APT-1001", "GEN-101", "2026-11-15",
-                                               "10:30 AM", "Dr. Adeyemi",
-                                               model::Appointment::STATUS_PENDING));
-    database.addAppointment(model::Appointment("APT-1002", "FOL-205", "2026-11-20",
-                                               "02:00 PM", "Dr. Funke",
-                                               model::Appointment::STATUS_COMPLETED));
-    database.addAppointment(model::Appointment("APT-1003", "GEN-005", "2026-11-22",
-                                               "11:00 AM", "Dr. Adeyemi",
-                                               model::Appointment::STATUS_PENDING));
-    database.addAppointment(model::Appointment("APT-1004", "EMG-999", "2026-11-10",
-                                               "01:15 PM", "Dr. Trauma",
-                                               model::Appointment::STATUS_COMPLETED));
+    manager.scheduleAppointment(model::Appointment("APT-1001", "GEN-101", "2026-11-15",
+                                                   "10:30 AM", "Dr. Adeyemi",
+                                                   model::Appointment::STATUS_PENDING));
+    manager.scheduleAppointment(model::Appointment("APT-1002", "FOL-205", "2026-11-20",
+                                                   "02:00 PM", "Dr. Funke",
+                                                   model::Appointment::STATUS_COMPLETED));
+    manager.scheduleAppointment(model::Appointment("APT-1003", "GEN-005", "2026-11-22",
+                                                   "11:00 AM", "Dr. Adeyemi",
+                                                   model::Appointment::STATUS_PENDING));
 }
 
 void MainWindow::refreshAll() {
@@ -188,6 +196,7 @@ void MainWindow::refreshAll() {
     queuePanel->refresh();
     searchPanel->refresh();
     reportPanel->refresh();
+    adminPanel->refresh();
 }
 
 void MainWindow::onDataChanged() {
@@ -195,7 +204,7 @@ void MainWindow::onDataChanged() {
 }
 
 void MainWindow::onUndoAction() {
-    const std::string undone = database.undoLastAction();
+    const std::string undone = manager.undoLastAction();
 
     refreshAll();
 
@@ -205,32 +214,6 @@ void MainWindow::onUndoAction() {
         QMessageBox::information(this, "Undo",
                                  QString::fromStdString(undone) + " was undone.");
     }
-}
-
-void MainWindow::onSaveData() {
-    const QString patientFile = QFileDialog::getSaveFileName(
-        this, "Save the patients", "patients.csv", "CSV files (*.csv)");
-    if (patientFile.isEmpty()) {
-        return;
-    }
-
-    const QString appointmentFile = QFileDialog::getSaveFileName(
-        this, "Save the appointments", "appointments.csv", "CSV files (*.csv)");
-    if (appointmentFile.isEmpty()) {
-        return;
-    }
-
-    try {
-        utils::FileHandler::savePatients(patientFile.toStdString(), database.getAllPatients());
-        utils::FileHandler::saveAppointments(appointmentFile.toStdString(),
-                                             database.getAllAppointments());
-    } catch (const utils::ClinicException& error) {
-        QMessageBox::critical(this, "Save error", error.what());
-        return;
-    }
-
-    QMessageBox::information(this, "Saved",
-                             "The patient and appointment data was written to CSV files.");
 }
 
 void MainWindow::showWarnings(const std::vector<std::string>& warnings) {
@@ -249,50 +232,6 @@ void MainWindow::showWarnings(const std::vector<std::string>& warnings) {
     box.setText("The file was loaded, but the rows below were skipped:");
     box.setInformativeText(text);
     box.exec();
-}
-
-void MainWindow::onLoadData() {
-    const QString patientFile = QFileDialog::getOpenFileName(
-        this, "Open the patient file", "", "CSV files (*.csv)");
-    if (patientFile.isEmpty()) {
-        return;
-    }
-
-    try {
-        std::vector<std::string> warnings;
-
-        std::vector<model::PatientRecord*> loadedPatients =
-            utils::FileHandler::loadPatients(patientFile.toStdString(), &warnings);
-        if (loadedPatients.empty()) {
-            QMessageBox::warning(this, "Empty file",
-                                 "There are no patient records in that file.");
-            return;
-        }
-
-        // The appointment file is expected to sit next to the patient file.
-        const QString appointmentFile =
-            QDir(QFileInfo(patientFile).absolutePath()).filePath("appointments.csv");
-
-        std::vector<model::Appointment> loadedAppointments;
-        if (QFileInfo::exists(appointmentFile)) {
-            loadedAppointments =
-                utils::FileHandler::loadAppointments(appointmentFile.toStdString(), &warnings);
-        }
-
-        database.clearAll();
-        database.addPatients(loadedPatients, &warnings);
-        database.addAppointments(loadedAppointments, &warnings);
-
-        refreshAll();
-        showWarnings(warnings);
-
-        QMessageBox::information(
-            this, "Loaded",
-            QString::number(database.getPatientCount()) + " patients and " +
-            QString::number(database.getAllAppointments().size()) + " appointments were loaded.");
-    } catch (const utils::ClinicException& error) {
-        QMessageBox::critical(this, "Load error", error.what());
-    }
 }
 
 void MainWindow::onAbout() {

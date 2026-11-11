@@ -10,15 +10,15 @@
 #include <QVBoxLayout>
 
 #include "../model/Appointment.h"
+#include "../model/Appointable.h"
 #include "../utils/ClinicExceptions.h"
 #include "../utils/DateUtil.h"
-#include "../utils/IDGenerator.h"
 
 namespace scapms {
 namespace gui {
 
-AppointmentPanel::AppointmentPanel(model::ClinicDatabase& database, QWidget* parent)
-    : QWidget(parent), database(database), aptIdEdited(false) {
+AppointmentPanel::AppointmentPanel(controller::ClinicManager& manager, QWidget* parent)
+    : QWidget(parent), manager(manager), aptIdEdited(false) {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(16, 16, 16, 16);
     layout->setSpacing(16);
@@ -120,18 +120,21 @@ QWidget* AppointmentPanel::buildSchedule(QWidget* parent) {
 }
 
 QString AppointmentPanel::nextAppointmentId() const {
-    std::vector<std::string> used;
-    for (const model::Appointment& appointment : database.getAllAppointments()) {
-        used.push_back(appointment.getAppointmentID());
-    }
-    return QString::fromStdString(utils::IDGenerator::nextAppointmentId(used));
+    // The controller knows which identifiers are already in use.
+    return QString::fromStdString(manager.appointments().suggestAppointmentId());
 }
 
 void AppointmentPanel::refreshPatientCombo() {
     const QString previous = cmbAptPatientID->currentData().toString();
 
     cmbAptPatientID->clear();
-    for (const model::PatientRecord* patient : database.getAllPatients()) {
+    for (const model::PatientRecord* patient : manager.getAllPatients()) {
+        // Only the categories that answer the Appointable interface can be
+        // booked. An emergency case is seen in the waiting room instead.
+        if (dynamic_cast<const model::Appointable*>(patient) == nullptr) {
+            continue;
+        }
+
         const QString entry = QString::fromStdString(patient->getPatientID() + " - " +
                                                       patient->getName()) +
                                " (" + QString::fromStdString(patient->getTypeLabel()) + ")";
@@ -180,7 +183,7 @@ void AppointmentPanel::onScheduleAppointment() {
                                               date.toStdString(), time.toStdString(),
                                               doctor.toStdString(),
                                               model::Appointment::STATUS_PENDING);
-        database.addAppointment(appointment);
+        manager.scheduleAppointment(appointment);
     } catch (const utils::ClinicException& error) {
         QMessageBox::critical(this, "Booking error", error.what());
         return;
@@ -204,7 +207,7 @@ void AppointmentPanel::onCancelSelectedAppointment() {
 
     const QString appointmentID = tableAppointments->item(row, 0)->text();
 
-    if (!database.cancelAppointment(appointmentID.toStdString())) {
+    if (!manager.cancelAppointment(appointmentID.toStdString())) {
         QMessageBox::warning(this, "Not found",
                              "That appointment is no longer scheduled.");
         return;
@@ -224,7 +227,7 @@ void AppointmentPanel::refresh() {
         txtAptID->setText(nextAppointmentId());
     }
 
-    const std::vector<model::Appointment>& appointments = database.getAllAppointments();
+    const std::vector<model::Appointment> appointments = manager.getAllAppointments();
     tableAppointments->setRowCount(static_cast<int>(appointments.size()));
 
     for (int i = 0; i < static_cast<int>(appointments.size()); ++i) {
