@@ -19,6 +19,20 @@ int timeToMinutes(const std::string& time) {
         return -1;
     }
 
+    // The marker has to be a real AM or PM. Without this check a time such
+    // as "10:30 XM" would be accepted and stored as bad data.
+    if (meridiem[0] != 'A' && meridiem[0] != 'P') {
+        return -1;
+    }
+    if (meridiem[1] != 'M') {
+        return -1;
+    }
+
+    // With a marker the hour runs from 1 to 12.
+    if (hour < 1 || hour > 12) {
+        return -1;
+    }
+
     int total = hour * 60 + minute;
     if (meridiem[0] == 'P' && hour < 12) {
         total += 12 * 60;                      // afternoon

@@ -125,6 +125,10 @@ public:
     // database and are undone by their own entries on the undo stack.
     virtual void restoreFrom(const PatientRecord& previous);
 
+    // Marks one of the appointments of this patient as completed. Returns
+    // false when there is no such appointment or when it was cancelled.
+    bool completeAppointment(const std::string& appointmentID);
+
 protected:
     // Stores an appointment in this patient's own collection. The
     // appointment is copied, and the copy is stamped with the identifier of

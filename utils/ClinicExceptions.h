@@ -41,7 +41,9 @@ public:
 class FileIOException : public ClinicException {
 public:
     FileIOException(const std::string& filename, const std::string& reason)
-        : ClinicException("Cannot open [" + filename + "]: " + reason) {}
+        : ClinicException("Cannot use the file [" + filename + "]: " + reason +
+                          ". Please check that the path is right and that the file is not "
+                          "open in another program.") {}
 };
 
 } // namespace utils

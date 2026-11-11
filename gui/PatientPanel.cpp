@@ -48,6 +48,17 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
 
     txtPatID = new QLineEdit(group);
     txtPatID->setPlaceholderText("e.g. GEN-201, EMG-801");
+    txtPatID->setToolTip("The identifier of the patient. It has to begin with the prefix "
+                          "of the chosen category, and it may only be used once.");
+
+    // The program answers while the identifier is being typed, so that the
+    // staff find out straight away that the identifier is already taken.
+    connect(txtPatID, &QLineEdit::textChanged, this, &PatientPanel::onPatientIDChanged);
+
+    lblIDHint = new QLabel(group);
+    lblIDHint->setToolTip("Tells you whether the identifier is free or already in use.");
+    lblIDHint->setWordWrap(true);
+    lblIDHint->setStyleSheet("color: #777; font-size: 11px;");
 
     btnSuggestID = new QPushButton("Suggest ID", group);
     btnSuggestID->setToolTip("Fill in the next free identifier for the chosen category.");
@@ -83,6 +94,7 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
     cmbPatType->setMaximumWidth(inputWidth);
 
     form->addRow("Patient ID *:", txtPatID);
+    form->addRow(lblIDHint);
     form->addRow(btnSuggestID);
     form->addRow("Full Name *:", txtPatName);
     form->addRow("Age *:", txtPatAge);
@@ -197,6 +209,13 @@ void PatientPanel::showCategoryFields(int index) {
 
 void PatientPanel::onPatientTypeChanged(int index) {
     showCategoryFields(index);
+
+    // The identifier carries the category, so the placeholder shows the
+    // prefix that the chosen category needs.
+    const std::string type = selectedPatientType();
+    const std::string prefix = utils::IDGenerator::patientPrefix(type);
+    txtPatID->setPlaceholderText(QString::fromStdString(
+        "e.g. " + prefix + "201, " + prefix + "801"));
 }
 
 void PatientPanel::clearPatientForm() {
@@ -378,6 +397,11 @@ void PatientPanel::onUpdatePatient() {
         candidate->setAge(age);
         candidate->setContactNumber(contact.toStdString());
         writeFields(candidate.get(), fields);
+
+        // The rules of the clinic are checked on the copy as well, so that an
+        // edit cannot put an illegal contact number or an illegal age into
+        // a record that was registered properly.
+        manager.validatePatient(*candidate);
     } catch (const utils::ClinicException& error) {
         QMessageBox::critical(this, "Update error", error.what());
         return;                                 // the live record was not touched
@@ -461,19 +485,53 @@ void PatientPanel::onShowReport() {
     box.exec();
 }
 
-void PatientPanel::onSuggestPatientID() {
-    const int typeIndex = cmbPatType->currentIndex();
-    std::string type = model::PatientRecord::TYPE_GENERAL;
-    if (typeIndex == EMERGENCY_INDEX) {
-        type = model::PatientRecord::TYPE_EMERGENCY;
-    } else if (typeIndex == FOLLOWUP_INDEX) {
-        type = model::PatientRecord::TYPE_FOLLOWUP;
+void PatientPanel::onPatientIDChanged(const QString& text) {
+    // The label under the identifier field tells the staff at once whether
+    // the identifier can be used. This is the answer of the program to the
+    // change of a text field.
+    const QString id = text.trimmed();
+
+    if (id.isEmpty()) {
+        lblIDHint->setText("The identifier is required.");
+        lblIDHint->setStyleSheet("color: #777; font-size: 11px;");
+        return;
     }
 
+    const std::string prefix = utils::IDGenerator::patientPrefix(selectedPatientType());
+    if (!id.startsWith(QString::fromStdString(prefix))) {
+        lblIDHint->setText("An identifier of this category begins with [" +
+                           QString::fromStdString(prefix) + "].");
+        lblIDHint->setStyleSheet("color: #b06000; font-size: 11px;");
+        return;
+    }
+
+    if (manager.findPatientByID(id.toStdString()) != nullptr) {
+        lblIDHint->setText("This identifier is already in the clinic.");
+        lblIDHint->setStyleSheet("color: #b00020; font-size: 11px;");
+        return;
+    }
+
+    lblIDHint->setText("This identifier is free.");
+    lblIDHint->setStyleSheet("color: #1b7a2f; font-size: 11px;");
+}
+
+void PatientPanel::onSuggestPatientID() {
     // The controller knows which identifiers are already in use.
-    const std::string suggestion = manager.suggestPatientId(type);
+    const std::string suggestion = manager.suggestPatientId(selectedPatientType());
     txtPatID->setText(QString::fromStdString(suggestion));
     txtPatID->setFocus();
+}
+
+std::string PatientPanel::selectedPatientType() const {
+    switch (cmbPatType->currentIndex()) {
+        case EMERGENCY_INDEX:
+            return model::PatientRecord::TYPE_EMERGENCY;
+        case FOLLOWUP_INDEX:
+            return model::PatientRecord::TYPE_FOLLOWUP;
+        case GENERAL_INDEX:
+        default:
+            return model::PatientRecord::TYPE_GENERAL;
+    }
 }
 
 int PatientPanel::categoryIndex(const model::PatientRecord* patient) {
@@ -542,9 +600,15 @@ PatientPanel::TypeFields PatientPanel::readFields(const model::PatientRecord* pa
 void PatientPanel::writeGeneral(model::GeneralPatient* patient, const TypeFields& fields) {
     bool ok = false;
     const double fee = fields.value1.trimmed().toDouble(&ok);
-    if (!ok || fee < 0.0) {
+
+    // A number that is not a number at all, a value that is infinite and a
+    // value that is far too large are all refused. Without this check a
+    // fee of "nan" would be accepted, because every comparison with nan is
+    // false, and it would then be written into the data file.
+    if (!ok || !model::GeneralPatient::isValidConsultationFee(fee)) {
         throw utils::InvalidPatientDataException(
-            "The consultation fee must be a number of naira, for example 4500.00.");
+            "The consultation fee must be a number of naira between 0 and 100,000,000, "
+            "for example 4500.00.");
     }
     patient->setConsultationFee(fee);
 }

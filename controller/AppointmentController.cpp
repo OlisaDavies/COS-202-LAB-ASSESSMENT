@@ -44,7 +44,8 @@ bool AppointmentController::patientCanBeBooked(const model::Appointment& appoint
     return dynamic_cast<const model::Appointable*>(patient) != nullptr;
 }
 
-void AppointmentController::scheduleAppointment(const model::Appointment& appointment) {
+void AppointmentController::scheduleAppointment(const model::Appointment& appointment,
+                                               bool trackUndo) {
     checkBookingRules(appointment);
 
     if (appointment.getPatientID().empty()) {
@@ -63,12 +64,39 @@ void AppointmentController::scheduleAppointment(const model::Appointment& appoin
             "] is not booked in advance. Please use the waiting room instead.");
     }
 
-    // The database stores the booking and remembers it for the undo stack.
-    database.addAppointment(appointment);
+    // The same doctor cannot be in two places at the same time.
+    const int newMinutes = utils::timeToMinutes(appointment.getTime());
+    for (const model::Appointment& existing : database.getAllAppointments()) {
+        if (existing.getStatus() == model::Appointment::STATUS_CANCELLED) {
+            continue;                           // a cancelled booking frees the slot
+        }
+        if (existing.getDoctorName() != appointment.getDoctorName() ||
+            existing.getDate() != appointment.getDate()) {
+            continue;
+        }
+        if (utils::timeToMinutes(existing.getTime()) != newMinutes) {
+            continue;
+        }
+        throw utils::InvalidAppointmentException(
+            "Doctor [" + appointment.getDoctorName() + "] is already booked on " +
+            appointment.getDate() + " at " + appointment.getTime() + ".");
+    }
+
+    // The database stores the booking. A booking that comes from a file is
+    // not an administrative step of its own, so it is not remembered.
+    if (trackUndo) {
+        database.addAppointment(appointment);
+    } else {
+        database.addAppointmentWithoutUndo(appointment);
+    }
 }
 
 bool AppointmentController::cancelAppointment(const std::string& appointmentID) {
     return database.cancelAppointment(appointmentID);
+}
+
+bool AppointmentController::completeAppointment(const std::string& appointmentID) {
+    return database.completeAppointment(appointmentID);
 }
 
 std::string AppointmentController::suggestAppointmentId() const {

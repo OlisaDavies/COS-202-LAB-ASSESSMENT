@@ -74,7 +74,8 @@ AdminPanel::AdminPanel(controller::ClinicManager& manager, QWidget* parent)
     recentLayout->setContentsMargins(12, 16, 12, 12);
 
     listRecent = new QListWidget(recentBox);
-    listRecent->setToolTip("The records that were used most recently.");
+    listRecent->setToolTip("The records that were used most recently, the most recently "
+                            "used one first. The list holds at most ten records.");
     listRecent->setMinimumHeight(220);
     recentLayout->addWidget(listRecent);
     lowerRow->addWidget(recentBox, 1);
@@ -86,8 +87,7 @@ AdminPanel::AdminPanel(controller::ClinicManager& manager, QWidget* parent)
 }
 
 void AdminPanel::refresh() {
-    txtDashboard->setPlainText(
-        QString::fromStdString(controller::ReportBuilder::dashboardSummary(manager)));
+    refreshStatistics();
 
     listRecent->clear();
     for (const model::PatientRecord* patient : manager.getRecentPatients()) {
@@ -95,6 +95,11 @@ void AdminPanel::refresh() {
             patient->getPatientID() + " - " + patient->getName() + " (" +
             patient->getTypeLabel() + ")"));
     }
+}
+
+void AdminPanel::refreshStatistics() {
+    txtDashboard->setPlainText(
+        QString::fromStdString(controller::ReportBuilder::dashboardSummary(manager)));
 }
 
 void AdminPanel::undoLastOperation() {
@@ -142,9 +147,29 @@ void AdminPanel::loadData() {
         return;
     }
 
-    // The appointment file is expected to sit next to the patient file.
-    const QString appointmentFile =
-        QDir(QFileInfo(patientFile).absolutePath()).filePath("appointments.csv");
+    // The appointment file is asked for as well, because the staff may have
+    // saved it under any name. When it is not wanted, the file that sits
+    // next to the patient file is used.
+    QString appointmentFile = QFileDialog::getOpenFileName(
+        this, "Open the appointment file (cancel to use the one next to the patient file)",
+        QFileInfo(patientFile).absolutePath(), "CSV files (*.csv)");
+    if (appointmentFile.isEmpty()) {
+        appointmentFile =
+            QDir(QFileInfo(patientFile).absolutePath()).filePath("appointments.csv");
+    }
+
+    // Loading replaces the whole clinic, so the staff are asked first.
+    if (manager.getPatientCount() > 0) {
+        const QMessageBox::StandardButton reply = QMessageBox::question(
+            this, "Load data",
+            "Loading a file replaces every patient and every appointment, and it clears "
+            "the undo history.\n\nContinue?",
+            QMessageBox::Yes | QMessageBox::No, QMessageBox::No);
+
+        if (reply != QMessageBox::Yes) {
+            return;
+        }
+    }
 
     std::vector<std::string> warnings;
 

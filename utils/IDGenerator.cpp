@@ -1,5 +1,7 @@
 #include "IDGenerator.h"
 
+#include <cerrno>
+#include <climits>
 #include <cstdlib>
 
 #include "../model/PatientRecord.h"
@@ -30,10 +32,19 @@ int IDGenerator::highestUsedNumber(const std::string& prefix,
         if (digits.find_first_not_of("0123456789") != std::string::npos) {
             continue;                            // not a plain number
         }
-
-        int number = std::atoi(digits.c_str());
-        if (number > highest) {
-            highest = number;
+        // The number is read with strtol and not with atoi, because atoi has
+        // undefined behaviour when the number does not fit into an int. A
+        // file with a very long number would otherwise produce a nonsense
+        // identifier such as [GEN--2147483648].
+        errno = 0;
+        char* end = nullptr;
+        const long number = std::strtol(digits.c_str(), &end, 10);
+        if (errno == ERANGE || end == digits.c_str() ||
+            (end != nullptr && *end != '\0')) {
+            continue;                            // too large to be a usable number
+        }
+        if (number > highest && number < INT_MAX) {
+            highest = static_cast<int>(number);
         }
     }
     return highest;

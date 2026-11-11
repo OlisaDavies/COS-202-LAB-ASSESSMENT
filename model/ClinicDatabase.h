@@ -39,6 +39,11 @@ private:
     std::stack<AdminAction> undoStack;
 
     // Fixed size cache of the most recently accessed records.
+    //
+    // The array is held from the oldest record at the front to the newest
+    // one at the back, and only the first recentCount places of it are in
+    // use. When it is full, the record at the front is the one that was
+    // used the longest time ago, and it makes room for a new record.
     PatientRecord* recentPatients[CACHE_SIZE];
     int recentCount;
 
@@ -50,9 +55,12 @@ private:
     void addAppointmentInternal(const Appointment& appointment, bool trackUndo);
 
     // Removes a record without touching the undo history. When backupOut is
-    // given it receives a copy of the removed record.
+    // given it receives a copy of the removed record. When waitingPositionOut
+    // is given it receives the place the record held in the waiting queue,
+    // or -1 when it was not waiting.
     bool removePatientInternal(const std::string& id,
-                               std::unique_ptr<PatientRecord>* backupOut);
+                               std::unique_ptr<PatientRecord>* backupOut,
+                               int* waitingPositionOut);
 
     // The patient that holds the given appointment, or nullptr.
     PatientRecord* findOwnerOfAppointment(const std::string& appointmentID);
@@ -63,6 +71,16 @@ private:
     void touchRecentPatient(PatientRecord* patient);
     void removeRecentPatient(PatientRecord* patient);
     void removeFromWaitingQueue(PatientRecord* patient);
+
+    // The place the record holds in the waiting queue, counted from the
+    // front, or -1 when it is not waiting.
+    int waitingQueuePosition(const PatientRecord* patient) const;
+
+    // Puts a record back into the waiting queue at the given place. A
+    // std::queue cannot put an element in the middle, so the queue is
+    // rebuilt. A place behind the last element means that the record is
+    // put at the end.
+    void insertIntoWaitingQueue(PatientRecord* patient, int position);
 
 public:
     ClinicDatabase();
@@ -100,6 +118,11 @@ public:
     std::vector<PatientRecord*> getAllPatients() const;
     std::size_t getPatientCount() const { return patients.size(); }
 
+    // Puts the records in the given order. The pointers have to be the
+    // records of this database, in any order. This is what the sort on the
+    // screen uses, so that the roster keeps the order that was chosen.
+    void setPatientOrder(const std::vector<PatientRecord*>& order);
+
     // Every appointment of every patient, gathered into one list.
     std::vector<Appointment> getAllAppointments() const;
 
@@ -117,6 +140,11 @@ public:
 
     bool cancelAppointment(const std::string& appointmentID);
 
+    // Marks a booking as completed, so that the visit counts towards the
+    // attendance of the patient. Returns false when there is no such
+    // appointment, or when it was cancelled already.
+    bool completeAppointment(const std::string& appointmentID);
+
     // Reverses the last administrative operation.
     // Returns the description of the operation, or an empty string when
     // there is nothing to undo.
@@ -125,7 +153,9 @@ public:
     // Removes every record, appointment and undo entry.
     void clearAll();
 
-    // The recently accessed records, most recent last.
+    // The recently accessed records, most recently accessed first. The
+    // cache holds at most CACHE_SIZE records; when it is full the record
+    // that was used the longest time ago makes room for a new one.
     std::vector<PatientRecord*> getRecentPatients() const;
 
     // Console output, used by the console demonstration.

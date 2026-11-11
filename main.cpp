@@ -129,8 +129,10 @@ int main() {
     index = SearchEngine::binarySearchByID(sorted, "FOL-205");
     std::cout << "Binary search on the sorted list found index " << index << std::endl;
 
-    // The recursive search walks the list itself.
-    index = SearchEngine::recursiveSearchByName(records, "Chioma Eze");
+    // The recursive search walks the list itself and collects every patient
+    // whose name holds the text.
+    const std::vector<int> nameMatches = SearchEngine::recursiveSearchByName(records, "Chioma Eze");
+    index = nameMatches.empty() ? -1 : nameMatches.front();
     std::cout << "Recursive search for Chioma Eze found index " << index << std::endl;
 
     // The category search returns every match.

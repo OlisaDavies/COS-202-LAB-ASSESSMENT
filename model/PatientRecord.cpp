@@ -102,6 +102,20 @@ bool PatientRecord::setAppointmentStatus(const std::string& appointmentID, const
     return false;
 }
 
+bool PatientRecord::completeAppointment(const std::string& appointmentID) {
+    for (Appointment& appointment : appointments) {
+        if (appointment.getAppointmentID() != appointmentID) {
+            continue;
+        }
+        if (appointment.getStatus() != Appointment::STATUS_PENDING) {
+            return false;                      // it was cancelled or completed already
+        }
+        appointment.setStatus(Appointment::STATUS_COMPLETED);
+        return true;
+    }
+    return false;
+}
+
 void PatientRecord::displayPatient() const {
     // A concrete method of the abstract class: it writes the report that the
     // category produced, and the call dispatches to the right subclass.

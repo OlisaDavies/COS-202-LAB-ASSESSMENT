@@ -23,8 +23,8 @@ bool ScheduledPatient::cancelAppointment(const std::string& appointmentID) {
     if (target == nullptr) {
         return false;                          // the patient does not hold that booking
     }
-    if (target->getStatus() == Appointment::STATUS_CANCELLED) {
-        return false;                          // it was cancelled already
+    if (target->getStatus() != Appointment::STATUS_PENDING) {
+        return false;                          // it was cancelled or completed already
     }
     target->setStatus(Appointment::STATUS_CANCELLED);
     return true;

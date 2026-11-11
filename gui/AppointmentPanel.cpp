@@ -108,10 +108,16 @@ QWidget* AppointmentPanel::buildSchedule(QWidget* parent) {
     layout->addWidget(tableAppointments);
 
     QHBoxLayout* buttonRow = new QHBoxLayout();
+    btnComplete = new QPushButton("Mark as Completed", group);
+    btnComplete->setToolTip("Record that the visit took place, so that it counts "
+                            "towards the attendance of the patient.");
+    connect(btnComplete, &QPushButton::clicked, this,
+            &AppointmentPanel::onCompleteSelectedAppointment);
     QPushButton* btnCancel = new QPushButton("Cancel Appointment", group);
     btnCancel->setToolTip("Cancel the selected booking. The step can be undone.");
     connect(btnCancel, &QPushButton::clicked,
             this, &AppointmentPanel::onCancelSelectedAppointment);
+    buttonRow->addWidget(btnComplete);
     buttonRow->addStretch();
     buttonRow->addWidget(btnCancel);
     layout->addLayout(buttonRow);
@@ -168,7 +174,8 @@ void AppointmentPanel::onScheduleAppointment() {
 
     if (!utils::isValidDate(date.toStdString())) {
         QMessageBox::warning(this, "Invalid input",
-                             "The date must be written as YYYY-MM-DD, for example 2026-11-25.");
+                             "[" + date + "] is not a real calendar date. Please enter a "
+                             "date as YYYY-MM-DD, for example 2026-11-25.");
         return;
     }
 
@@ -209,7 +216,7 @@ void AppointmentPanel::onCancelSelectedAppointment() {
 
     if (!manager.cancelAppointment(appointmentID.toStdString())) {
         QMessageBox::warning(this, "Not found",
-                             "That appointment is no longer scheduled.");
+                             "That appointment is not scheduled, or it was cancelled already.");
         return;
     }
 
@@ -217,6 +224,28 @@ void AppointmentPanel::onCancelSelectedAppointment() {
     emit dataChanged();
 
     QMessageBox::information(this, "Cancelled", appointmentID + " was cancelled.");
+}
+
+void AppointmentPanel::onCompleteSelectedAppointment() {
+    const int row = tableAppointments->currentRow();
+    if (row < 0) {
+        QMessageBox::warning(this, "No selection", "Please select an appointment row first.");
+        return;
+    }
+
+    const QString appointmentID = tableAppointments->item(row, 0)->text();
+
+    if (!manager.completeAppointment(appointmentID.toStdString())) {
+        QMessageBox::warning(this, "Not found",
+                             "That appointment is not scheduled, or it was cancelled already.");
+        return;
+    }
+
+    refresh();
+    emit dataChanged();
+
+    QMessageBox::information(this, "Completed",
+                             appointmentID + " was marked as completed.");
 }
 
 void AppointmentPanel::refresh() {

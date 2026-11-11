@@ -147,6 +147,7 @@ classDiagram
         +patientID: string
         +patientBackup: unique_ptr~PatientRecord~
         +appointmentBackup: Appointment
+        +waitingQueuePosition: int
     }
 
     %% Database (Composition)

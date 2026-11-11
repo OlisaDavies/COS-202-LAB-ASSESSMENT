@@ -1,6 +1,8 @@
 #include "FileHandler.h"
 
+#include <cstdio>
 #include <fstream>
+#include <iomanip>
 #include <memory>
 #include <ostream>
 #include <sstream>
@@ -83,11 +85,21 @@ std::vector<std::string> FileHandler::splitRow(const std::string& line) {
     }
 
     fields.push_back(current);
+
+    // A row whose quote was never closed was cut in half by a line break
+    // inside a quoted field. The broken row is dropped, so that it cannot
+    // turn into a patient with nonsense fields.
+    if (insideQuotes) {
+        fields.clear();
+    }
     return fields;
 }
 
 std::string FileHandler::quoteField(const std::string& value) {
-    if (value.find_first_of(",\"\n\r") == std::string::npos) {
+    // Only a comma and a quote have to be protected. A line break is not
+    // protected, because the reader reads the file line by line and would
+    // not be able to join a field that is spread over two lines.
+    if (value.find_first_of(",\"") == std::string::npos) {
         return value;                           // nothing to protect
     }
 
@@ -95,6 +107,8 @@ std::string FileHandler::quoteField(const std::string& value) {
     for (char c : value) {
         if (c == '"') {
             quoted += "\"\"";                    // escape the quote
+        } else if (c == '\n' || c == '\r') {
+            quoted += ' ';                       // a line break would break the file
         } else {
             quoted += c;
         }
@@ -110,7 +124,10 @@ void FileHandler::writeCategoryFields(std::ostream& out, const model::PatientRec
         const model::GeneralPatient* general =
             dynamic_cast<const model::GeneralPatient*>(patient);
         if (general != nullptr) {
-            out << general->getConsultationFee();
+            // The fee is written with two decimals. Without that the
+            // stream would round the number to six digits, and a fee such
+            // as 123456.78 would come back as 123457.
+            out << std::fixed << std::setprecision(2) << general->getConsultationFee();
         }
     } else if (type == model::PatientRecord::TYPE_EMERGENCY) {
         const model::EmergencyPatient* emergency =
@@ -131,46 +148,89 @@ void FileHandler::writeCategoryFields(std::ostream& out, const model::PatientRec
 
 void FileHandler::savePatients(const std::string& filename,
                                const std::vector<model::PatientRecord*>& patients) {
-    std::ofstream outFile(filename);
-    if (!outFile.is_open()) {
-        throw FileIOException(filename, "could not be opened for writing");
-    }
+    // The records are written to a temporary file first. The real file is
+    // only replaced when the writing was finished, so a disk that is full
+    // or a drive that is removed cannot leave a half written file behind.
+    const std::string temporary = filename + ".tmp";
 
-    for (const model::PatientRecord* patient : patients) {
-        if (patient == nullptr) {
-            continue;
+    {
+        std::ofstream outFile(temporary);
+        if (!outFile.is_open()) {
+            throw FileIOException(filename, "could not be opened for writing");
         }
 
-        outFile << patient->getPatientType() << ","
-                << quoteField(patient->getPatientID()) << ","
-                << quoteField(patient->getName()) << ","
-                << patient->getAge() << ","
-                << quoteField(patient->getContactNumber()) << ",";
+        for (const model::PatientRecord* patient : patients) {
+            if (patient == nullptr) {
+                continue;
+            }
 
-        writeCategoryFields(outFile, patient);
-        outFile << "\n";
+            outFile << patient->getPatientType() << ","
+                    << quoteField(patient->getPatientID()) << ","
+                    << quoteField(patient->getName()) << ","
+                    << patient->getAge() << ","
+                    << quoteField(patient->getContactNumber()) << ",";
+
+            writeCategoryFields(outFile, patient);
+            outFile << "\n";
+        }
+
+        outFile.close();
+
+        // The state of the stream is checked, because a stream that has
+        // failed does not say so by itself.
+        if (outFile.fail()) {
+            std::remove(temporary.c_str());
+            throw FileIOException(filename,
+                                  "could not be written completely. The disk may be full "
+                                  "or the folder may not be writable");
+        }
     }
 
-    outFile.close();
+    replaceFile(temporary, filename);
 }
 
 void FileHandler::saveAppointments(const std::string& filename,
                                    const std::vector<model::Appointment>& appointments) {
-    std::ofstream outFile(filename);
-    if (!outFile.is_open()) {
-        throw FileIOException(filename, "could not be opened for writing");
+    // The same two step writing as for the patients.
+    const std::string temporary = filename + ".tmp";
+
+    {
+        std::ofstream outFile(temporary);
+        if (!outFile.is_open()) {
+            throw FileIOException(filename, "could not be opened for writing");
+        }
+
+        for (const model::Appointment& appointment : appointments) {
+            outFile << quoteField(appointment.getAppointmentID()) << ","
+                    << quoteField(appointment.getPatientID()) << ","
+                    << quoteField(appointment.getDate()) << ","
+                    << quoteField(appointment.getTime()) << ","
+                    << quoteField(appointment.getDoctorName()) << ","
+                    << appointment.getStatus() << "\n";
+        }
+
+        outFile.close();
+
+        if (outFile.fail()) {
+            std::remove(temporary.c_str());
+            throw FileIOException(filename,
+                                  "could not be written completely. The disk may be full "
+                                  "or the folder may not be writable");
+        }
     }
 
-    for (const model::Appointment& appointment : appointments) {
-        outFile << quoteField(appointment.getAppointmentID()) << ","
-                << quoteField(appointment.getPatientID()) << ","
-                << quoteField(appointment.getDate()) << ","
-                << quoteField(appointment.getTime()) << ","
-                << quoteField(appointment.getDoctorName()) << ","
-                << appointment.getStatus() << "\n";
-    }
+    replaceFile(temporary, filename);
+}
 
-    outFile.close();
+void FileHandler::replaceFile(const std::string& temporary, const std::string& filename) {
+    // The old file is only removed when the new one is ready, so the clinic
+    // never loses its data because of a failed save.
+    std::remove(filename.c_str());
+
+    if (std::rename(temporary.c_str(), filename.c_str()) != 0) {
+        std::remove(temporary.c_str());
+        throw FileIOException(filename, "could not be replaced by the new file");
+    }
 }
 
 std::unique_ptr<model::PatientRecord> FileHandler::readPatient(
@@ -207,9 +267,23 @@ std::unique_ptr<model::PatientRecord> FileHandler::readPatient(
 
     if (type == model::PatientRecord::TYPE_GENERAL) {
         double fee = 0.0;
-        std::string feeText = fields.size() > 5 ? utils::trim(fields[5]) : "";
+        if (fields.size() <= 5) {
+            // A general row without a fee is incomplete, so it is skipped
+            // instead of being loaded with a fee of zero.
+            *warning = "patient [" + id + "] has no consultation fee and was skipped";
+            return nullptr;
+        }
+        const std::string feeText = utils::trim(fields[5]);
         if (!feeText.empty() && !parseDouble(feeText, &fee)) {
             *warning = "patient [" + id + "] has an unreadable fee [" + feeText + "], using 0";
+            fee = 0.0;
+        }
+        // A fee of "nan" or of infinity is not a real amount. It is skipped,
+        // because a broken fee would be carried through every report.
+        if (!model::GeneralPatient::isValidConsultationFee(fee)) {
+            *warning = "patient [" + id + "] has a fee of [" + feeText +
+                       "] that is not a real amount, and was skipped";
+            return nullptr;
         }
         return std::make_unique<model::GeneralPatient>(id, name, age, contact, fee);
     }

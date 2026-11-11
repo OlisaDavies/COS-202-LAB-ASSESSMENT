@@ -1,5 +1,6 @@
 #pragma once
 
+#include <cmath>
 #include <string>
 
 #include "ScheduledPatient.h"
@@ -14,6 +15,12 @@ private:
     double consultationFee;
 
 public:
+    // The consultation fee of the clinic. The rule lives with the data, so
+    // that the screen, the controller and the file reader all use the same
+    // numbers.
+    static constexpr double MAX_CONSULTATION_FEE = 100000000.0;
+    static constexpr double MIN_CONSULTATION_FEE = 0.0;
+
     GeneralPatient(std::string id, std::string patientName, int patientAge,
                    std::string contact, double fee)
         : ScheduledPatient(id, patientName, patientAge,
@@ -24,6 +31,15 @@ public:
 
     double getConsultationFee() const { return consultationFee; }
     void setConsultationFee(double fee) { consultationFee = fee; }
+
+    // True when the fee is a real amount that the clinic can bill. A value
+    // of "nan" or of infinity is not a real amount, even though every
+    // comparison with it is false.
+    static bool isValidConsultationFee(double fee) {
+        return std::isfinite(fee) &&
+               fee >= MIN_CONSULTATION_FEE &&
+               fee <= MAX_CONSULTATION_FEE;
+    }
 
     std::string getTypeLabel() const override { return "General Outpatient"; }
 

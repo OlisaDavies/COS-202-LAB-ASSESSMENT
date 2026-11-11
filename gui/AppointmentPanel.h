@@ -27,6 +27,7 @@ signals:
 private slots:
     void onScheduleAppointment();
     void onCancelSelectedAppointment();
+    void onCompleteSelectedAppointment();
 
 private:
     controller::ClinicManager& manager;
@@ -37,6 +38,7 @@ private:
     QLineEdit* txtAptTime;
     QLineEdit* txtAptDoctor;
     QTableWidget* tableAppointments;
+    QPushButton* btnComplete;
 
     // True when the clinic staff has typed an appointment ID of their own.
     bool aptIdEdited;
