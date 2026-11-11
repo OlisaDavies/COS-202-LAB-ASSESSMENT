@@ -27,6 +27,16 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override;
 
+    // Opens the given tab, counted from zero, and does nothing when the
+    // number is out of range. The command line uses this, so that any panel
+    // can be opened, photographed or demonstrated directly.
+    void showTab(int index);
+
+    // The two panels the command line also fills in, so that the entry point
+    // does not have to reach into the widgets of a panel itself.
+    QueuePanel* queuePanelWidget() { return queuePanel; }
+    SearchPanel* searchPanelWidget() { return searchPanel; }
+
 protected:
     // Used to put the window in the middle of the screen once it is shown.
     void showEvent(QShowEvent* event) override;

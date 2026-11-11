@@ -7,6 +7,12 @@ CONFIG += c++17
 DEFINES += _CRT_SECURE_NO_WARNINGS
 
 # The graphical user interface.
+#
+# The program has two entry points: gui_main.cpp builds the graphical
+# program, and main.cpp builds the console demonstration of the same model,
+# controller and utility layers. They cannot be in one binary, because each
+# of them has its own main(), so the console version is built by build.bat
+# with the compiler directly and is not part of this project file.
 SOURCES += \
     gui_main.cpp \
     gui/MainWindow.cpp \

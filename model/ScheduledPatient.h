@@ -9,15 +9,10 @@
 namespace scapms {
 namespace model {
 
-// Intermediate abstract class for the patient types that can be booked.
-//
-// It inherits from the abstract base class and from two pure abstract
-// interfaces at the same time, which shows that a class may implement more
-// than one interface. It writes the booking code once, so GeneralPatient and
-// FollowUpPatient do not have to repeat it.
-//
-// The booking itself lives in the appointment collection of the base class,
-// so there is only ever one copy of the truth.
+// Intermediate abstract class for the patient types that can be booked. It
+// inherits from the base class and from two interfaces at once, so a class
+// may implement more than one contract, and it writes the booking code once
+// for GeneralPatient and FollowUpPatient.
 class ScheduledPatient : public PatientRecord, public Appointable, public Billable {
 public:
     ScheduledPatient(std::string id, std::string patientName, int patientAge,

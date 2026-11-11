@@ -175,7 +175,7 @@ The brief rules out the STL algorithms, so every search and sort below is writte
 ## 5. Graphical User Interface (GUI) & Event Architecture
 
 The graphical frontend was built natively using **Qt 6.5.3 (C++17)**:
-- **Layout Management (Req. 8):** Hardcoded pixel coordinates were strictly avoided. Responsive layouts adapt dynamically to window resizing using `QVBoxLayout`, `QHBoxLayout`, `QFormLayout` and `QGridLayout`. The forms use `QFormLayout`, so a label and its field stay together and the form grows with its longest label; the panels use `QHBoxLayout` and `QVBoxLayout`, so the columns and the rows share the space that is left; and the two tables of categories and priorities use `QGridLayout`, so the entries line up under each other in both directions.
+- **Layout Management (Req. 8):** Hardcoded pixel coordinates were strictly avoided. Responsive layouts adapt dynamically to window resizing using `QVBoxLayout`, `QHBoxLayout`, `QFormLayout` and `QGridLayout`. The forms use `QFormLayout`, so a label and its field stay together and the form grows with its longest label; the panels use `QHBoxLayout` and `QVBoxLayout`, so the columns and the rows share the space that is left; and the three tables of figures and of categories and priorities use `QGridLayout`, so the entries line up under each other in both directions.
 - **Event-Driven Programming (Req. 6):** User actions trigger Qt Signals connected to C++ Member Slots.
   - *Button events (6.a):* Add, Edit, Delete, Undo, Book, Mark as Completed, Cancel, Search, Sort, Save, Load and New Database are all wired to a slot.
   - *Menu events (6.b):* The File menu holds **New**, **Save as...** (`Ctrl+S`), **Load...** (`Ctrl+O`) and **Exit** (`Ctrl+Q`); the Edit menu holds **Undo last operation** (`Ctrl+Z`) and **Quick search** (`Ctrl+F`); the Help menu holds **About**.
@@ -198,6 +198,7 @@ The graphical frontend was built natively using **Qt 6.5.3 (C++17)**:
   - Standard file dialog integration via `QFileDialog` for custom file import/export.
   - Accessible keyboard shortcuts (`Ctrl+N`, `Ctrl+S`, `Ctrl+O`, `Ctrl+Z`, `Ctrl+F`, `Ctrl+Q`).
   - A live hint under the patient identifier field that says whether the identifier can be used.
+  - A tooltip on every button, every field and every list, which says what the control does in one short sentence.
 
 ## 6. Exception Handling
 
@@ -216,71 +217,29 @@ All GUI event slots wrap database mutations inside `try { ... } catch (const Cli
 
 ## 7. Challenges and Fixes
 
-1. **Memory Management with Polymorphic Pointers:**
-   - *Challenge:* Storing polymorphic base pointers in a collection risks memory leaks when records are deleted or when the database is cleared.
-   - *Resolution:* The database owns every live record in a `std::vector<std::unique_ptr<PatientRecord>>` and frees them in its destructor. Each undo entry owns its own **copy** of the record, held in a `std::unique_ptr`, so the undo stack and the roster never share memory and no record is freed twice. Because the undo entry owns a record, it follows the rule of five and can be moved but not copied.
-2. **A Partially Applied Edit:**
-   - *Challenge:* The edit form writes the name, the age and the category fields in turn. If a category field turns out to be invalid, the record was left half changed, and no undo entry had been created for it.
-   - *Resolution:* The edit is now tried out on a **copy** of the record first. Only when the copy has passed every validation is the undo entry created and the values copied onto the live record, so an invalid entry can never leave the record in a mixed state.
-3. **The Order of Evaluation of Function Arguments:**
-   - *Challenge:* The undo entry was created in a single call that both read the identifier of the record and moved the snapshot into the entry. The C++ standard does not fix the order in which the arguments of a call are evaluated, and the compiler evaluated the move first, which emptied the pointer before the identifier was read.
-   - *Resolution:* The identifier is read into a local variable **before** the entry is created, so the move is never written in the same call as the reads.
-4. **Binary Search Precondition:**
-   - *Challenge:* Binary search produces incorrect results or infinite loops if executed on unsorted vectors.
-   - *Resolution:* The controller sorts a defensive copy with `SortEngine::mergeSort` before executing binary search.
-5. **Stability of the Merge Sort:**
-   - *Challenge:* The first version of the merge took the record of the right half when two records had the same key, which silently changed the order of equal records.
-   - *Resolution:* The merge now takes the record of the **left** half unless the record of the right half is strictly smaller, which is the standard rule for a stable merge sort.
-6. **MOC (Meta-Object Compiler) Integration in Multi-File Builds:**
-   - *Challenge:* Compiling Qt classes declaring `Q_OBJECT` with MSVC command-line tools requires generating and compiling `moc_*.cpp` files.
-   - *Resolution:* Configured a clean Qt Project (`SCAPMS.pro`) and automated script (`build_gui.bat`) running `qmake` and `nmake`.
-7. **One Class That Did Too Much:**
-   - *Challenge:* The first version of the program had the graphical panels calling the database directly. Every rule of the clinic - a valid age, a date that is written correctly, a patient that may be booked - was therefore written inside `ClinicDatabase`, which grew to 488 lines and mixed the data handling with the business logic. That is exactly what requirement 2 forbids.
-   - *Resolution:* The rules were moved up into a new `ClinicManager` and an `AppointmentController` in the controller layer, and the panels were repointed from the database to the manager. `ClinicDatabase` now only stores and finds, and no file in the `gui/` folder refers to it any more.
-8. **Code That Was Written But Never Used:**
-   - *Challenge:* The dashboard summary and the list of the recently accessed records were written for the reports but nothing ever asked for them, so they were dead code.
-   - *Resolution:* Both were given a real purpose in the new `AdminPanel`, which shows the live dashboard of the clinic and the ten records of the fixed size cache. The summary of the dashboard is built by the report builder, so the console demonstration and the dashboard of the graphical program read the numbers in the same way.
-9. **A Visit That Could Never Be Completed:**
-   - *Challenge:* The `Completed` status existed in the data model and the reports counted it, but there was no button to set it. The report of the most frequently attended patients was therefore always empty, and the only way to reach that status was to load a file.
-   - *Resolution:* The Appointments panel has a **Mark as Completed** button, the step is remembered on the undo stack, and the status rules were tightened so that a completed visit can no longer be cancelled and a cancelled visit can no longer be completed.
-10. **The Order That the Sort Produced Was Thrown Away:**
-   - *Challenge:* The Sort button only reordered the results table of the Search and Sort panel. The roster of the Patient Records panel kept its own order, so the sort looked like it did nothing.
-   - *Resolution:* The controller now keeps the chosen order, and the other panels are redrawn when it changes.
-11. **The Undo Stack Was Full After Every Load:**
-   - *Challenge:* Loading a file pushed one undo entry for every record that was read, and the sample data the program starts with did the same. The first Ctrl+Z after a load therefore deleted records that the user had never touched.
-   - *Resolution:* A load is now **one** administrative step as a whole, so the records that come from it are not remembered one by one.
-12. **The Consultation Fee Was Changed By The Data File:**
-   - *Challenge:* The fee was written with the default format of the stream, which rounds to six digits. A fee of 123456.78 came back as 123457 after a save and a load, so the bill of the patient was silently wrong.
-   - *Resolution:* The fee is written with two decimals, and a row that does not hold one is skipped and reported instead of being loaded with a fee of zero.
-13. **The Cache Of Frequently Accessed Records Did Not Work As A Cache:**
-   - *Challenge:* The fixed-size array of ten records was written with three different ideas of the order at the same time. A record that was used again was moved to the **front**, a new record was **added at the back**, and when the array was full the oldest record was dropped and the new one was put at the **back**. The result was that the array kept the order in which the records were *registered* and not the order in which they were *used*, so the panel showed the wrong "most recently accessed" records. On top of that, `findPatientByID` returned a record that was already in the cache without recording the access at all.
-   - *Resolution:* One order is used everywhere now: the array is held from the oldest record at the front to the newest at the back. Using a record that is already in the cache moves it to the newest place, and a record that is not in the cache is added at the back, which pushes the oldest one out when the cache is full. A cache hit now records the access.
-14. **Undoing A Delete Lost The Place In The Waiting Room:**
-   - *Challenge:* When a patient who was waiting for consultation was deleted, the patient was taken out of the waiting queue. Undoing the delete brought the record back, but the patient did not return to the waiting room, so the undo did not really reverse the whole step.
-   - *Resolution:* The undo entry now keeps the place the record held in the waiting queue, and the undo puts it back at exactly that place. A record that was not waiting is not put back into the queue.
-15. **The Binary Search Showed The Wrong Patient:**
-    - *Challenge:* The binary search needs a list that is sorted, so the panel made a sorted copy of the records and searched in that copy. The routine returned the **place** of the record it found, and the panel then used that place to look the record up in the **unsorted** roster. The two lists have a different order, so the panel showed a patient that had nothing to do with the search. Searching for GEN-101 showed GEN-005.
-    - *Resolution:* The panel now works with the records themselves and not with their places. The search returns the records that matched, so the record that is shown is always the record that was found. The same was true of the routine that runs the search again when the data changed.
-16. **The Sort Ordered The Names By Their Capital Letters:**
-    - *Challenge:* The search ignored the letter case, but the sort did not. A name that was typed in small letters was put at the end of the list, because the small letters come after the capital ones in the ASCII order. The two halves of the program disagreed with each other.
-    - *Resolution:* The sort and the binary search now use the same comparison that ignores the letter case, so a name in small letters sits in the right place and the list is still sorted in the way the binary search expects.
-17. **One Mistake Could End The Whole Program:**
-    - *Challenge:* Qt does not catch an exception that leaves a slot. The exception travels out of the event loop and the program ends with "terminate called after throwing an instance of ...". The windows of the clinic simply disappear and the work of the day is lost. The panels check their own errors, but one mistake that slipped past them would take the program down.
-    - *Resolution:* The application class in gui_main.cpp now overrides 
-otify(), which is the one place every event of the program passes through. Anything that escapes a slot is caught there and shown to the staff as a message, so the program keeps running. The sample data of the start-up is guarded as well, because it is loaded in the constructor of the window, where 
-otify() cannot help.
-18. **A Fee Of "nan" Was Accepted And Written Into The Data File:**
-    - *Challenge:* The fee was checked with `fee < 0.0`. Every comparison with the value "nan" is false, so a fee of "nan" or of "inf" passed the check, was shown in the roster as "Nnan", and was written into the CSV file. It even survived a save and a load without a single warning.
-    - *Resolution:* The rule now uses std::isfinite and an upper bound, and it lives with the data in GeneralPatient::isValidConsultationFee, so the screen, the controller and the file reader all use the same rule. A row in a data file with a broken fee is now skipped and reported.
-19. **A Failed Save Could Destroy The Data That Was Already Saved:**
-    - *Challenge:* The file was opened for writing straight away, and an ofstream empties the file the moment it is opened. If the writing then failed, because the disk was full or the drive was removed, a half written file was left behind and the program still said "The data was written".
-    - *Resolution:* The records are written to a temporary file first. The real file is only replaced when the writing was finished, so a failed save leaves the old file untouched and the staff is told what happened.
-20. **Loading A File Could Silently Throw The Appointments Away:**
-    - *Challenge:* The save asked for two file names, but the load asked for one and then looked for a file called "appointments.csv" next to the patient file. Appointments that had been saved under any other name were silently lost, and the message named a file the user had never chosen. Loading also emptied the whole clinic, including the undo history, without asking.
-    - *Resolution:* The load now asks for the appointment file as well, and offers the one next to the patient file when the staff cancels. The real reason of a failure is passed on instead of being thrown away, and the staff are asked before the clinic is replaced.
-21. **The Rules Of The Clinic Were Not Checked On An Edit:**
-    - *Challenge:* The contact number rule was checked when a patient was registered, but the edit path only checked the fields of the category. A patient could therefore be edited into a record with an illegal contact number.
-    - *Resolution:* The edit now runs the same ClinicManager::validatePatient check as the registration, so the rules are the same on every way into the clinic.
+1. **One Class That Did Too Much:**
+   - *Challenge:* The graphical panels called the database directly, so every rule of the clinic - a valid age, a date written correctly, a patient that may be booked - ended up inside `ClinicDatabase`, which grew to 488 lines and mixed the data handling with the business logic.
+   - *Resolution:* The rules were moved up into `ClinicManager` and `AppointmentController` in the controller layer, and the panels were repointed from the database to the manager. `ClinicDatabase` now only stores and finds.
+
+2. **The Binary Search Showed The Wrong Patient:**
+   - *Challenge:* The panel made a sorted copy of the records and searched in that copy. The routine returned the **place** of the record it found, and the panel then used that place to look the record up in the unsorted roster, so it showed a patient that had nothing to do with the search.
+   - *Resolution:* The search returns the records that matched, not their positions, so the record shown is always the record that was found.
+
+3. **The Cache Of Frequently Accessed Records Did Not Work:**
+   - *Challenge:* The fixed-size array of ten records was written with three different ideas of the order at the same time, so it kept the order in which the records were *registered* rather than the order in which they were *used*. A cache hit did not even record the access.
+   - *Resolution:* One order is used everywhere now: the array is held from the oldest record at the front to the newest at the back, using a record moves it to the newest place, and a new record is added at the back.
+
+4. **A Failed Save Could Destroy The Data That Was Already Saved:**
+   - *Challenge:* The file was opened for writing straight away, and an ofstream empties the file the moment it is opened. If the writing then failed, a half written file was left behind and the program still said "The data was written".
+   - *Resolution:* The records are written to a temporary file first, and the real file is only replaced when the writing has finished, so a failed save leaves the old file untouched.
+
+5. **Loading A File Could Silently Throw The Appointments Away:**
+   - *Challenge:* The save asked for two file names, but the load asked for one and then looked for a file called "appointments.csv" next to the patient file. Appointments saved under any other name were silently lost, and loading emptied the whole clinic without asking.
+   - *Resolution:* The load asks for the appointment file as well, offers the one next to the patient file when the staff cancels, and asks before the clinic is replaced.
+
+6. **One Mistake Could End The Whole Program:**
+   - *Challenge:* Qt does not catch an exception that leaves a slot. The exception travels out of the event loop and the program ends with "terminate called after throwing an instance of ...", and the windows disappear.
+   - *Resolution:* The application class in gui_main.cpp overrides `notify()`, the one place every event passes through, so anything that escapes a slot is caught and shown as a message.
 
 ## 8. Conclusion
 

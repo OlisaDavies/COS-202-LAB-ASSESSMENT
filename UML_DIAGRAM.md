@@ -118,8 +118,11 @@ classDiagram
     ScheduledPatient <|-- GeneralPatient : inherits the interfaces
     ScheduledPatient <|-- FollowUpPatient : inherits the interfaces
 
-    %% Composition: a patient owns its appointments
-    PatientRecord "1" *-- "0..*" Appointment : Composition (std::vector)
+    %% Composition: a patient owns its appointments.
+    %% A Mermaid relationship label may not contain a colon, so the C++
+    %% container is written without the scope operator. The container is also
+    %% shown in the class body above, as "vector~Appointment~".
+    PatientRecord "1" *-- "0..*" Appointment : Composition, std vector
 
     %% Models
     class Appointment {
@@ -179,9 +182,9 @@ classDiagram
         +getRecentPatients() vector~PatientRecord*~
     }
 
-    ClinicDatabase *-- PatientRecord : Composition (std::vector)
-    ClinicDatabase *-- AdminAction : Composition (std::stack)
-    AdminAction *-- PatientRecord : Composition (std::unique_ptr)
+    ClinicDatabase *-- PatientRecord : Composition, std vector
+    ClinicDatabase *-- AdminAction : Composition, std stack
+    AdminAction *-- PatientRecord : Composition, std unique_ptr
 
     %% Controllers
     class ClinicManager {
@@ -339,6 +342,13 @@ classDiagram
     class AdminPanel {
         <<GUI>>
         -manager: ClinicManager
+        -lblPatientCount: QLabel*
+        -lblWaitingCount: QLabel*
+        -lblBookedCount: QLabel*
+        -lblCompletedCount: QLabel*
+        -lblPendingCount: QLabel*
+        -lblCancelledCount: QLabel*
+        -listRecent: QListWidget*
         +refresh() void
         +refreshStatistics() void
         +undoLastOperation() void
@@ -373,7 +383,6 @@ classDiagram
     SearchPanel --> SearchEngine : Calls
     SearchPanel --> SortEngine : Calls
     ReportPanel --> ReportBuilder : Calls
-    AdminPanel --> ReportBuilder : Calls
     ClinicManager --> FileHandler : Calls
     ClinicManager --> IDGenerator : Calls
     AppointmentController --> IDGenerator : Calls

@@ -210,10 +210,15 @@ void AppointmentPanel::onCancelSelectedAppointment() {
 
     const QString appointmentID = tableAppointments->item(row, 0)->text();
 
-    if (!manager.cancelAppointment(appointmentID.toStdString())) {
-        QMessageBox::warning(this, "Not found",
-                             "That appointment is not scheduled, or it was cancelled already.");
-        return;
+    try {
+        if (!manager.cancelAppointment(appointmentID.toStdString())) {
+            QMessageBox::warning(this, "Not found",
+                                 "That appointment is not scheduled, or it was cancelled already.");
+            return;
+        }
+    } catch (const utils::ClinicException& error) {
+        QMessageBox::critical(this, "Cancel error", error.what());
+        return;                                 // the booking was not changed
     }
 
     refresh();
@@ -231,10 +236,15 @@ void AppointmentPanel::onCompleteSelectedAppointment() {
 
     const QString appointmentID = tableAppointments->item(row, 0)->text();
 
-    if (!manager.completeAppointment(appointmentID.toStdString())) {
-        QMessageBox::warning(this, "Not found",
-                             "That appointment is not scheduled, or it was cancelled already.");
-        return;
+    try {
+        if (!manager.completeAppointment(appointmentID.toStdString())) {
+            QMessageBox::warning(this, "Not found",
+                                 "That appointment is not scheduled, or it was cancelled already.");
+            return;
+        }
+    } catch (const utils::ClinicException& error) {
+        QMessageBox::critical(this, "Complete error", error.what());
+        return;                                 // the booking was not changed
     }
 
     refresh();

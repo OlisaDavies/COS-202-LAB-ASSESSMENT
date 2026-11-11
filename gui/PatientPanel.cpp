@@ -475,9 +475,14 @@ void PatientPanel::onDeleteSelectedPatient() {
         onCancelEdit();
     }
 
-    if (!manager.deletePatient(id.toStdString())) {
-        QMessageBox::warning(this, "Not found", "That patient is no longer in the clinic.");
-        return;
+    try {
+        if (!manager.deletePatient(id.toStdString())) {
+            QMessageBox::warning(this, "Not found", "That patient is no longer in the clinic.");
+            return;
+        }
+    } catch (const utils::ClinicException& error) {
+        QMessageBox::critical(this, "Delete error", error.what());
+        return;                                 // the patient is still in the clinic
     }
 
     refresh();

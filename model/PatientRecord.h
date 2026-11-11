@@ -8,16 +8,10 @@
 namespace scapms {
 namespace model {
 
-// Abstract base class for every patient the clinic knows about.
-//
-// It holds the details that every category has in common and leaves the
-// category specific behaviour to the subclasses. Because it declares pure
-// virtual functions it can never be created on its own, which is what makes
-// the polymorphic calls through PatientRecord* safe.
-//
-// The class also shows the other half of an abstract class: besides the pure
-// virtual functions it carries concrete methods that every category shares,
-// such as the accessors, restoreFrom() and displayPatient().
+// Abstract base class for every patient the clinic knows about. It holds the
+// details every category has in common and leaves the rest to the subclasses.
+// It declares pure virtual functions, so it can never be created on its own,
+// and it also carries concrete methods that every category shares.
 class PatientRecord {
 public:
     // The three patient categories. The strings are also the key used in the
