@@ -1,7 +1,9 @@
 #pragma once
 
 #include <string>
-#include <utility>
+#include <vector>
+
+#include "Appointment.h"
 
 namespace scapms {
 namespace model {
@@ -12,6 +14,10 @@ namespace model {
 // category specific behaviour to the subclasses. Because it declares pure
 // virtual functions it can never be created on its own, which is what makes
 // the polymorphic calls through PatientRecord* safe.
+//
+// The class also shows the other half of an abstract class: besides the pure
+// virtual functions it carries concrete methods that every category shares,
+// such as the accessors, restoreFrom() and displayPatient().
 class PatientRecord {
 public:
     // The three patient categories. The strings are also the key used in the
@@ -27,6 +33,12 @@ protected:
     std::string contactNumber;
     std::string patientType;
 
+    // Composition: a patient holds the appointments that belong to it, so a
+    // patient is associated with one or more appointments. The appointments
+    // are stored by value, so they are created and destroyed together with
+    // the patient that owns them.
+    std::vector<Appointment> appointments;
+
 public:
     PatientRecord(std::string id, std::string patientName, int patientAge,
                   std::string contact, std::string type)
@@ -37,7 +49,8 @@ public:
           patientType(type) {}
 
     // Copying is allowed so that a record can be cloned safely for the undo
-    // stack and for the edit snapshot.
+    // stack and for the edit snapshot. The copy is deep: the appointment
+    // collection is copied as well.
     PatientRecord(const PatientRecord& other) = default;
     PatientRecord& operator=(const PatientRecord& other) = default;
 
@@ -55,21 +68,75 @@ public:
     void setAge(int newAge) { age = newAge; }
     void setContactNumber(std::string newContact) { contactNumber = newContact; }
 
+    // ---- the appointments of this patient ----
+
+    // The appointments the patient holds. This is the association that the
+    // UML diagram shows as a composition.
+    const std::vector<Appointment>& getAppointments() const { return appointments; }
+
+    // How many appointments the patient holds.
+    std::size_t getAppointmentCount() const { return appointments.size(); }
+
+    // The appointment with the given identifier, or nullptr.
+    const Appointment* findAppointment(const std::string& appointmentID) const;
+
+    // True when the patient holds an appointment with that identifier.
+    bool hasAppointment(const std::string& appointmentID) const;
+
+    // The pending appointment that comes first, or nullptr when there is none.
+    const Appointment* getNextPendingAppointment() const;
+
+    // How many of the appointments of this patient are still pending.
+    std::size_t getPendingAppointmentCount() const;
+
+    // Takes one of the patient's appointments out of the collection. The
+    // database uses this when a booking is undone.
+    bool removeAppointment(const std::string& appointmentID);
+
+    // Puts an appointment back the way the backup copy says it was. The
+    // database uses this when a cancellation is undone.
+    bool restoreAppointment(const Appointment& backup);
+
+    // ---- the abstract part ----
+
     // The name shown to the clinic staff, for example "Emergency Patient".
     virtual std::string getTypeLabel() const = 0;
 
+    // The full record of the patient as text. Every category writes its own
+    // version, so this is one of the pure virtual functions that the
+    // polymorphic calls dispatch on.
+    virtual std::string getPatientReport() const = 0;
+
     // Category specific behaviour. These are the pure virtual functions that
     // make PatientRecord an abstract class.
-    virtual void displayPatient() const = 0;
+    virtual void displayPatient() const;
     virtual std::string getSpecialDetail() const = 0;
 
     // Deep copy of the record, used by the undo stack and by the edit
-    // snapshot. Each subclass copies its own extra fields.
+    // snapshot. Each subclass copies its own extra fields. The return type
+    // is covariant, so a GeneralPatient clone comes back as a GeneralPatient.
+    // The caller takes over the memory and should wrap the result in a
+    // std::unique_ptr.
     virtual PatientRecord* clone() const = 0;
 
     // Copies the common fields back from a snapshot of the same category.
-    // Subclasses override this and restore their own extra fields.
+    // Subclasses override this and restore their own extra fields. The
+    // appointments are not touched, because they are managed by the
+    // database and are undone by their own entries on the undo stack.
     virtual void restoreFrom(const PatientRecord& previous);
+
+protected:
+    // Stores an appointment in this patient's own collection. The
+    // appointment is copied, and the copy is stamped with the identifier of
+    // its owner, so the two can never disagree. Returns false when the
+    // patient already holds an appointment with that identifier.
+    bool addAppointment(const Appointment& appointment);
+
+    // Puts an appointment back into the state it had before.
+    bool setAppointmentStatus(const std::string& appointmentID, const std::string& status);
+
+    // A writable pointer to one of the appointments of this patient.
+    Appointment* findAppointmentForUpdate(const std::string& appointmentID);
 };
 
 } // namespace model

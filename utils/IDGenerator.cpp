@@ -2,14 +2,16 @@
 
 #include <cstdlib>
 
+#include "../model/PatientRecord.h"
+
 namespace scapms {
 namespace utils {
 
 const char* IDGenerator::patientPrefix(const std::string& patientType) {
-    if (patientType == "Emergency") {
+    if (patientType == model::PatientRecord::TYPE_EMERGENCY) {
         return "EMG-";
     }
-    if (patientType == "FollowUp") {
+    if (patientType == model::PatientRecord::TYPE_FOLLOWUP) {
         return "FOL-";
     }
     return "GEN-";

@@ -6,7 +6,7 @@
 #include <QPushButton>
 #include <QTableWidget>
 
-#include "../model/ClinicDatabase.h"
+#include "../controller/ClinicManager.h"
 
 namespace scapms {
 namespace gui {
@@ -16,7 +16,7 @@ class AppointmentPanel : public QWidget {
     Q_OBJECT
 
 public:
-    explicit AppointmentPanel(model::ClinicDatabase& database, QWidget* parent = nullptr);
+    explicit AppointmentPanel(controller::ClinicManager& manager, QWidget* parent = nullptr);
 
     // Redraws the schedule and the patient list of the form.
     void refresh();
@@ -29,7 +29,7 @@ private slots:
     void onCancelSelectedAppointment();
 
 private:
-    model::ClinicDatabase& database;
+    controller::ClinicManager& manager;
 
     QLineEdit* txtAptID;
     QComboBox* cmbAptPatientID;

@@ -3,7 +3,7 @@
 #include <string>
 #include <vector>
 
-#include "../model/ClinicDatabase.h"
+#include "ClinicManager.h"
 
 namespace scapms {
 namespace controller {
@@ -16,20 +16,20 @@ namespace controller {
 class ReportBuilder {
 public:
     // How many patients there are in each category.
-    static std::string categoryDistribution(const model::ClinicDatabase& database);
+    static std::string categoryDistribution(const ClinicManager& manager);
 
     // Every appointment that has not been completed yet.
-    static std::string pendingAppointments(const model::ClinicDatabase& database);
+    static std::string pendingAppointments(const ClinicManager& manager);
 
     // How many appointments were scheduled, completed, cancelled or are still
     // pending.
-    static std::string dailySummary(const model::ClinicDatabase& database);
+    static std::string dailySummary(const ClinicManager& manager);
 
     // The patients with the most completed visits, best first.
-    static std::string frequentPatients(const model::ClinicDatabase& database);
+    static std::string frequentPatients(const ClinicManager& manager);
 
     // The short version shown on the dashboard.
-    static std::string dashboardSummary(const model::ClinicDatabase& database);
+    static std::string dashboardSummary(const ClinicManager& manager);
 
 private:
     // The title block that every report starts with.
@@ -40,7 +40,7 @@ private:
 
     // Counts the completed visits of every patient.
     static std::vector<std::pair<std::string, int>> completedVisitCounts(
-        const model::ClinicDatabase& database);
+        const ClinicManager& manager);
 };
 
 } // namespace controller

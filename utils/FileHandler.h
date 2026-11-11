@@ -1,6 +1,7 @@
 #pragma once
 
 #include <iosfwd>
+#include <memory>
 #include <string>
 #include <vector>
 
@@ -26,10 +27,11 @@ public:
     static void saveAppointments(const std::string& filename,
                                  const std::vector<model::Appointment>& appointments);
 
-    // Reads the patients. The caller owns the returned records.
-    // Rows that cannot be read are skipped and described in the warnings list.
-    static std::vector<model::PatientRecord*> loadPatients(const std::string& filename,
-                                                           std::vector<std::string>* warnings = nullptr);
+    // Reads the patients. The returned records are owned by the caller, so a
+    // file that is only half read never leaks them. Rows that cannot be read
+    // are skipped and described in the warnings list.
+    static std::vector<std::unique_ptr<model::PatientRecord>> loadPatients(
+        const std::string& filename, std::vector<std::string>* warnings = nullptr);
 
     // Reads the appointments. Rows that cannot be read are skipped and
     // described in the warnings list.
@@ -49,8 +51,8 @@ private:
     static void writeCategoryFields(std::ostream& out, const model::PatientRecord* patient);
 
     // Reads the category specific columns and builds the matching subclass.
-    static model::PatientRecord* readPatient(const std::vector<std::string>& fields,
-                                             std::string* warning);
+    static std::unique_ptr<model::PatientRecord> readPatient(
+        const std::vector<std::string>& fields, std::string* warning);
 };
 
 } // namespace utils

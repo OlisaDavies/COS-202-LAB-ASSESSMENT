@@ -13,8 +13,8 @@
 namespace scapms {
 namespace gui {
 
-SearchPanel::SearchPanel(model::ClinicDatabase& database, QWidget* parent)
-    : QWidget(parent), database(database) {
+SearchPanel::SearchPanel(controller::ClinicManager& manager, QWidget* parent)
+    : QWidget(parent), manager(manager) {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(16, 16, 16, 16);
     layout->setSpacing(14);
@@ -166,7 +166,7 @@ void SearchPanel::showResults(const std::vector<model::PatientRecord*>& results)
 }
 
 void SearchPanel::onExecuteSearch() {
-    const std::vector<model::PatientRecord*>& patients = database.getAllPatients();
+    const std::vector<model::PatientRecord*> patients = manager.getAllPatients();
     const int algorithm = cmbSearchAlgorithm->currentIndex();
 
     std::vector<model::PatientRecord*> results;
@@ -236,7 +236,7 @@ void SearchPanel::onExecuteSearch() {
 }
 
 void SearchPanel::onExecuteSort() {
-    std::vector<model::PatientRecord*> sorted = database.getAllPatients();
+    std::vector<model::PatientRecord*> sorted = manager.getAllPatients();
     if (sorted.empty()) {
         QMessageBox::information(this, "No records",
                                  "There are no patient records to sort.");

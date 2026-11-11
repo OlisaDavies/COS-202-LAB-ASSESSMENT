@@ -9,8 +9,8 @@
 namespace scapms {
 namespace gui {
 
-QueuePanel::QueuePanel(model::ClinicDatabase& database, QWidget* parent)
-    : QWidget(parent), database(database) {
+QueuePanel::QueuePanel(controller::ClinicManager& manager, QWidget* parent)
+    : QWidget(parent), manager(manager) {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(16, 16, 16, 16);
     layout->setSpacing(16);
@@ -72,7 +72,7 @@ void QueuePanel::refreshPatientCombo() {
     const QString previous = cmbQueuePatientID->currentData().toString();
 
     cmbQueuePatientID->clear();
-    for (const model::PatientRecord* patient : database.getAllPatients()) {
+    for (const model::PatientRecord* patient : manager.getAllPatients()) {
         const QString entry = QString::fromStdString(patient->getPatientID() + " - " +
                                                       patient->getName()) +
                                " (" + QString::fromStdString(patient->getTypeLabel()) + ")";
@@ -93,19 +93,19 @@ void QueuePanel::onEnqueuePatient() {
     }
 
     const QString patientID = cmbQueuePatientID->currentData().toString();
-    model::PatientRecord* patient = database.findPatientByID(patientID.toStdString());
+    model::PatientRecord* patient = manager.findPatientByID(patientID.toStdString());
     if (patient == nullptr) {
-        QMessageBox::warning(this, "Not found", "That patient is no longer in the database.");
+        QMessageBox::warning(this, "Not found", "That patient is no longer in the clinic.");
         return;
     }
 
-    database.enqueuePatient(patient);
+    manager.enqueuePatient(patient);
     refresh();
     emit dataChanged();
 }
 
 void QueuePanel::onCallNextPatient() {
-    model::PatientRecord* next = database.callNextPatient();
+    model::PatientRecord* next = manager.callNextPatient();
     if (next == nullptr) {
         refresh();
         QMessageBox::information(this, "Queue empty", "There are no patients waiting.");
@@ -126,13 +126,13 @@ void QueuePanel::refresh() {
     refreshPatientCombo();
 
     listQueueView->clear();
-    for (const model::PatientRecord* patient : database.getWaitingQueue()) {
+    for (const model::PatientRecord* patient : manager.getWaitingQueue()) {
         listQueueView->addItem(QString::fromStdString(patient->getPatientID() + " - " +
                                                       patient->getName()) +
                                " (" + QString::fromStdString(patient->getTypeLabel()) + ")");
     }
 
-    lblQueueCount->setText("<b>Waiting: " + QString::number(database.getQueueSize()) + "</b>");
+    lblQueueCount->setText("<b>Waiting: " + QString::number(manager.getQueueSize()) + "</b>");
 }
 
 } // namespace gui

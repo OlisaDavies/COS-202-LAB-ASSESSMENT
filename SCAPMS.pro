@@ -15,6 +15,7 @@ SOURCES += \
     gui/QueuePanel.cpp \
     gui/SearchPanel.cpp \
     gui/ReportPanel.cpp \
+    gui/AdminPanel.cpp \
 
 HEADERS += \
     gui/MainWindow.h \
@@ -23,6 +24,7 @@ HEADERS += \
     gui/QueuePanel.h \
     gui/SearchPanel.h \
     gui/ReportPanel.h \
+    gui/AdminPanel.h \
 
 # The model layer.
 SOURCES += \
@@ -32,11 +34,13 @@ SOURCES += \
     model/EmergencyPatient.cpp \
     model/FollowUpPatient.cpp \
     model/Appointment.cpp \
+    model/AdminAction.cpp \
     model/ClinicDatabase.cpp
 
 HEADERS += \
     model/PatientRecord.h \
     model/Appointable.h \
+    model/Billable.h \
     model/ScheduledPatient.h \
     model/GeneralPatient.h \
     model/EmergencyPatient.h \
@@ -47,11 +51,15 @@ HEADERS += \
 
 # The controller layer.
 SOURCES += \
+    controller/ClinicManager.cpp \
+    controller/AppointmentController.cpp \
     controller/SearchEngine.cpp \
     controller/SortEngine.cpp \
     controller/ReportBuilder.cpp
 
 HEADERS += \
+    controller/ClinicManager.h \
+    controller/AppointmentController.h \
     controller/SearchEngine.h \
     controller/SortEngine.h \
     controller/ReportBuilder.h

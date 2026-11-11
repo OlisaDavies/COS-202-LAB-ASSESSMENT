@@ -2,13 +2,21 @@
 
 ```mermaid
 classDiagram
-    %% Abstract Interface
+    %% Abstract Interface 1
     class Appointable {
         <<interface>>
-        +scheduleAppointment(date: string, time: string)* bool
-        +cancelAppointment()* bool
-        +hasScheduledAppointment()* bool
-        +getAppointmentDetails()* string
+        +scheduleAppointment(appointment: Appointment) bool
+        +cancelAppointment() bool
+        +cancelAppointment(appointmentID: string) bool
+        +hasScheduledAppointment() bool
+        +getAppointmentDetails() string
+    }
+
+    %% Abstract Interface 2
+    class Billable {
+        <<interface>>
+        +getBillAmount() double
+        +describeBill() string
     }
 
     %% Abstract Base Class
@@ -19,6 +27,7 @@ classDiagram
         #age: int
         #contactNumber: string
         #patientType: string
+        #appointments: vector~Appointment~
         +getPatientID() string
         +getName() string
         +getAge() int
@@ -27,24 +36,32 @@ classDiagram
         +setName(newName: string) void
         +setAge(newAge: int) void
         +setContactNumber(newContact: string) void
+        +getAppointments() vector~Appointment~
+        +getAppointmentCount() size_t
+        +findAppointment(appointmentID: string) Appointment
+        +hasAppointment(appointmentID: string) bool
+        +getNextPendingAppointment() Appointment
+        +getPendingAppointmentCount() size_t
+        +removeAppointment(appointmentID: string) bool
+        +restoreAppointment(backup: Appointment) bool
         +getTypeLabel()* string
-        +displayPatient()* void
+        +getPatientReport()* string
         +getSpecialDetail()* string
         +clone()* PatientRecord
+        +displayPatient() void
         +restoreFrom(previous: PatientRecord) void
     }
 
     %% Intermediate abstract class
     class ScheduledPatient {
         <<abstract>>
-        #appointmentBooked: bool
-        #appointmentDate: string
-        #appointmentTime: string
-        +scheduleAppointment(date: string, time: string) bool
+        +scheduleAppointment(appointment: Appointment) bool
         +cancelAppointment() bool
+        +cancelAppointment(appointmentID: string) bool
         +hasScheduledAppointment() bool
         +getAppointmentDetails() string
-        +restoreFrom(previous: PatientRecord) void
+        +getBillAmount() double
+        +describeBill() string
     }
 
     %% Subclasses (Inheritance)
@@ -53,9 +70,11 @@ classDiagram
         +getConsultationFee() double
         +setConsultationFee(fee: double) void
         +getTypeLabel() string
-        +displayPatient() void
+        +getPatientReport() string
         +getSpecialDetail() string
-        +clone() PatientRecord
+        +getBillAmount() double
+        +describeBill() string
+        +clone() GeneralPatient
         +restoreFrom(previous: PatientRecord) void
     }
 
@@ -68,9 +87,9 @@ classDiagram
         +setTriageNote(note: string) void
         +getUrgencyDescription() string
         +getTypeLabel() string
-        +displayPatient() void
+        +getPatientReport() string
         +getSpecialDetail() string
-        +clone() PatientRecord
+        +clone() EmergencyPatient
         +restoreFrom(previous: PatientRecord) void
     }
 
@@ -82,9 +101,9 @@ classDiagram
         +getAssignedDoctor() string
         +setAssignedDoctor(doctor: string) void
         +getTypeLabel() string
-        +displayPatient() void
+        +getPatientReport() string
         +getSpecialDetail() string
-        +clone() PatientRecord
+        +clone() FollowUpPatient
         +restoreFrom(previous: PatientRecord) void
     }
 
@@ -93,9 +112,14 @@ classDiagram
     PatientRecord <|-- EmergencyPatient : Inheritance
     ScheduledPatient <|-- FollowUpPatient : Inheritance
 
+    %% A class may implement more than one interface
     Appointable <|.. ScheduledPatient : Implements Interface
-    ScheduledPatient <|-- GeneralPatient : inherits the interface
-    ScheduledPatient <|-- FollowUpPatient : inherits the interface
+    Billable <|.. ScheduledPatient : Implements Interface
+    ScheduledPatient <|-- GeneralPatient : inherits the interfaces
+    ScheduledPatient <|-- FollowUpPatient : inherits the interfaces
+
+    %% Composition: a patient owns its appointments
+    PatientRecord "1" *-- "0..*" Appointment : Composition (std::vector)
 
     %% Models
     class Appointment {
@@ -111,8 +135,10 @@ classDiagram
         +getTime() string
         +getDoctorName() string
         +getStatus() string
+        +setPatientID(id: string) void
         +setStatus(s: string) void
         +displayAppointment() void
+        +happensBefore(first: Appointment, second: Appointment) bool
     }
 
     class AdminAction {
@@ -125,35 +151,72 @@ classDiagram
 
     %% Database (Composition)
     class ClinicDatabase {
-        -patients: vector~PatientRecord*~
-        -appointments: vector~Appointment~
+        -patients: vector~unique_ptr~PatientRecord~~
         -waitingQueue: queue~PatientRecord*~
         -undoStack: stack~AdminAction~
         -recentPatients: PatientRecord*[10]
         -recentCount: int
-        +addPatient(p: PatientRecord*) void
-        +addPatients(list: vector~PatientRecord*~) void
+        +addPatient(p: unique_ptr~PatientRecord~) void
+        +addPatients(list: vector~unique_ptr~PatientRecord~~) void
         +removePatient(id: string) bool
-        +pushPatientSnapshot(snapshot: PatientRecord*) void
+        +pushPatientSnapshot(snapshot: unique_ptr~PatientRecord~) void
         +findPatientByID(id: string) PatientRecord*
         +getAllPatients() vector~PatientRecord*~
         +getPatientCount() size_t
         +getAppointmentsFor(id: string) vector~Appointment~
+        +getAllAppointments() vector~Appointment~
         +getPendingCountFor(id: string) size_t
         +enqueuePatient(p: PatientRecord*) void
         +callNextPatient() PatientRecord*
         +getQueueSize() size_t
         +addAppointment(apt: Appointment) void
+        +addAppointments(list: vector~Appointment~) void
         +cancelAppointment(id: string) bool
         +undoLastAction() string
         +clearAll() void
+        +getRecentPatients() vector~PatientRecord*~
     }
 
     ClinicDatabase *-- PatientRecord : Composition (std::vector)
-    ClinicDatabase *-- Appointment : Composition (std::vector)
     ClinicDatabase *-- AdminAction : Composition (std::stack)
+    AdminAction *-- PatientRecord : Composition (std::unique_ptr)
 
     %% Controllers
+    class ClinicManager {
+        <<controller>>
+        -clinicDatabase: ClinicDatabase
+        -appointmentController: AppointmentController
+        +registerPatient(p: unique_ptr~PatientRecord~) void
+        +registerPatients(list: vector~unique_ptr~PatientRecord~~) void
+        +deletePatient(patientID: string) bool
+        +findPatientByID(patientID: string) PatientRecord*
+        +getAllPatients() vector~PatientRecord*~
+        +getPatientCount() size_t
+        +suggestPatientId(patientType: string) string
+        +pushPatientSnapshot(snapshot: unique_ptr~PatientRecord~) void
+        +scheduleAppointment(appointment: Appointment) void
+        +cancelAppointment(appointmentID: string) bool
+        +getAllAppointments() vector~Appointment~
+        +enqueuePatient(p: PatientRecord*) void
+        +callNextPatient() PatientRecord*
+        +getQueueSize() size_t
+        +undoLastAction() string
+        +clearAll() void
+        +getRecentPatients() vector~PatientRecord*~
+        +saveToFiles(patientFile: string, appointmentFile: string) void
+        +loadFromFiles(patientFile: string, appointmentFile: string) void
+    }
+
+    class AppointmentController {
+        <<controller>>
+        -database: ClinicDatabase
+        +scheduleAppointment(appointment: Appointment) void
+        +cancelAppointment(appointmentID: string) bool
+        +allAppointments() vector~Appointment~
+        +appointmentsFor(patientID: string) vector~Appointment~
+        +suggestAppointmentId() string
+    }
+
     class SearchEngine {
         <<controller>>
         +linearSearchByID(records, id) int
@@ -171,18 +234,18 @@ classDiagram
 
     class ReportBuilder {
         <<controller>>
-        +categoryDistribution(db) string
-        +pendingAppointments(db) string
-        +dailySummary(db) string
-        +frequentPatients(db) string
-        +dashboardSummary(db) string
+        +categoryDistribution(manager) string
+        +pendingAppointments(manager) string
+        +dailySummary(manager) string
+        +frequentPatients(manager) string
+        +dashboardSummary(manager) string
     }
 
     %% Utilities
     class FileHandler {
         <<utility>>
         +savePatients(filename, patients) void
-        +loadPatients(filename, warnings) vector~PatientRecord*~
+        +loadPatients(filename, warnings) vector~unique_ptr~PatientRecord~~
         +saveAppointments(filename, appointments) void
         +loadAppointments(filename, warnings) vector~Appointment~
     }
@@ -191,6 +254,7 @@ classDiagram
         <<utility>>
         +nextAppointmentId(takenIds) string
         +nextPatientId(prefix, takenIds) string
+        +patientPrefix(patientType) string
     }
 
     class ClinicException {
@@ -224,12 +288,15 @@ classDiagram
     class PatientPanel {
         <<GUI>>
         -database: ClinicDatabase
+        -editSnapshot: unique_ptr~PatientRecord~
         +refresh() void
         +onRegisterPatient() void
         +onEditSelectedPatient() void
         +onUpdatePatient() void
         +onCancelEdit() void
         +onDeleteSelectedPatient() void
+        +onShowReport() void
+        +onSuggestPatientID() void
     }
 
     class AppointmentPanel {
@@ -264,24 +331,47 @@ classDiagram
         +onGenerateReport() void
     }
 
+    class AdminPanel {
+        <<GUI>>
+        -manager: ClinicManager
+        +refresh() void
+        +undoLastOperation() void
+        +saveData() void
+        +loadData() void
+        +newDatabase() void
+    }
+
     MainWindow *-- PatientPanel : Composition
     MainWindow *-- AppointmentPanel : Composition
     MainWindow *-- QueuePanel : Composition
     MainWindow *-- SearchPanel : Composition
     MainWindow *-- ReportPanel : Composition
+    MainWindow *-- AdminPanel : Composition
+    MainWindow *-- ClinicManager : Composition
 
-    MainWindow --> ClinicDatabase : Uses
-    PatientPanel --> ClinicDatabase : Uses
-    AppointmentPanel --> ClinicDatabase : Uses
-    QueuePanel --> ClinicDatabase : Uses
-    SearchPanel --> ClinicDatabase : Uses
-    ReportPanel --> ClinicDatabase : Uses
+    %% The screens talk to the controller, never to the data.
+    PatientPanel --> ClinicManager : Uses
+    AppointmentPanel --> ClinicManager : Uses
+    QueuePanel --> ClinicManager : Uses
+    SearchPanel --> ClinicManager : Uses
+    ReportPanel --> ClinicManager : Uses
+    AdminPanel --> ClinicManager : Uses
+    MainWindow --> ClinicManager : Uses
+
+    %% The controller owns the data and the rules.
+    ClinicManager *-- ClinicDatabase : Composition
+    ClinicManager *-- AppointmentController : Composition
+    AppointmentController --> ClinicDatabase : Uses
 
     PatientPanel --> SearchEngine : Calls
     SearchPanel --> SearchEngine : Calls
     SearchPanel --> SortEngine : Calls
     ReportPanel --> ReportBuilder : Calls
-    MainWindow --> FileHandler : Calls
-    AppointmentPanel --> IDGenerator : Calls
+    AdminPanel --> ReportBuilder : Calls
+    ClinicManager --> FileHandler : Calls
+    ClinicManager --> IDGenerator : Calls
+    AppointmentController --> IDGenerator : Calls
     ClinicDatabase ..> ClinicException : Throws
+    ClinicManager ..> ClinicException : Throws
+    AppointmentController ..> ClinicException : Throws
 ```

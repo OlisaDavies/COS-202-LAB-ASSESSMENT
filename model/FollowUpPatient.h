@@ -1,7 +1,6 @@
 #pragma once
 
 #include <string>
-#include <utility>
 
 #include "ScheduledPatient.h"
 
@@ -33,10 +32,13 @@ public:
 
     std::string getTypeLabel() const override { return "Follow-Up Patient"; }
 
-    void displayPatient() const override;
+    // The full record of the patient as text.
+    std::string getPatientReport() const override;
+
     std::string getSpecialDetail() const override;
 
-    PatientRecord* clone() const override { return new FollowUpPatient(*this); }
+    // The covariant return type hands back a FollowUpPatient.
+    FollowUpPatient* clone() const override { return new FollowUpPatient(*this); }
 
     void restoreFrom(const PatientRecord& previous) override;
 };

@@ -1,6 +1,7 @@
 #include "FileHandler.h"
 
 #include <fstream>
+#include <memory>
 #include <ostream>
 #include <sstream>
 
@@ -172,8 +173,8 @@ void FileHandler::saveAppointments(const std::string& filename,
     outFile.close();
 }
 
-model::PatientRecord* FileHandler::readPatient(const std::vector<std::string>& fields,
-                                               std::string* warning) {
+std::unique_ptr<model::PatientRecord> FileHandler::readPatient(
+    const std::vector<std::string>& fields, std::string* warning) {
     if (fields.size() < 5) {
         *warning = "a row has fewer than five columns and was skipped";
         return nullptr;
@@ -210,7 +211,7 @@ model::PatientRecord* FileHandler::readPatient(const std::vector<std::string>& f
         if (!feeText.empty() && !parseDouble(feeText, &fee)) {
             *warning = "patient [" + id + "] has an unreadable fee [" + feeText + "], using 0";
         }
-        return new model::GeneralPatient(id, name, age, contact, fee);
+        return std::make_unique<model::GeneralPatient>(id, name, age, contact, fee);
     }
 
     if (type == model::PatientRecord::TYPE_EMERGENCY) {
@@ -221,22 +222,23 @@ model::PatientRecord* FileHandler::readPatient(const std::vector<std::string>& f
             *warning = "patient [" + id + "] has an unreadable severity, using 1";
             severity = 1;
         }
-        return new model::EmergencyPatient(id, name, age, contact, severity, note);
+        return std::make_unique<model::EmergencyPatient>(id, name, age, contact, severity, note);
     }
 
     if (type == model::PatientRecord::TYPE_FOLLOWUP) {
         std::string previousVisit = fields.size() > 5 ? utils::trim(fields[5]) : "";
         std::string doctor = fields.size() > 6 ? utils::trim(fields[6]) : "";
-        return new model::FollowUpPatient(id, name, age, contact, previousVisit, doctor);
+        return std::make_unique<model::FollowUpPatient>(id, name, age, contact,
+                                                         previousVisit, doctor);
     }
 
     *warning = "patient [" + id + "] has an unknown category [" + type + "] and was skipped";
     return nullptr;
 }
 
-std::vector<model::PatientRecord*> FileHandler::loadPatients(const std::string& filename,
-                                                             std::vector<std::string>* warnings) {
-    std::vector<model::PatientRecord*> loaded;
+std::vector<std::unique_ptr<model::PatientRecord>> FileHandler::loadPatients(
+    const std::string& filename, std::vector<std::string>* warnings) {
+    std::vector<std::unique_ptr<model::PatientRecord>> loaded;
     std::ifstream inFile(filename);
     if (!inFile.is_open()) {
         throw FileIOException(filename, "could not be opened for reading");
@@ -252,14 +254,14 @@ std::vector<model::PatientRecord*> FileHandler::loadPatients(const std::string& 
 
         std::vector<std::string> fields = splitRow(line);
         std::string warning;
-        model::PatientRecord* patient = readPatient(fields, &warning);
+        std::unique_ptr<model::PatientRecord> patient = readPatient(fields, &warning);
         if (patient == nullptr) {
             if (warnings != nullptr) {
                 warnings->push_back("row " + std::to_string(rowNumber) + ": " + warning);
             }
             continue;
         }
-        loaded.push_back(patient);
+        loaded.push_back(std::move(patient));
     }
 
     inFile.close();

@@ -7,7 +7,7 @@
 #include <QPushButton>
 #include <QTableWidget>
 
-#include "../model/ClinicDatabase.h"
+#include "../controller/ClinicManager.h"
 
 namespace scapms {
 namespace gui {
@@ -20,7 +20,7 @@ class SearchPanel : public QWidget {
     Q_OBJECT
 
 public:
-    explicit SearchPanel(model::ClinicDatabase& database, QWidget* parent = nullptr);
+    explicit SearchPanel(controller::ClinicManager& manager, QWidget* parent = nullptr);
 
     void refresh();
 
@@ -34,7 +34,7 @@ private slots:
     void onSortAlgorithmChanged(int index);
 
 private:
-    model::ClinicDatabase& database;
+    controller::ClinicManager& manager;
 
     QLineEdit* txtSearchQuery;
     QComboBox* cmbSearchAlgorithm;

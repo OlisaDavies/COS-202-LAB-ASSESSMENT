@@ -10,6 +10,9 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 
+#include <memory>
+#include <vector>
+
 #include "../model/Appointable.h"
 #include "../model/GeneralPatient.h"
 #include "../model/EmergencyPatient.h"
@@ -21,8 +24,8 @@
 namespace scapms {
 namespace gui {
 
-PatientPanel::PatientPanel(model::ClinicDatabase& database, QWidget* parent)
-    : QWidget(parent), database(database), editSnapshot(nullptr) {
+PatientPanel::PatientPanel(controller::ClinicManager& manager, QWidget* parent)
+    : QWidget(parent), manager(manager) {
     QHBoxLayout* layout = new QHBoxLayout(this);
     layout->setContentsMargins(16, 16, 16, 16);
     layout->setSpacing(16);
@@ -45,6 +48,10 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
 
     txtPatID = new QLineEdit(group);
     txtPatID->setPlaceholderText("e.g. GEN-201, EMG-801");
+
+    btnSuggestID = new QPushButton("Suggest ID", group);
+    btnSuggestID->setToolTip("Fill in the next free identifier for the chosen category.");
+    connect(btnSuggestID, &QPushButton::clicked, this, &PatientPanel::onSuggestPatientID);
 
     txtPatName = new QLineEdit(group);
     txtPatName->setPlaceholderText("Full Patient Name");
@@ -76,6 +83,7 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
     cmbPatType->setMaximumWidth(inputWidth);
 
     form->addRow("Patient ID *:", txtPatID);
+    form->addRow(btnSuggestID);
     form->addRow("Full Name *:", txtPatName);
     form->addRow("Age *:", txtPatAge);
     form->addRow("Contact Phone:", txtPatContact);
@@ -144,6 +152,10 @@ QWidget* PatientPanel::buildRoster(QWidget* parent) {
     tablePatients->verticalHeader()->setVisible(false);
     tablePatients->setSelectionBehavior(QAbstractItemView::SelectRows);
     tablePatients->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    // The Details column holds a long text, so the text is cut off with an
+    // ellipsis instead of being written over the next column.
+    tablePatients->setTextElideMode(Qt::ElideRight);
     layout->addWidget(tablePatients);
 
     QHBoxLayout* buttonRow = new QHBoxLayout();
@@ -156,7 +168,12 @@ QWidget* PatientPanel::buildRoster(QWidget* parent) {
     btnDelete->setToolTip("Remove the selected patient. The step can be undone.");
     connect(btnDelete, &QPushButton::clicked, this, &PatientPanel::onDeleteSelectedPatient);
 
+    btnReport = new QPushButton("Full Report", group);
+    btnReport->setToolTip("Show the full report of the selected patient.");
+    connect(btnReport, &QPushButton::clicked, this, &PatientPanel::onShowReport);
+
     buttonRow->addWidget(btnEdit);
+    buttonRow->addWidget(btnReport);
     buttonRow->addStretch();
     buttonRow->addWidget(btnDelete);
     layout->addLayout(buttonRow);
@@ -255,30 +272,32 @@ void PatientPanel::onRegisterPatient() {
     fields.value2 = txtTypeField2->text().trimmed();
     fields.hasSecondField = txtTypeField2->isVisible();
 
-    model::PatientRecord* patient = nullptr;
+    // The unique pointer owns the record until it is handed over to the
+    // database, so it is released even when the registration is refused.
+    std::unique_ptr<model::PatientRecord> owned;
+
     if (typeIndex == EMERGENCY_INDEX) {
-        patient = new model::EmergencyPatient(id.toStdString(), name.toStdString(), age,
-                                              contact.toStdString(), 1, "");
+        owned = std::make_unique<model::EmergencyPatient>(id.toStdString(), name.toStdString(),
+                                                           age, contact.toStdString(), 1, "");
     } else if (typeIndex == FOLLOWUP_INDEX) {
-        patient = new model::FollowUpPatient(id.toStdString(), name.toStdString(), age,
-                                             contact.toStdString(), "", "");
+        owned = std::make_unique<model::FollowUpPatient>(id.toStdString(), name.toStdString(),
+                                                          age, contact.toStdString(), "", "");
     } else {
-        patient = new model::GeneralPatient(id.toStdString(), name.toStdString(), age,
-                                            contact.toStdString(), 0.0);
+        owned = std::make_unique<model::GeneralPatient>(id.toStdString(), name.toStdString(),
+                                                         age, contact.toStdString(), 0.0);
     }
 
     try {
         // The category fields are checked before the record is stored.
-        writeFields(patient, fields);
+        writeFields(owned.get(), fields);
     } catch (const utils::ClinicException& error) {
-        delete patient;                          // the panel still owns it
         QMessageBox::critical(this, "Registration error", error.what());
         return;                                 // the form is kept as it is
     }
 
     try {
-        // From here on the database owns the record, also when it refuses it.
-        database.addPatient(patient);
+        // From here on the manager owns the record, also when it refuses it.
+        manager.registerPatient(std::move(owned));
     } catch (const utils::ClinicException& error) {
         QMessageBox::critical(this, "Registration error", error.what());
         return;                                 // the form is kept as it is
@@ -299,14 +318,15 @@ void PatientPanel::onEditSelectedPatient() {
     }
 
     const QString id = tablePatients->item(row, 0)->text();
-    model::PatientRecord* patient = database.findPatientByID(id.toStdString());
+    model::PatientRecord* patient = manager.findPatientByID(id.toStdString());
     if (patient == nullptr) {
-        QMessageBox::warning(this, "Not found", "That patient is no longer in the database.");
+        QMessageBox::warning(this, "Not found", "That patient is no longer in the clinic.");
         return;
     }
 
-    delete editSnapshot;
-    editSnapshot = patient->clone();             // the copy taken before the edit
+    // The copy taken before the edit. The unique pointer owns it, so it is
+    // released even when the window is closed in the middle of an edit.
+    editSnapshot.reset(patient->clone());
     editingPatientID = patient->getPatientID();
 
     loadPatientIntoForm(patient);
@@ -318,9 +338,9 @@ void PatientPanel::onUpdatePatient() {
         return;
     }
 
-    model::PatientRecord* patient = database.findPatientByID(editingPatientID);
+    model::PatientRecord* patient = manager.findPatientByID(editingPatientID);
     if (patient == nullptr) {
-        QMessageBox::warning(this, "Not found", "That patient is no longer in the database.");
+        QMessageBox::warning(this, "Not found", "That patient is no longer in the clinic.");
         onCancelEdit();
         return;
     }
@@ -349,20 +369,28 @@ void PatientPanel::onUpdatePatient() {
     fields.value2 = txtTypeField2->text().trimmed();
     fields.hasSecondField = txtTypeField2->isVisible();
 
+    // The change is first tried out on a copy of the record. That way an
+    // invalid value cannot leave the live record half changed.
+    std::unique_ptr<model::PatientRecord> candidate(patient->clone());
+
     try {
-        patient->setName(name.toStdString());
-        patient->setAge(age);
-        patient->setContactNumber(contact.toStdString());
-        writeFields(patient, fields);
+        candidate->setName(name.toStdString());
+        candidate->setAge(age);
+        candidate->setContactNumber(contact.toStdString());
+        writeFields(candidate.get(), fields);
     } catch (const utils::ClinicException& error) {
         QMessageBox::critical(this, "Update error", error.what());
-        return;
+        return;                                 // the live record was not touched
     }
 
-    // The database keeps the copy, so that the change can be undone.
-    database.pushPatientSnapshot(editSnapshot);
-    editSnapshot = nullptr;
+    // The change is good, so the state from before the edit is kept on the
+    // undo stack before the live record is changed.
+    manager.pushPatientSnapshot(std::move(editSnapshot));
     editingPatientID.clear();
+
+    // The values that were checked on the copy are now copied onto the live
+    // record.
+    patient->restoreFrom(*candidate);
 
     setEditingMode(false);
     clearPatientForm();
@@ -373,8 +401,7 @@ void PatientPanel::onUpdatePatient() {
 }
 
 void PatientPanel::onCancelEdit() {
-    delete editSnapshot;
-    editSnapshot = nullptr;
+    editSnapshot.reset();
     editingPatientID.clear();
 
     setEditingMode(false);
@@ -403,13 +430,50 @@ void PatientPanel::onDeleteSelectedPatient() {
         onCancelEdit();
     }
 
-    if (!database.removePatient(id.toStdString())) {
-        QMessageBox::warning(this, "Not found", "That patient is no longer in the database.");
+    if (!manager.deletePatient(id.toStdString())) {
+        QMessageBox::warning(this, "Not found", "That patient is no longer in the clinic.");
         return;
     }
 
     refresh();
     emit dataChanged();
+}
+
+void PatientPanel::onShowReport() {
+    const int row = tablePatients->currentRow();
+    if (row < 0) {
+        QMessageBox::warning(this, "No selection", "Please select a patient row first.");
+        return;
+    }
+
+    const QString id = tablePatients->item(row, 0)->text();
+    const model::PatientRecord* patient = manager.findPatientByID(id.toStdString());
+    if (patient == nullptr) {
+        QMessageBox::warning(this, "Not found", "That patient is no longer in the clinic.");
+        return;
+    }
+
+    // The call goes through the base class pointer, so the report of the
+    // category of the patient is built at run time.
+    QMessageBox box(this);
+    box.setWindowTitle("Patient report - " + id);
+    box.setText(QString::fromStdString(patient->getPatientReport()));
+    box.exec();
+}
+
+void PatientPanel::onSuggestPatientID() {
+    const int typeIndex = cmbPatType->currentIndex();
+    std::string type = model::PatientRecord::TYPE_GENERAL;
+    if (typeIndex == EMERGENCY_INDEX) {
+        type = model::PatientRecord::TYPE_EMERGENCY;
+    } else if (typeIndex == FOLLOWUP_INDEX) {
+        type = model::PatientRecord::TYPE_FOLLOWUP;
+    }
+
+    // The controller knows which identifiers are already in use.
+    const std::string suggestion = manager.suggestPatientId(type);
+    txtPatID->setText(QString::fromStdString(suggestion));
+    txtPatID->setFocus();
 }
 
 int PatientPanel::categoryIndex(const model::PatientRecord* patient) {
@@ -556,7 +620,7 @@ void PatientPanel::applyRowFormatting(int row, const std::string& patientType) {
 }
 
 void PatientPanel::refresh() {
-    const std::vector<model::PatientRecord*>& patients = database.getAllPatients();
+    const std::vector<model::PatientRecord*> patients = manager.getAllPatients();
     tablePatients->setRowCount(static_cast<int>(patients.size()));
 
     for (int i = 0; i < static_cast<int>(patients.size()); ++i) {
@@ -582,7 +646,7 @@ void PatientPanel::refresh() {
 
         // A patient can hold more than one appointment, so the number of
         // them is shown as well.
-        const std::size_t total = database.getAppointmentsFor(patient->getPatientID()).size();
+        const std::size_t total = patient->getAppointmentCount();
         if (total > 1) {
             details += " | " + QString::number(total) + " appointments";
         }

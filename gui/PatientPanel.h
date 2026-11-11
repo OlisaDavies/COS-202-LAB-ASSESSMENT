@@ -7,7 +7,9 @@
 #include <QPushButton>
 #include <QTableWidget>
 
-#include "../model/ClinicDatabase.h"
+#include <memory>
+
+#include "../controller/ClinicManager.h"
 #include "../model/PatientRecord.h"
 
 namespace scapms {
@@ -29,7 +31,7 @@ class PatientPanel : public QWidget {
     Q_OBJECT
 
 public:
-    explicit PatientPanel(model::ClinicDatabase& database, QWidget* parent = nullptr);
+    explicit PatientPanel(controller::ClinicManager& manager, QWidget* parent = nullptr);
 
     // Redraws the roster table.
     void refresh();
@@ -49,6 +51,8 @@ private slots:
     void onUpdatePatient();
     void onCancelEdit();
     void onDeleteSelectedPatient();
+    void onShowReport();
+    void onSuggestPatientID();
 
 private:
     // The order of the entries in the category combo box.
@@ -67,7 +71,7 @@ private:
         bool hasSecondField = false;
     };
 
-    model::ClinicDatabase& database;
+    controller::ClinicManager& manager;
 
     // Form.
     QLineEdit* txtPatID;
@@ -90,9 +94,13 @@ private:
     QPushButton* btnUndo;
     QPushButton* btnEdit;
     QPushButton* btnDelete;
+    QPushButton* btnReport;
+    QPushButton* btnSuggestID;
 
     // The record that is being edited and the copy taken before the edit.
-    model::PatientRecord* editSnapshot;
+    // The copy is owned by the panel, so it is released even when the
+    // window is closed in the middle of an edit.
+    std::unique_ptr<model::PatientRecord> editSnapshot;
     std::string editingPatientID;
 
     QWidget* buildForm(QWidget* parent);

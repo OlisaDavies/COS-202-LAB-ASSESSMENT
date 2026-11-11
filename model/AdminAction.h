@@ -1,5 +1,6 @@
 #pragma once
 
+#include <memory>
 #include <string>
 
 #include "PatientRecord.h"
@@ -13,6 +14,9 @@ namespace model {
 // An entry remembers what was done, which record it was about and a copy of
 // that record. The copy is a separate object, so the undo stack and the
 // roster never share the same memory.
+//
+// The class owns a record, so it follows the rule of five: it can be moved
+// but not copied.
 class AdminAction {
 public:
     enum class Type {
@@ -26,18 +30,22 @@ public:
     Type type;
     std::string description;
     std::string patientID;             // the record the action is about
-    PatientRecord* patientBackup;      // a copy of the record
+    std::unique_ptr<PatientRecord> patientBackup;   // a copy of the record
     Appointment appointmentBackup;
 
+    AdminAction(Type actionType, const std::string& text, const std::string& affectedPatientID);
     AdminAction(Type actionType, const std::string& text, const std::string& affectedPatientID,
-                PatientRecord* backup = nullptr)
-        : type(actionType), description(text), patientID(affectedPatientID),
-          patientBackup(backup), appointmentBackup("", "", "", "", "") {}
+                std::unique_ptr<PatientRecord> backup);
+    AdminAction(Type actionType, const std::string& text, const std::string& affectedPatientID,
+                const Appointment& appointment);
 
-    AdminAction(Type actionType, const std::string& text, const std::string& affectedPatientID,
-                const Appointment& appointment)
-        : type(actionType), description(text), patientID(affectedPatientID),
-          patientBackup(nullptr), appointmentBackup(appointment) {}
+    // The entry owns a record, so copying it would copy the ownership as
+    // well. It can be moved, which is what the stack does.
+    AdminAction(const AdminAction&) = delete;
+    AdminAction& operator=(const AdminAction&) = delete;
+    AdminAction(AdminAction&&) = default;
+    AdminAction& operator=(AdminAction&&) = default;
+    ~AdminAction() = default;
 };
 
 } // namespace model
