@@ -6,7 +6,6 @@
 #include <QLineEdit>
 #include <QPushButton>
 #include <QTableWidget>
-
 #include <memory>
 
 #include "../controller/ClinicManager.h"
@@ -33,12 +32,9 @@ class PatientPanel : public QWidget {
 public:
     explicit PatientPanel(controller::ClinicManager& manager, QWidget* parent = nullptr);
 
-    // Redraws the roster table.
     void refresh();
 
 signals:
-    // Emitted whenever the panel changed the data, so that the other panels
-    // can refresh themselves.
     void dataChanged();
 
     // The window owns the undo stack, so the button asks it to undo.
@@ -74,7 +70,6 @@ private:
 
     controller::ClinicManager& manager;
 
-    // Form.
     QLineEdit* txtPatID;
     QLineEdit* txtPatName;
     QLineEdit* txtPatAge;
@@ -89,10 +84,8 @@ private:
     // type whether the identifier is free or already in use.
     QLabel* lblIDHint;
 
-    // Roster.
     QTableWidget* tablePatients;
 
-    // Buttons.
     QPushButton* btnRegister;
     QPushButton* btnSaveChanges;
     QPushButton* btnCancelEdit;
@@ -116,6 +109,11 @@ private:
     void showCategoryFields(int index);
     void applyRowFormatting(int row, const std::string& patientType);
     void setEditingMode(bool editing);
+
+    // A small label in the colour of one category, used by the legend above
+    // the roster table.
+    static QLabel* buildLegendChip(const QString& text, const QString& background,
+                                    const QString& foreground, QWidget* parent);
 
     // The combo box entry of a record and of a category name.
     static int categoryIndex(const model::PatientRecord* patient);

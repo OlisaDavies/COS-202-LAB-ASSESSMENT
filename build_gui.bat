@@ -6,12 +6,21 @@ cd /d "%~dp0"
 
 echo [1/3] Generating Makefile with qmake...
 C:\Qt\6.5.3\msvc2019_64\bin\qmake.exe SCAPMS.pro -spec win32-msvc "CONFIG+=release"
+if errorlevel 1 goto :failed
 
 echo [2/3] Compiling Qt Application with nmake...
 nmake /NOLOGO release
+if errorlevel 1 goto :failed
 
 echo [3/3] Deploying Qt runtime DLLs...
 C:\Qt\6.5.3\msvc2019_64\bin\windeployqt.exe release\SCAPMS_GUI.exe --no-translations --compiler-runtime >nul 2>&1
+if errorlevel 1 goto :failed
 
 echo.
 echo Build Complete! Binary created at: release\SCAPMS_GUI.exe
+exit /b 0
+
+:failed
+echo.
+echo Build FAILED
+exit /b 1

@@ -158,21 +158,22 @@ classDiagram
         -recentPatients: PatientRecord*[10]
         -recentCount: int
         +addPatient(p: unique_ptr~PatientRecord~) void
-        +addPatients(list: vector~unique_ptr~PatientRecord~~) void
+        +addPatientWithoutUndo(p: unique_ptr~PatientRecord~) void
         +removePatient(id: string) bool
         +pushPatientSnapshot(snapshot: unique_ptr~PatientRecord~) void
         +findPatientByID(id: string) PatientRecord*
         +getAllPatients() vector~PatientRecord*~
         +getPatientCount() size_t
-        +getAppointmentsFor(id: string) vector~Appointment~
+        +setPatientOrder(order: vector~PatientRecord*~) void
         +getAllAppointments() vector~Appointment~
-        +getPendingCountFor(id: string) size_t
         +enqueuePatient(p: PatientRecord*) void
         +callNextPatient() PatientRecord*
         +getQueueSize() size_t
+        +getWaitingQueue() vector~PatientRecord*~
         +addAppointment(apt: Appointment) void
-        +addAppointments(list: vector~Appointment~) void
+        +addAppointmentWithoutUndo(apt: Appointment) void
         +cancelAppointment(id: string) bool
+        +completeAppointment(id: string) bool
         +undoLastAction() string
         +clearAll() void
         +getRecentPatients() vector~PatientRecord*~
@@ -267,28 +268,31 @@ classDiagram
     %% GUI
     class MainWindow {
         <<GUI>>
-        -database: ClinicDatabase
+        -manager: ClinicManager
         -tabWidget: QTabWidget*
         -dashboardTimer: QTimer*
+        -centred: bool
         -patientPanel: PatientPanel*
         -appointmentPanel: AppointmentPanel*
         -queuePanel: QueuePanel*
         -searchPanel: SearchPanel*
         -reportPanel: ReportPanel*
+        -adminPanel: AdminPanel*
         +setupUI() void
         +setupMenuBar() void
         +setupTimer() void
+        +applyStyleSheet() void
+        +loadSampleData() void
         +refreshAll() void
         +onDataChanged() void
         +onUndoAction() void
-        +onSaveData() void
-        +onLoadData() void
+        +showWarnings(warnings) void
         +onAbout() void
     }
 
     class PatientPanel {
         <<GUI>>
-        -database: ClinicDatabase
+        -manager: ClinicManager
         -editSnapshot: unique_ptr~PatientRecord~
         +refresh() void
         +onRegisterPatient() void
@@ -302,7 +306,7 @@ classDiagram
 
     class AppointmentPanel {
         <<GUI>>
-        -database: ClinicDatabase
+        -manager: ClinicManager
         +refresh() void
         +onScheduleAppointment() void
         +onCancelSelectedAppointment() void
@@ -310,7 +314,7 @@ classDiagram
 
     class QueuePanel {
         <<GUI>>
-        -database: ClinicDatabase
+        -manager: ClinicManager
         +refresh() void
         +onEnqueuePatient() void
         +onCallNextPatient() void
@@ -318,7 +322,7 @@ classDiagram
 
     class SearchPanel {
         <<GUI>>
-        -database: ClinicDatabase
+        -manager: ClinicManager
         +refresh() void
         +onExecuteSearch() void
         +onExecuteSort() void
@@ -327,7 +331,7 @@ classDiagram
 
     class ReportPanel {
         <<GUI>>
-        -database: ClinicDatabase
+        -manager: ClinicManager
         +refresh() void
         +onGenerateReport() void
     }
@@ -336,6 +340,7 @@ classDiagram
         <<GUI>>
         -manager: ClinicManager
         +refresh() void
+        +refreshStatistics() void
         +undoLastOperation() void
         +saveData() void
         +loadData() void

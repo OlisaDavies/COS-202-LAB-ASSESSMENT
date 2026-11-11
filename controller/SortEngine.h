@@ -21,7 +21,6 @@ enum class SortField {
 // and conquer routine that always needs O(n log n) comparisons.
 class SortEngine {
 public:
-    // Compares two records on the chosen field.
     static bool comparePatients(const model::PatientRecord* first,
                                 const model::PatientRecord* second,
                                 SortField field);

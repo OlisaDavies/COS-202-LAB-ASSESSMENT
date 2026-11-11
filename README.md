@@ -1,7 +1,7 @@
 # Smart Clinic Appointment & Patient Management System (SCAPMS)
 
 **Course:** COS202 Programming II - Lab Assessment Project  
-**Author:** Chinedu-Eze Olisa Davies  
+**Author:** OlisaEmeka Davies Chinedu-Eze  
 **Technologies:** C++17, Qt 6.5.3 (x64), MSVC 2022
 
 ## Project Overview
@@ -42,7 +42,7 @@ model/       PatientRecord, Appointable, Billable, ScheduledPatient, GeneralPati
              EmergencyPatient, FollowUpPatient, Appointment, AdminAction, ClinicDatabase
 controller/  ClinicManager, AppointmentController, SearchEngine, SortEngine, ReportBuilder
 gui/         MainWindow, PatientPanel, AppointmentPanel, QueuePanel,
-             SearchPanel, ReportPanel, AdminPanel, style.qss
+             SearchPanel, ReportPanel, AdminPanel, style.qss, clinic.ico
 utils/       ClinicExceptions, DateUtil, FileHandler, IDGenerator, StringUtil
 main.cpp     the console demonstration
 gui_main.cpp the entry point of the graphical program
@@ -73,8 +73,8 @@ directly: every panel holds a `ClinicManager&` and asks it to do the work.
 | 5 Sorting | `controller/SortEngine.h` - selection sort and merge sort, chosen from a combo box on the Search & Sort panel. The chosen order is kept by the controller, so the roster and the results show the same order. The names and the identifiers are compared without regard to letter case |
 | 6 Events | `gui/MainWindow.cpp` and the panels - button clicks, menu actions, combo box changes, text field changes and a `QTimer` that refreshes the status bar and the dashboard. The File menu holds New, Save as, Load and Exit |
 | 7 Panels | Patient Records, Appointments, Waiting Queue, Search & Sort, Clinic Reports, Administration |
-| 8 Layout | `QFormLayout` for the forms, `QHBoxLayout` and `QVBoxLayout` for the panels |
-| 9 Advanced GUI | 9.a colour coded rows, 9.b fields that change with the patient type, 9.c file dialogs, 9.d status bar timer, 9.e validation messages, 9.f shortcuts, 9.g tooltips |
+| 8 Layout | `QFormLayout` for the forms, `QHBoxLayout` and `QVBoxLayout` for the panels, `QGridLayout` for the tables of the categories and their priorities |
+| 9 Advanced GUI | 9.a colour coded rows with a table of the categories and their priorities, 9.b fields that change with the patient type, 9.c file dialogs, 9.d status bar timer, 9.e validation messages, 9.f shortcuts, 9.g tooltips |
 | 10 Exceptions | `utils/ClinicExceptions.h` - `DuplicateIDException`, `InvalidPatientDataException`, `InvalidAppointmentException`, `FileIOException`. `gui_main.cpp` also catches anything that escapes a slot, so that the program never stops by itself |
 | 11 Persistence | `utils/FileHandler.h` - CSV read and write for both patients and appointments. A file is written to a temporary name first, so a failed save cannot destroy the data that is already on the disk |
 
@@ -93,6 +93,20 @@ The rules live in the controller layer, so that the screens and the data always 
 | The same doctor cannot be booked twice in the same slot | `AppointmentController::scheduleAppointment` |
 | An emergency patient is not booked in advance, it goes to the waiting room | `AppointmentController::scheduleAppointment` |
 | A visit that was completed cannot be cancelled, and a cancelled visit cannot be completed | `ScheduledPatient::cancelAppointment` |
+
+## Screenshots
+
+The `screenshots/` folder holds the six views of the graphical program, in the order in which the
+submission asks for them:
+
+| File | View |
+| --- | --- |
+| `1_main_dashboard.png` | The dashboard of the clinic, with the live figures and the categories |
+| `2_patient_registration.png` | The registration form and the roster of the patients |
+| `3_appointment_management.png` | The booking form and the schedule of the clinic |
+| `4_search_and_sort.png` | The search and the sort, with the result of a search |
+| `5_waiting_queue.png` | The waiting room and the patients that are waiting |
+| `6_clinic_reports.png` | The report of the clinic |
 
 ## Build & Run
 

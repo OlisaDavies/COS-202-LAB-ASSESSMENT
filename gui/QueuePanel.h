@@ -20,7 +20,6 @@ class QueuePanel : public QWidget {
 public:
     explicit QueuePanel(controller::ClinicManager& manager, QWidget* parent = nullptr);
 
-    // Redraws the queue list and the patient list of the form.
     void refresh();
 
 signals:

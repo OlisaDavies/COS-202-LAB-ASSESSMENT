@@ -2,7 +2,7 @@
 
 **Course:** COS202 Programming II  
 **Project Title:** Smart Clinic Appointment & Patient Management System (SCAPMS)  
-**Author / Student:** Davies Johnson  
+**Author / Student:** OlisaEmeka Davies Chinedu-Eze  
 **Language & Framework:** C++17, Qt 6.5.3 (x64)  
 **IDE & Build Environment:** Visual Studio 2022 MSVC Build Tools / Visual Studio Code  
 
@@ -71,7 +71,9 @@ The **`AdminPanel`** is a sixth tab that holds the operations that belong to the
 of the clinic rather than to the treatment of a patient: undoing the last step, saving and loading
 the data, and starting a new day with an empty database. It also shows the live dashboard of the
 clinic and the records that were used most recently, which are the ten records held in the fixed
-size cache.
+size cache. The dashboard is built out of real widgets rather than out of one block of text: a
+table of the six figures of the clinic, and a table of the three categories with the priority that
+goes with each of them.
 
 ### 2.1 Abstract Base Class & Inheritance Hierarchy
 At the core of the clinical model is the abstract base class `PatientRecord`
@@ -173,7 +175,7 @@ The brief rules out the STL algorithms, so every search and sort below is writte
 ## 5. Graphical User Interface (GUI) & Event Architecture
 
 The graphical frontend was built natively using **Qt 6.5.3 (C++17)**:
-- **Layout Management (Req. 8):** Hardcoded pixel coordinates were strictly avoided. Responsive layouts adapt dynamically to window resizing using `QVBoxLayout`, `QHBoxLayout`, and `QFormLayout`.
+- **Layout Management (Req. 8):** Hardcoded pixel coordinates were strictly avoided. Responsive layouts adapt dynamically to window resizing using `QVBoxLayout`, `QHBoxLayout`, `QFormLayout` and `QGridLayout`. The forms use `QFormLayout`, so a label and its field stay together and the form grows with its longest label; the panels use `QHBoxLayout` and `QVBoxLayout`, so the columns and the rows share the space that is left; and the two tables of categories and priorities use `QGridLayout`, so the entries line up under each other in both directions.
 - **Event-Driven Programming (Req. 6):** User actions trigger Qt Signals connected to C++ Member Slots.
   - *Button events (6.a):* Add, Edit, Delete, Undo, Book, Mark as Completed, Cancel, Search, Sort, Save, Load and New Database are all wired to a slot.
   - *Menu events (6.b):* The File menu holds **New**, **Save as...** (`Ctrl+S`), **Load...** (`Ctrl+O`) and **Exit** (`Ctrl+Q`); the Edit menu holds **Undo last operation** (`Ctrl+Z`) and **Quick search** (`Ctrl+F`); the Help menu holds **About**.
@@ -185,12 +187,12 @@ The graphical frontend was built natively using **Qt 6.5.3 (C++17)**:
   - *Panel 3:* Waiting room line manager with FIFO calling dialogs (`gui/QueuePanel.cpp`).
   - *Panel 4:* Search and sort engine with real-time algorithm selection dropdowns (`gui/SearchPanel.cpp`).
   - *Panel 5:* Clinic Reports generator (`gui/ReportPanel.cpp`).
-  - *Panel 6:* Administration panel with the administrative steps, the live dashboard and the recently accessed records (`gui/AdminPanel.cpp`).
+  - *Panel 6:* Administration panel with the administrative steps, the live dashboard of the clinic and the recently accessed records (`gui/AdminPanel.cpp`).
 - **Separation of concerns (Req. 2):** Every tab is its own panel class that owns its widgets and
   talks to the `ClinicManager`, never to the database. `gui/MainWindow.cpp` only builds the tabs,
   the menu bar and the status bar, and it refreshes the panels when one of them reports a change.
 - **Advanced GUI Techniques (Req. 9):**
-  - Custom table cell presentation using soft colors (`#ffebee` for Emergency, `#e8f5e9` for General, `#e3f2fd` for Follow-Up).
+  - Custom table cell presentation using soft colors (`#ffebee` for Emergency, `#e8f5e9` for General, `#e3f2fd` for Follow-Up), with a table of the categories and their priorities beside the roster and beside the dashboard.
   - Fields that appear and disappear with the selected patient type.
   - Background `QTimer` maintaining live clock synchronization, queue size updates, a reminder of the pending appointments and a live refresh of the dashboard statistics.
   - Standard file dialog integration via `QFileDialog` for custom file import/export.
@@ -237,7 +239,7 @@ All GUI event slots wrap database mutations inside `try { ... } catch (const Cli
    - *Resolution:* The rules were moved up into a new `ClinicManager` and an `AppointmentController` in the controller layer, and the panels were repointed from the database to the manager. `ClinicDatabase` now only stores and finds, and no file in the `gui/` folder refers to it any more.
 8. **Code That Was Written But Never Used:**
    - *Challenge:* The dashboard summary and the list of the recently accessed records were written for the reports but nothing ever asked for them, so they were dead code.
-   - *Resolution:* Both were given a real purpose in the new `AdminPanel`, which shows the live dashboard of the clinic and the ten records of the fixed size cache.
+   - *Resolution:* Both were given a real purpose in the new `AdminPanel`, which shows the live dashboard of the clinic and the ten records of the fixed size cache. The summary of the dashboard is built by the report builder, so the console demonstration and the dashboard of the graphical program read the numbers in the same way.
 9. **A Visit That Could Never Be Completed:**
    - *Challenge:* The `Completed` status existed in the data model and the reports counted it, but there was no button to set it. The report of the most frequently attended patients was therefore always empty, and the only way to reach that status was to load a file.
    - *Resolution:* The Appointments panel has a **Mark as Completed** button, the step is remembered on the undo stack, and the status rules were tightened so that a completed visit can no longer be cancelled and a cancelled visit can no longer be completed.
@@ -251,7 +253,7 @@ All GUI event slots wrap database mutations inside `try { ... } catch (const Cli
    - *Challenge:* The fee was written with the default format of the stream, which rounds to six digits. A fee of 123456.78 came back as 123457 after a save and a load, so the bill of the patient was silently wrong.
    - *Resolution:* The fee is written with two decimals, and a row that does not hold one is skipped and reported instead of being loaded with a fee of zero.
 13. **The Cache Of Frequently Accessed Records Did Not Work As A Cache:**
-   - *Challenge:* The fixed-size array of ten records was written with three different ideas of the order at the same time. A record that was used again was moved to the **front**, a new record was **added at the back**, and when the array was full the oldest record was dropped and the new one was put at the **back**. The result was that the array kept the order in which the records were *registered* and not the order in which they were *used*, so the panel showed the wrong "most recently accessed" records. On top of that, indPatientByID returned a record that was already in the cache without recording the access at all.
+   - *Challenge:* The fixed-size array of ten records was written with three different ideas of the order at the same time. A record that was used again was moved to the **front**, a new record was **added at the back**, and when the array was full the oldest record was dropped and the new one was put at the **back**. The result was that the array kept the order in which the records were *registered* and not the order in which they were *used*, so the panel showed the wrong "most recently accessed" records. On top of that, `findPatientByID` returned a record that was already in the cache without recording the access at all.
    - *Resolution:* One order is used everywhere now: the array is held from the oldest record at the front to the newest at the back. Using a record that is already in the cache moves it to the newest place, and a record that is not in the cache is added at the back, which pushes the oldest one out when the cache is full. A cache hit now records the access.
 14. **Undoing A Delete Lost The Place In The Waiting Room:**
    - *Challenge:* When a patient who was waiting for consultation was deleted, the patient was taken out of the waiting queue. Undoing the delete brought the record back, but the patient did not return to the waiting room, so the undo did not really reverse the whole step.
@@ -268,7 +270,7 @@ All GUI event slots wrap database mutations inside `try { ... } catch (const Cli
 otify(), which is the one place every event of the program passes through. Anything that escapes a slot is caught there and shown to the staff as a message, so the program keeps running. The sample data of the start-up is guarded as well, because it is loaded in the constructor of the window, where 
 otify() cannot help.
 18. **A Fee Of "nan" Was Accepted And Written Into The Data File:**
-    - *Challenge:* The fee was checked with ee < 0.0. Every comparison with the value "nan" is false, so a fee of "nan" or of "inf" passed the check, was shown in the roster as "Nnan", and was written into the CSV file. It even survived a save and a load without a single warning.
+    - *Challenge:* The fee was checked with `fee < 0.0`. Every comparison with the value "nan" is false, so a fee of "nan" or of "inf" passed the check, was shown in the roster as "Nnan", and was written into the CSV file. It even survived a save and a load without a single warning.
     - *Resolution:* The rule now uses std::isfinite and an upper bound, and it lives with the data in GeneralPatient::isValidConsultationFee, so the screen, the controller and the file reader all use the same rule. A row in a data file with a broken fee is now skipped and reported.
 19. **A Failed Save Could Destroy The Data That Was Already Saved:**
     - *Challenge:* The file was opened for writing straight away, and an ofstream empties the file the moment it is opened. If the writing then failed, because the disk was full or the drive was removed, a half written file was left behind and the program still said "The data was written".

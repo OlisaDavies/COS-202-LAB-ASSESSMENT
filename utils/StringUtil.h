@@ -16,7 +16,6 @@ inline std::string toLower(const std::string& text) {
     return lowered;
 }
 
-// Compares two strings ignoring letter case.
 inline bool equalsIgnoreCase(const std::string& left, const std::string& right) {
     return toLower(left) == toLower(right);
 }
@@ -50,7 +49,6 @@ inline bool containsIgnoreCase(const std::string& text, const std::string& part)
     return toLower(text).find(toLower(part)) != std::string::npos;
 }
 
-// Removes leading and trailing spaces, tabs and carriage returns.
 inline std::string trim(const std::string& text) {
     std::size_t first = text.find_first_not_of(" \t\r\n");
     if (first == std::string::npos) {

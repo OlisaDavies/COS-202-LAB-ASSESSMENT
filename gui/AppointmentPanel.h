@@ -18,7 +18,6 @@ class AppointmentPanel : public QWidget {
 public:
     explicit AppointmentPanel(controller::ClinicManager& manager, QWidget* parent = nullptr);
 
-    // Redraws the schedule and the patient list of the form.
     void refresh();
 
 signals:

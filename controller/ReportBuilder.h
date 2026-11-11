@@ -15,7 +15,6 @@ namespace controller {
 // user interface.
 class ReportBuilder {
 public:
-    // How many patients there are in each category.
     static std::string categoryDistribution(const ClinicManager& manager);
 
     // Every appointment that has not been completed yet.
@@ -32,13 +31,10 @@ public:
     static std::string dashboardSummary(const ClinicManager& manager);
 
 private:
-    // The title block that every report starts with.
     static std::string header(const std::string& title);
 
-    // The current date and time, written as text.
     static std::string timestamp();
 
-    // Counts the completed visits of every patient.
     static std::vector<std::pair<std::string, int>> completedVisitCounts(
         const ClinicManager& manager);
 };

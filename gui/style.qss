@@ -1,8 +1,4 @@
-/* The look and feel of SCAPMS.
-
-   The rules are the same as in the first version of the program, they are
-   only kept in a resource file now so that they do not take up half of the
-   window class. */
+/* The look and feel of SCAPMS. One flat palette for every panel. */
 
 QMainWindow {
     background-color: #f7f8fa;
@@ -71,6 +67,39 @@ QLineEdit:focus, QComboBox:focus {
     background: #f7f8fa;
 }
 
+QComboBox QAbstractItemView {
+    background-color: #ffffff;
+    border: 1px solid #c4ccd6;
+    selection-background-color: #35618f;
+    selection-color: #ffffff;
+    outline: none;
+}
+
+QPushButton {
+    background-color: #ffffff;
+    border: 1px solid #c4ccd6;
+    border-radius: 6px;
+    padding: 7px 14px;
+    font-size: 13px;
+    color: #25292f;
+}
+
+QPushButton:hover {
+    background-color: #eef3f8;
+    border-color: #35618f;
+    color: #2a4d72;
+}
+
+QPushButton:pressed {
+    background-color: #dde5ee;
+}
+
+QPushButton:disabled {
+    background-color: #f7f8fa;
+    border-color: #e2e6ea;
+    color: #a8b0b9;
+}
+
 QTableWidget {
     background-color: #ffffff;
     border: 1px solid #dde1e7;
@@ -117,12 +146,61 @@ QListWidget::item {
     border-left: 3px solid #35618f;
 }
 
+QMenuBar {
+    background-color: #ffffff;
+    border-bottom: 1px solid #dde1e7;
+    padding: 2px;
+}
+
+QMenuBar::item {
+    padding: 6px 12px;
+    background: transparent;
+    border-radius: 4px;
+}
+
+QMenuBar::item:selected {
+    background: #e6ecf3;
+    color: #2a4d72;
+}
+
+QMenu {
+    background-color: #ffffff;
+    border: 1px solid #dde1e7;
+    border-radius: 6px;
+    padding: 4px;
+}
+
+QMenu::item {
+    padding: 6px 26px 6px 14px;
+    border-radius: 4px;
+}
+
+QMenu::item:selected {
+    background-color: #e6ecf3;
+    color: #2a4d72;
+}
+
+QMenu::separator {
+    height: 1px;
+    background: #eef1f4;
+    margin: 4px 8px;
+}
+
 QStatusBar {
     background: #eef1f4;
     color: #5b636e;
     font-weight: 500;
     font-size: 12px;
     border-top: 1px solid #dde1e7;
+}
+
+QToolTip {
+    background-color: #25292f;
+    color: #ffffff;
+    border: 1px solid #25292f;
+    border-radius: 4px;
+    padding: 5px 8px;
+    font-size: 12px;
 }
 
 QTextEdit {

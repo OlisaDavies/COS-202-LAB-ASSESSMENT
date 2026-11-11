@@ -27,7 +27,8 @@ ReportPanel::ReportPanel(controller::ClinicManager& manager, QWidget* parent)
     cmbReportType->addItem("Daily appointment summary");
     cmbReportType->addItem("Frequently attended patients");
     cmbReportType->setToolTip("The report that is built.");
-    topRow->addWidget(cmbReportType, 1);
+    cmbReportType->setMaximumWidth(340);
+    topRow->addWidget(cmbReportType);
 
     // Choosing another report builds it at once, so that the button does not
     // have to be pressed as well.
@@ -39,13 +40,14 @@ ReportPanel::ReportPanel(controller::ClinicManager& manager, QWidget* parent)
     connect(btnGenerate, &QPushButton::clicked, this, &ReportPanel::onGenerateReport);
     topRow->addWidget(btnGenerate);
 
+    topRow->addStretch();
     layout->addLayout(topRow);
 
     txtReportOutput = new QTextEdit(this);
     txtReportOutput->setReadOnly(true);
     txtReportOutput->setFontFamily("Consolas");
     txtReportOutput->setFontPointSize(10);
-    layout->addWidget(txtReportOutput);
+    layout->addWidget(txtReportOutput, 1);
 
     onGenerateReport();
 }

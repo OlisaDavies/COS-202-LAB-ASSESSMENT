@@ -26,26 +26,20 @@ public:
 
     ScheduledPatient(const ScheduledPatient& other) = default;
 
-    // ---- Appointable ----
-
     // Books the appointment in this patient's own collection. The booking is
     // refused when it has no date or no time.
     bool scheduleAppointment(const Appointment& appointment) override;
 
-    // Cancels the booking that comes first.
     bool cancelAppointment() override;
 
     // Marks the appointment with that identifier as cancelled. The booking
     // stays in the collection, because the clinic keeps a record of it.
     bool cancelAppointment(const std::string& appointmentID) override;
 
-    // True when the patient holds a booking that has not been dealt with yet.
     bool hasScheduledAppointment() const override;
 
-    // A short description of the booking that comes first.
     std::string getAppointmentDetails() const override;
 
-    // ---- Billable ----
     // The billing contract is answered here with the default of a category
     // that does not charge for its visits. The categories that do charge
     // override the two methods.

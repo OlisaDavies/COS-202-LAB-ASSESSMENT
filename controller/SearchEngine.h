@@ -44,7 +44,6 @@ public:
                                                   const std::string& targetName,
                                                   int currentIndex = 0);
 
-    // Returns the positions of every patient in the given category.
     static std::vector<int> searchByCategory(const std::vector<model::PatientRecord*>& records,
                                              const std::string& category);
 };

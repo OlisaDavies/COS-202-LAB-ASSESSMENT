@@ -67,16 +67,16 @@ QWidget* AppointmentPanel::buildForm(QWidget* parent) {
 
     // A free identifier is filled in, unless the staff types one of their own.
     connect(txtAptID, &QLineEdit::textEdited, this, [this]() { aptIdEdited = true; });
-
     QPushButton* btnBook = new QPushButton("Book Appointment", group);
     btnBook->setToolTip("Store the booking in the schedule.");
     connect(btnBook, &QPushButton::clicked, this, &AppointmentPanel::onScheduleAppointment);
     form->addRow(btnBook);
 
-    // The form keeps a fixed width, so that the schedule table always has
-    // room on a small screen.
-    group->setFixedWidth(360);
-    group->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    // The form keeps a minimum width, so that the schedule table always has
+    // room on a small screen, and it may grow when the window is wide.
+    group->setMinimumWidth(330);
+    group->setMaximumWidth(420);
+    group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     return group;
 }
 
@@ -91,17 +91,13 @@ QWidget* AppointmentPanel::buildSchedule(QWidget* parent) {
     tableAppointments->setHorizontalHeaderLabels(
         {"ID", "Patient ID", "Date", "Time", "Doctor", "Status"});
 
-    // The column widths are set by hand, so that the table never asks for
-    // more room than the window can give.
+    // The short columns take the width of their content, so that an
+    // identifier or a date is never cut in half. The status column takes
+    // the rest of the table.
     QHeaderView* header = tableAppointments->horizontalHeader();
-    header->setSectionResizeMode(QHeaderView::Interactive);
+    header->setSectionResizeMode(QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(5, QHeaderView::Stretch);
     header->setMinimumSectionSize(45);
-    header->resizeSection(0, 80);    // ID
-    header->resizeSection(1, 90);    // Patient ID
-    header->resizeSection(2, 90);    // Date
-    header->resizeSection(3, 80);    // Time
-    header->resizeSection(4, 90);    // Doctor
-    header->setStretchLastSection(true);
     tableAppointments->verticalHeader()->setVisible(false);
     tableAppointments->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableAppointments->setEditTriggers(QAbstractItemView::NoEditTriggers);

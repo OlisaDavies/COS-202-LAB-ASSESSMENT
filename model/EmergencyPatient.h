@@ -32,12 +32,10 @@ public:
     const std::string& getTriageNote() const { return triageNote; }
     void setTriageNote(std::string note) { triageNote = note; }
 
-    // Reads the severity level as a short piece of text.
     std::string getUrgencyDescription() const;
 
     std::string getTypeLabel() const override { return "Emergency Patient"; }
 
-    // The full record of the patient as text.
     std::string getPatientReport() const override;
 
     std::string getSpecialDetail() const override;

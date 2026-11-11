@@ -20,7 +20,6 @@ public:
     static std::string nextPatientId(const std::string& prefix,
                                      const std::vector<std::string>& takenIds);
 
-    // Prefix used for each patient category.
     static const char* patientPrefix(const std::string& patientType);
 
 private:

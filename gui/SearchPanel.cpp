@@ -21,8 +21,8 @@ SearchPanel::SearchPanel(controller::ClinicManager& manager, QWidget* parent)
 
     QHBoxLayout* controlRow = new QHBoxLayout();
     controlRow->setSpacing(16);
-    controlRow->addWidget(buildSearchBox(this));
-    controlRow->addWidget(buildSortBox(this));
+    controlRow->addWidget(buildSearchBox(this), 3);
+    controlRow->addWidget(buildSortBox(this), 2);
     layout->addLayout(controlRow);
 
     lblAlgorithmExplanation = new QLabel(
@@ -36,20 +36,22 @@ SearchPanel::SearchPanel(controller::ClinicManager& manager, QWidget* parent)
     tableSearchResults->setHorizontalHeaderLabels(
         {"ID", "Full Name", "Age", "Phone", "Category"});
 
-    // The column widths are set by hand, so that the table never asks for
-    // more room than the window can give.
+    // The identifier, the name, the age and the telephone number take the
+    // width of their content, so that none of them is cut in half. The
+    // category column takes the rest of the table.
     QHeaderView* header = tableSearchResults->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Interactive);
+    header->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(4, QHeaderView::Stretch);
     header->setMinimumSectionSize(45);
-    header->resizeSection(0, 70);
-    header->resizeSection(1, 120);
-    header->resizeSection(2, 45);
-    header->resizeSection(3, 110);
-    header->setStretchLastSection(true);
     tableSearchResults->verticalHeader()->setVisible(false);
     tableSearchResults->setSelectionBehavior(QAbstractItemView::SelectRows);
     tableSearchResults->setEditTriggers(QAbstractItemView::NoEditTriggers);
-    layout->addWidget(tableSearchResults);
+    tableSearchResults->setTextElideMode(Qt::ElideRight);
+    layout->addWidget(tableSearchResults, 1);
 
     onSearchAlgorithmChanged(SEARCH_LINEAR_ID);
     onSortAlgorithmChanged(0);

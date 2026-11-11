@@ -39,11 +39,9 @@ public:
     // when it was cancelled already.
     bool completeAppointment(const std::string& appointmentID);
 
-    // The next free appointment identifier, for example "APT-1004".
     std::string suggestAppointmentId() const;
 
 private:
-    // The rules that a booking has to follow.
     void checkBookingRules(const model::Appointment& appointment) const;
 
     // True when the patient is registered and can be booked in advance.

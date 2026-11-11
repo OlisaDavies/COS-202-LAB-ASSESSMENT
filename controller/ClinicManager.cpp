@@ -50,7 +50,7 @@ void ClinicManager::checkPatientRules(const model::PatientRecord& patient) const
     }
 
     // The identifier of a patient carries the category, so that a general
-    // patient is GEN-101, an emergency case is EMG-102 and a follow-up
+    // patient is GEN-101, an emergency case is EMG-999 and a follow-up
     // patient is FOL-205. A record that breaks the rule is refused, so
     // that the list is not mixed up later on.
     const std::string expectedPrefix = utils::IDGenerator::patientPrefix(patient.getPatientType());

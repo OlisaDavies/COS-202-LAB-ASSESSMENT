@@ -23,7 +23,6 @@ public:
     static void savePatients(const std::string& filename,
                              const std::vector<model::PatientRecord*>& patients);
 
-    // Writes the appointments.
     static void saveAppointments(const std::string& filename,
                                  const std::vector<model::Appointment>& appointments);
 
@@ -43,14 +42,12 @@ private:
     // contain a comma, and a doubled quote is read as one quote character.
     static std::vector<std::string> splitRow(const std::string& line);
 
-    // Wraps a field in double quotes when it contains a comma, a quote or a
-    // newline, so that reading the file back gives the original value.
+    // Wraps a field in double quotes when it contains a comma or a quote, so
+    // that reading the file back gives the original value.
     static std::string quoteField(const std::string& value);
 
-    // Writes the category specific columns of one patient.
     static void writeCategoryFields(std::ostream& out, const model::PatientRecord* patient);
 
-    // Reads the category specific columns and builds the matching subclass.
     static std::unique_ptr<model::PatientRecord> readPatient(
         const std::vector<std::string>& fields, std::string* warning);
 
