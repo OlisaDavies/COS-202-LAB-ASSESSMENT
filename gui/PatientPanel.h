@@ -53,6 +53,7 @@ private slots:
     void onDeleteSelectedPatient();
     void onShowReport();
     void onSuggestPatientID();
+    void onPatientIDChanged(const QString& text);
 
 private:
     // The order of the entries in the category combo box.
@@ -83,6 +84,10 @@ private:
     QLineEdit* txtTypeField1;
     QLabel* lblTypeField2;
     QLineEdit* txtTypeField2;
+
+    // The line under the identifier field. It tells the staff while they
+    // type whether the identifier is free or already in use.
+    QLabel* lblIDHint;
 
     // Roster.
     QTableWidget* tablePatients;
@@ -115,6 +120,9 @@ private:
     // The combo box entry of a record and of a category name.
     static int categoryIndex(const model::PatientRecord* patient);
     static int categoryIndex(const std::string& patientType);
+
+    // The category that is chosen in the combo box.
+    std::string selectedPatientType() const;
 
     // The empty form of a category, the values of a record, and writing the
     // values back into a record.

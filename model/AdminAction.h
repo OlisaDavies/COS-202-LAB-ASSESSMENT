@@ -24,7 +24,8 @@ public:
         DeletePatient,
         UpdatePatient,
         AddAppointment,
-        CancelAppointment
+        CancelAppointment,
+        CompleteAppointment
     };
 
     Type type;
@@ -32,6 +33,11 @@ public:
     std::string patientID;             // the record the action is about
     std::unique_ptr<PatientRecord> patientBackup;   // a copy of the record
     Appointment appointmentBackup;
+
+    // The place the record held in the waiting queue when it was deleted,
+    // counted from the front. A value of -1 means that the record was not
+    // waiting, so undoing the delete must not put it back into the queue.
+    int waitingQueuePosition;
 
     AdminAction(Type actionType, const std::string& text, const std::string& affectedPatientID);
     AdminAction(Type actionType, const std::string& text, const std::string& affectedPatientID,

@@ -9,7 +9,8 @@ AdminAction::AdminAction(Type actionType, const std::string& text,
       description(text),
       patientID(affectedPatientID),
       patientBackup(nullptr),
-      appointmentBackup("", "", "", "", "") {}
+      appointmentBackup("", "", "", "", ""),
+      waitingQueuePosition(-1) {}
 
 AdminAction::AdminAction(Type actionType, const std::string& text,
                          const std::string& affectedPatientID,
@@ -18,7 +19,8 @@ AdminAction::AdminAction(Type actionType, const std::string& text,
       description(text),
       patientID(affectedPatientID),
       patientBackup(std::move(backup)),
-      appointmentBackup("", "", "", "", "") {}
+      appointmentBackup("", "", "", "", ""),
+      waitingQueuePosition(-1) {}
 
 AdminAction::AdminAction(Type actionType, const std::string& text,
                          const std::string& affectedPatientID,
@@ -27,7 +29,8 @@ AdminAction::AdminAction(Type actionType, const std::string& text,
       description(text),
       patientID(affectedPatientID),
       patientBackup(nullptr),
-      appointmentBackup(appointment) {}
+      appointmentBackup(appointment),
+      waitingQueuePosition(-1) {}
 
 } // namespace model
 } // namespace scapms

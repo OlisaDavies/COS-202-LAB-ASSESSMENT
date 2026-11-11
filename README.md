@@ -66,17 +66,33 @@ directly: every panel holds a `ClinicManager&` and asks it to do the work.
 | 1.f / 2 Organisation | The four layers above, each with its own namespace; every class with behaviour is split into a header and a source file |
 | 2 Separation of responsibilities | `controller/ClinicManager.h` is the only class the GUI talks to. `controller/AppointmentController.h` holds the rules of a booking. `model/ClinicDatabase.h` only stores and finds. The GUI never calls the database directly. |
 | 3.a Vector | `model/PatientRecord.h` - `std::vector<Appointment> appointments`; `model/ClinicDatabase.h` - `std::vector<std::unique_ptr<PatientRecord>> patients` |
-| 3.b Queue | `model/ClinicDatabase.h` - `std::queue<PatientRecord*> waitingQueue` |
-| 3.c Stack | `model/ClinicDatabase.h` - `std::stack<AdminAction> undoStack`, with `model/AdminAction.h` holding the copy of the record that is put back |
-| 3.d Fixed-size array | `model/ClinicDatabase.h` - `PatientRecord* recentPatients[10]`, shown in the Administration panel |
-| 4 Searching | `controller/SearchEngine.h` - linear by ID, binary by ID on sorted records, recursive by name, linear by category |
-| 5 Sorting | `controller/SortEngine.h` - selection sort and merge sort, chosen from a combo box on the Search & Sort panel |
-| 6 Events | `gui/MainWindow.cpp` and the panels - button clicks, menu actions, combo box changes and a `QTimer` that refreshes the status bar |
+| 3.b Queue | `model/ClinicDatabase.h` - `std::queue<PatientRecord*> waitingQueue`. The patient who joins first is served first |
+| 3.c Stack | `model/ClinicDatabase.h` - `std::stack<AdminAction> undoStack`, with `model/AdminAction.h` holding the copy of the record that is put back. Undoing a delete also gives the record its place in the waiting queue again |
+| 3.d Fixed-size array | `model/ClinicDatabase.h` - `PatientRecord* recentPatients[10]`, shown in the Administration panel. The array is held from the oldest record at the front to the newest at the back, the most recently used record is shown first, and when the cache is full the record that was used the longest time ago makes room for a new one |
+| 4 Searching | `controller/SearchEngine.h` - linear by ID or name, binary by ID on sorted records, recursive by name, linear by category. The text is matched without regard to letter case, and a part of the identifier or the name is enough |
+| 5 Sorting | `controller/SortEngine.h` - selection sort and merge sort, chosen from a combo box on the Search & Sort panel. The chosen order is kept by the controller, so the roster and the results show the same order. The names and the identifiers are compared without regard to letter case |
+| 6 Events | `gui/MainWindow.cpp` and the panels - button clicks, menu actions, combo box changes, text field changes and a `QTimer` that refreshes the status bar and the dashboard. The File menu holds New, Save as, Load and Exit |
 | 7 Panels | Patient Records, Appointments, Waiting Queue, Search & Sort, Clinic Reports, Administration |
 | 8 Layout | `QFormLayout` for the forms, `QHBoxLayout` and `QVBoxLayout` for the panels |
 | 9 Advanced GUI | 9.a colour coded rows, 9.b fields that change with the patient type, 9.c file dialogs, 9.d status bar timer, 9.e validation messages, 9.f shortcuts, 9.g tooltips |
-| 10 Exceptions | `utils/ClinicExceptions.h` - `DuplicateIDException`, `InvalidPatientDataException`, `InvalidAppointmentException`, `FileIOException` |
-| 11 Persistence | `utils/FileHandler.h` - CSV read and write for both patients and appointments |
+| 10 Exceptions | `utils/ClinicExceptions.h` - `DuplicateIDException`, `InvalidPatientDataException`, `InvalidAppointmentException`, `FileIOException`. `gui_main.cpp` also catches anything that escapes a slot, so that the program never stops by itself |
+| 11 Persistence | `utils/FileHandler.h` - CSV read and write for both patients and appointments. A file is written to a temporary name first, so a failed save cannot destroy the data that is already on the disk |
+
+## The rules of the clinic
+
+The rules live in the controller layer, so that the screens and the data always agree on them.
+
+| Rule | Where it is checked |
+| --- | --- |
+| The age has to be between 0 and 120 | `ClinicManager::checkPatientRules` |
+| The name may not be empty | `ClinicManager::checkPatientRules` |
+| The identifier has to begin with the prefix of the category: `GEN-`, `EMG-` or `FOL-` | `ClinicManager::checkPatientRules` |
+| A contact number that is given has to look like a telephone number | `ClinicManager::checkPatientRules` |
+| The same patient may not wait in the queue twice | `ClinicManager::enqueuePatient` |
+| The date has to be written as `YYYY-MM-DD` and the time as `HH:MM AM` or `HH:MM PM` | `AppointmentController::checkBookingRules` |
+| The same doctor cannot be booked twice in the same slot | `AppointmentController::scheduleAppointment` |
+| An emergency patient is not booked in advance, it goes to the waiting room | `AppointmentController::scheduleAppointment` |
+| A visit that was completed cannot be cancelled, and a cancelled visit cannot be completed | `ScheduledPatient::cancelAppointment` |
 
 ## Build & Run
 

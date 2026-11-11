@@ -22,16 +22,27 @@ public:
     static int linearSearchByID(const std::vector<model::PatientRecord*>& records,
                                 const std::string& targetID);
 
+    // Scans the whole list and returns the position of every patient whose
+    // identifier or whose name holds the given text.
+    //
+    // The text is matched without regard to letter case, and a part of the
+    // identifier or of the name is enough. That is what the clinic staff
+    // expect, because they type "chi" and mean "Chioma".
+    static std::vector<int> linearSearchByText(const std::vector<model::PatientRecord*>& records,
+                                               const std::string& text);
+
     // Halves the search space on every step. The list must be sorted by
     // patient ID, otherwise the result is meaningless.
     static int binarySearchByID(const std::vector<model::PatientRecord*>& sortedRecords,
                                 const std::string& targetID);
 
-    // Looks for a patient by name. The search calls itself with the next
-    // position until it finds the name or runs off the end of the list.
-    static int recursiveSearchByName(const std::vector<model::PatientRecord*>& records,
-                                     const std::string& targetName,
-                                     int currentIndex = 0);
+    // Looks for patients by name. The search calls itself with the next
+    // position until it runs off the end of the list, and it collects every
+    // patient whose name holds the given text. The text is matched without
+    // regard to letter case.
+    static std::vector<int> recursiveSearchByName(const std::vector<model::PatientRecord*>& records,
+                                                  const std::string& targetName,
+                                                  int currentIndex = 0);
 
     // Returns the positions of every patient in the given category.
     static std::vector<int> searchByCategory(const std::vector<model::PatientRecord*>& records,

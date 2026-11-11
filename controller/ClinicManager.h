@@ -38,14 +38,23 @@ public:
 
     // Registers a new patient. The record is checked against the rules of
     // the clinic first, so a record that breaks a rule is refused with an
-    // exception and the caller is told why.
+    // exception and the caller is told why. The step is remembered, so it
+    // can be undone.
     void registerPatient(std::unique_ptr<model::PatientRecord> patient);
 
     // Registers several patients at once, for example after a file was read.
     // The records that break a rule are skipped and described in the
-    // warnings list.
+    // warnings list. The load is one administrative step as a whole, so the
+    // records are not remembered one by one.
     void registerPatients(std::vector<std::unique_ptr<model::PatientRecord>> patients,
                           std::vector<std::string>* warnings = nullptr);
+
+    // Checks a record against the rules of the clinic without storing it.
+    // The edit panel uses this, so that an edit cannot put an illegal
+    // value into a record that was registered properly.
+    void validatePatient(const model::PatientRecord& patient) const {
+        checkPatientRules(patient);
+    }
 
     // Deletes a patient. The step can be undone.
     bool deletePatient(const std::string& patientID);
@@ -58,6 +67,10 @@ public:
     std::vector<model::PatientRecord*> getAllPatients() const;
     std::size_t getPatientCount() const;
 
+    // Puts the records in the given order, so that the roster and the
+    // search results show the same order.
+    void setPatientOrder(const std::vector<model::PatientRecord*>& order);
+
     // The next free identifier for a category, for example "GEN-106".
     std::string suggestPatientId(const std::string& patientType) const;
 
@@ -67,10 +80,14 @@ public:
     // ---- appointments ----
 
     // Books an appointment. The rules of the clinic are checked first.
-    void scheduleAppointment(const model::Appointment& appointment);
+    // A booking that comes from a file is not remembered on the undo stack.
+    void scheduleAppointment(const model::Appointment& appointment, bool trackUndo = true);
 
     // Cancels an appointment. The step can be undone.
     bool cancelAppointment(const std::string& appointmentID);
+
+    // Marks a visit as completed. The step can be undone.
+    bool completeAppointment(const std::string& appointmentID);
 
     // Every appointment of the clinic.
     std::vector<model::Appointment> getAllAppointments() const;

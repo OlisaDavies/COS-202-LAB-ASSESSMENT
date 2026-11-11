@@ -97,6 +97,21 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 
 ---
 
+### Question 7a: "What is the fixed-size array for, and how does it decide which records to keep?"
+**Model Answer:**
+> *"The brief asks for a fixed-size C++ array as a cache of the frequently accessed patient records, so I used \PatientRecord* recentPatients[10]\ with a counter \ecentCount\ that says how many of the ten places are in use.
+>
+> The array is held from the **oldest** record at the front to the **newest** at the back. Every time a record is used, \	ouchRecentPatient\ is called:
+>
+> - If the record is **already in the cache**, it is moved to the newest place, and the records in between keep their order. That is what makes it a cache of the *frequently* accessed records rather than a list of the first ten registered ones.
+> - If the record is **not in the cache**, it is added at the back. When the array is already full, the oldest record at the front is pushed out to make room - that is the classic eviction rule.
+>
+> The panel shows the list from the back to the front, so the most recently used record is the first one the staff sees.
+>
+> I found a bug here while testing. The three paths - a record that was used again, a new record, and the eviction - each used a **different** idea of which end was the newest one, so the array kept the registration order instead of the access order. On top of that, \indPatientByID\ returned a record that was already cached without recording the access. I tested it with a probe that touched twenty-five records and checked which ones stayed in the cache, and I made the order the same in all three paths."*
+
+---
+
 ### Question 7b: "How do you make sure the memory is freed exactly once?"
 **Model Answer:**
 > *"Ownership is written down explicitly. The database owns the live records in a `std::vector<std::unique_ptr<PatientRecord>>`, the undo entry owns its copy in a `std::unique_ptr`, and the edit panel owns the snapshot it takes before an edit in a `std::unique_ptr` as well.
@@ -133,13 +148,55 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 
 ---
 
-### Question 10b: "What does `ClinicManager` do, and why does it exist?"
+### Question 10b: "How do your searches work? What if the staff types a name?"
+**Model Answer:**
+> *"There are four routines and the staff chooses one from a drop-down.
+>
+> The **linear search** is the one I would expect to be used most. It scans the list once and matches the identifier **and** the name, without regard to letter case, and a part of either is enough. So if the staff types "chi" they find "Chioma Eze". It returns every match, not just the first one.
+>
+> The **binary search** needs the list to be sorted, so the panel makes a sorted copy with the merge sort before calling it. It finds an exact identifier in log n steps, and it is the right choice when there are many patients and the search is by identifier.
+>
+> The **recursive search** walks the list by calling itself with the next position until it reaches the end. It collects every patient whose name holds the text.
+>
+> The **category search** returns every patient of a category, which is what the staff want when they ask for all emergency cases.
+>
+> Which one to use depends on the state of the data and on what is being searched, and that is exactly what the drop-down is for."*
+
+---
+
+### Question 10c: "How do you know a booking is allowed?"
+**Model Answer:**
+> *"The rules live in the controller layer, so the screens and the data always agree on them.
+>
+> `AppointmentController::checkBookingRules` checks that the date is written as YYYY-MM-DD and the time as HH:MM AM or PM. `scheduleAppointment` then checks that the patient is registered and that the category can be booked in advance - an emergency patient is not, it goes to the waiting room instead.
+>
+> There is one more rule I added after testing: **the same doctor cannot be booked twice in the same slot**. That is checked against the appointments that are already booked, and a booking that breaks it is refused with a message that says who is busy and when.
+>
+> The same doctor with a different time is of course fine - the check compares the doctor, the date **and** the time."*
+
+---
+
+### Question 10d: "What does `ClinicManager` do, and why does it exist?"
+**Model Answer:**
 **Model Answer:**
 > *"The `ClinicManager` is the class that the graphical interface talks to. It is the only class the screens are allowed to call, and it owns the database and the appointment controller.
 >
 > It exists because of a problem I ran into. In the first version the panels called the database themselves, so every rule of the clinic - the age has to be between 0 and 120, the date has to be written as YYYY-MM-DD, an emergency patient may not be booked in advance - was written inside `ClinicDatabase`. That class grew to 488 lines and mixed the business logic with the data handling, which is exactly what requirement 2 asks me not to do.
 >
 > So I moved the rules up into the controller layer. `ClinicManager` now checks the rules of a patient record, `AppointmentController` checks the rules of a booking, and `ClinicDatabase` only stores and finds. The panels were repointed from the database to the manager, and **no file in the `gui/` folder refers to the database any more**. That is the check I would point a marker to: the separation is not a claim in the report, it is a fact in the source tree."*
+
+---
+
+### Question 10e: "How do you handle errors? What happens if something goes wrong?"
+**Model Answer:**
+> *"I use my own exception classes. Everything derives from one base class, \ClinicException\, which derives from \std::exception\, so the standard \what()\ works. There are four kinds: \DuplicateIDException\ for an identifier that is already registered, \InvalidPatientDataException\ for a bad age, an empty name, a bad contact number or a bad fee, \InvalidAppointmentException\ for a booking that breaks a rule, and \FileIOException\ when a file cannot be read or written.
+>
+> The rules themselves live in the controller layer, so the panels never invent their own. \ClinicManager::checkPatientRules\ is the one place that decides whether a record is allowed into the clinic, and it is run when a patient is registered, when a patient is edited and when a record is read from a file.
+>
+> Every panel wraps the call in a try and catch and shows the message of the exception in a message box, so the staff sees what was wrong and how to fix it.
+>
+> There is also a safety net. Qt does not catch an exception that leaves a slot - it would travel out of the event loop and end the program. So my application class overrides \
+otify()\, which is the one place every event passes through, and turns anything that escapes into a message box. The clinic has to keep running after a normal mistake, so one bad action must never close the whole program."*
 
 ---
 

@@ -1,7 +1,10 @@
 #include "ReportPanel.h"
 
+#include <QComboBox>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QPushButton>
+#include <QTextEdit>
 #include <QVBoxLayout>
 
 #include "../controller/ReportBuilder.h"
@@ -25,6 +28,11 @@ ReportPanel::ReportPanel(controller::ClinicManager& manager, QWidget* parent)
     cmbReportType->addItem("Frequently attended patients");
     cmbReportType->setToolTip("The report that is built.");
     topRow->addWidget(cmbReportType, 1);
+
+    // Choosing another report builds it at once, so that the button does not
+    // have to be pressed as well.
+    connect(cmbReportType, QOverload<int>::of(&QComboBox::currentIndexChanged),
+            this, &ReportPanel::onGenerateReport);
 
     QPushButton* btnGenerate = new QPushButton("Generate", this);
     btnGenerate->setToolTip("Build the chosen report from the clinic data.");

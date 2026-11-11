@@ -1,5 +1,7 @@
 #include "SortEngine.h"
 
+#include "../utils/StringUtil.h"
+
 namespace scapms {
 namespace controller {
 
@@ -12,13 +14,18 @@ bool SortEngine::comparePatients(const model::PatientRecord* first,
 
     switch (field) {
         case SortField::PatientID:
-            return first->getPatientID() < second->getPatientID();
+            // The letter case is ignored, so that a name that was typed in
+            // small letters does not jump to the end of the list.
+            return utils::compareIgnoreCase(first->getPatientID(),
+                                            second->getPatientID()) < 0;
         case SortField::PatientName:
-            return first->getName() < second->getName();
+            return utils::compareIgnoreCase(first->getName(),
+                                            second->getName()) < 0;
         case SortField::PatientAge:
             return first->getAge() < second->getAge();
         default:
-            return first->getPatientID() < second->getPatientID();
+            return utils::compareIgnoreCase(first->getPatientID(),
+                                            second->getPatientID()) < 0;
     }
 }
 

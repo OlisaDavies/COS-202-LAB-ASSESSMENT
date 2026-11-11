@@ -26,6 +26,11 @@ public:
     // Redraws the dashboard and the list of recent records.
     void refresh();
 
+    // Redraws only the statistics of the dashboard. The timer of the window
+    // calls this, so that the numbers of the clinic are always the true
+    // ones even when nothing was changed.
+    void refreshStatistics();
+
     // The administrative steps. The window connects its menu entries to
     // these, so that the menu and the panel do the same thing.
     void undoLastOperation();

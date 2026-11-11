@@ -6,6 +6,8 @@
 #include <QMessageBox>
 #include <QVBoxLayout>
 
+#include "../utils/ClinicExceptions.h"
+
 namespace scapms {
 namespace gui {
 
@@ -99,7 +101,13 @@ void QueuePanel::onEnqueuePatient() {
         return;
     }
 
-    manager.enqueuePatient(patient);
+    try {
+        manager.enqueuePatient(patient);
+    } catch (const utils::ClinicException& error) {
+        QMessageBox::warning(this, "Cannot add to the queue", error.what());
+        return;
+    }
+
     refresh();
     emit dataChanged();
 }

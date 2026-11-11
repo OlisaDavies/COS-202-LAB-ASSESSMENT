@@ -53,6 +53,10 @@ SearchPanel::SearchPanel(controller::ClinicManager& manager, QWidget* parent)
 
     onSearchAlgorithmChanged(SEARCH_LINEAR_ID);
     onSortAlgorithmChanged(0);
+
+    // No search has been run yet, so there is nothing to repeat.
+    lastQuery.clear();
+    lastAlgorithm = SEARCH_LINEAR_ID;
 }
 
 QWidget* SearchPanel::buildSearchBox(QWidget* parent) {
@@ -165,10 +169,9 @@ void SearchPanel::showResults(const std::vector<model::PatientRecord*>& results)
     }
 }
 
-void SearchPanel::onExecuteSearch() {
-    const std::vector<model::PatientRecord*> patients = manager.getAllPatients();
-    const int algorithm = cmbSearchAlgorithm->currentIndex();
-
+std::vector<model::PatientRecord*> SearchPanel::runSearch(
+    const std::vector<model::PatientRecord*>& patients, const QString& query,
+    int algorithm) {
     std::vector<model::PatientRecord*> results;
 
     if (algorithm == SEARCH_CATEGORY) {
@@ -178,10 +181,93 @@ void SearchPanel::onExecuteSearch() {
             : (categoryIndex == 2 ? model::PatientRecord::TYPE_FOLLOWUP
                                   : model::PatientRecord::TYPE_GENERAL);
 
-        const std::vector<int> matches = controller::SearchEngine::searchByCategory(patients, category);
-        for (int index : matches) {
-            results.push_back(patients[index]);
+        const std::vector<int> matches =
+            controller::SearchEngine::searchByCategory(patients, category);
+        for (int position : matches) {
+            if (position >= 0 && position < static_cast<int>(patients.size()) &&
+                patients[position] != nullptr) {
+                results.push_back(patients[position]);
+            }
         }
+        return results;
+    }
+
+    if (query.isEmpty()) {
+        return results;                          // a search for nothing finds nothing
+    }
+
+    if (algorithm == SEARCH_BINARY_ID) {
+        // Binary search only works on a sorted list, so a sorted copy of the
+        // records is made first. The record that is found comes out of that
+        // copy, so it is the right one and not the record that happens to
+        // have the same place in the roster.
+        std::vector<model::PatientRecord*> sortedCopy = patients;
+        controller::SortEngine::mergeSort(sortedCopy, controller::SortField::PatientID);
+
+        const int found = controller::SearchEngine::binarySearchByID(sortedCopy, query.toStdString());
+        if (found != -1) {
+            results.push_back(sortedCopy[found]);
+        }
+        return results;
+    }
+
+    if (algorithm == SEARCH_RECURSIVE_NAME) {
+        const std::vector<int> matches =
+            controller::SearchEngine::recursiveSearchByName(patients, query.toStdString());
+        for (int position : matches) {
+            if (position >= 0 && position < static_cast<int>(patients.size()) &&
+                patients[position] != nullptr) {
+                results.push_back(patients[position]);
+            }
+        }
+        return results;
+    }
+
+    // The linear search looks at the identifier and at the name, so the
+    // staff can type either one.
+    const std::vector<int> matches =
+        controller::SearchEngine::linearSearchByText(patients, query.toStdString());
+    for (int position : matches) {
+        if (position >= 0 && position < static_cast<int>(patients.size()) &&
+            patients[position] != nullptr) {
+            results.push_back(patients[position]);
+        }
+    }
+    return results;
+}
+
+controller::SortField SearchPanel::selectedSortField() const {
+    switch (cmbSortField->currentIndex()) {
+        case SORT_BY_NAME:
+            return controller::SortField::PatientName;
+        case SORT_BY_AGE:
+            return controller::SortField::PatientAge;
+        case SORT_BY_ID:
+        default:
+            return controller::SortField::PatientID;
+    }
+}
+
+void SearchPanel::onExecuteSearch() {
+    const std::vector<model::PatientRecord*> patients = manager.getAllPatients();
+    const int algorithm = cmbSearchAlgorithm->currentIndex();
+    const QString query = txtSearchQuery->text().trimmed();
+
+    if (algorithm != SEARCH_CATEGORY && query.isEmpty()) {
+        // The table is cleared, so that an old result cannot be mistaken
+        // for the result of the new search.
+        showResults(std::vector<model::PatientRecord*>());
+        lastQuery.clear();
+        QMessageBox::warning(this, "Invalid input", "Please enter an ID or a name to look for.");
+        return;
+    }
+
+    const std::vector<model::PatientRecord*> results = runSearch(patients, query, algorithm);
+    showResults(results);
+
+    if (algorithm == SEARCH_CATEGORY) {
+        lastQuery.clear();                       // a category search has no text
+        lastAlgorithm = algorithm;
 
         if (results.empty()) {
             QMessageBox::information(this, "No match",
@@ -190,49 +276,35 @@ void SearchPanel::onExecuteSearch() {
             QMessageBox::information(this, "Match found",
                                      QString::number(results.size()) + " patient(s) found.");
         }
-        showResults(results);
         return;
     }
 
-    const QString query = txtSearchQuery->text().trimmed();
-    if (query.isEmpty()) {
-        QMessageBox::warning(this, "Invalid input", "Please enter an ID or a name to look for.");
-        return;
-    }
-
-    int foundIndex = -1;
-    std::vector<model::PatientRecord*> sortedCopy;
-
-    if (algorithm == SEARCH_BINARY_ID) {
-        // Binary search only works on a sorted list, so a sorted copy of the
-        // records is made first.
-        sortedCopy = patients;
-        controller::SortEngine::mergeSort(sortedCopy, controller::SortField::PatientID);
-        foundIndex = controller::SearchEngine::binarySearchByID(sortedCopy, query.toStdString());
-        if (foundIndex != -1) {
-            results.push_back(sortedCopy[foundIndex]);
-        }
-    } else if (algorithm == SEARCH_RECURSIVE_NAME) {
-        foundIndex = controller::SearchEngine::recursiveSearchByName(patients, query.toStdString());
-        if (foundIndex != -1) {
-            results.push_back(patients[foundIndex]);
-        }
-    } else {
-        foundIndex = controller::SearchEngine::linearSearchByID(patients, query.toStdString());
-        if (foundIndex != -1) {
-            results.push_back(patients[foundIndex]);
-        }
-    }
+    lastQuery = query;
+    lastAlgorithm = algorithm;
 
     if (results.empty()) {
-        showResults(results);
         QMessageBox::information(this, "No match", "No patient matched \"" + query + "\".");
         return;
     }
 
-    showResults(results);
-    QMessageBox::information(this, "Match found",
-                             QString::fromStdString(results.front()->getPatientID()) + " matched.");
+    if (results.size() == 1) {
+        QMessageBox::information(this, "Match found",
+                                 QString::fromStdString(results.front()->getPatientID()) + " matched.");
+    } else {
+        QMessageBox::information(this, "Matches found",
+                                 QString::number(results.size()) + " patients matched.");
+    }
+}
+
+void SearchPanel::repeatLastSearch() {
+    if (lastQuery.isEmpty()) {
+        // No search was run yet, so there is nothing to repeat.
+        showResults(std::vector<model::PatientRecord*>());
+        return;
+    }
+
+    const std::vector<model::PatientRecord*> patients = manager.getAllPatients();
+    showResults(runSearch(patients, lastQuery, lastAlgorithm));
 }
 
 void SearchPanel::onExecuteSort() {
@@ -243,13 +315,7 @@ void SearchPanel::onExecuteSort() {
         return;
     }
 
-    controller::SortField field = controller::SortField::PatientID;
-    const int fieldIndex = cmbSortField->currentIndex();
-    if (fieldIndex == 1) {
-        field = controller::SortField::PatientName;
-    } else if (fieldIndex == 2) {
-        field = controller::SortField::PatientAge;
-    }
+    const controller::SortField field = selectedSortField();
 
     const QString algorithmName = cmbSortAlgorithm->currentText();
     if (cmbSortAlgorithm->currentIndex() == 0) {
@@ -258,14 +324,24 @@ void SearchPanel::onExecuteSort() {
         controller::SortEngine::mergeSort(sorted, field);
     }
 
+    // The sorted records are shown in the results table, and the order is
+    // also kept by the controller, so that the roster and the search results
+    // show the same order.
+    manager.setPatientOrder(sorted);
     showResults(sorted);
+
+    // The other panels have to be redrawn, so that the roster shows the
+    // new order as well.
+    emit dataChanged();
 
     QMessageBox::information(this, "Sorted",
                              "The records were ordered with " + algorithmName + ".");
 }
 
 void SearchPanel::refresh() {
-    // Nothing to redraw: the table holds the result of the last search.
+    // The data may have changed, so the last search is run again. Otherwise
+    // the table would still show a patient that has been deleted.
+    repeatLastSearch();
 }
 
 } // namespace gui

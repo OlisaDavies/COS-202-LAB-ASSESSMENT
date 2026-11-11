@@ -104,6 +104,13 @@ void MainWindow::setupMenuBar() {
 
     QMenu* fileMenu = bar->addMenu("&File");
 
+    QAction* actNew = fileMenu->addAction("&New");
+    actNew->setShortcut(QKeySequence("Ctrl+N"));
+    actNew->setToolTip("Clear every record and start again with an empty clinic.");
+    connect(actNew, &QAction::triggered, this, [this]() { adminPanel->newDatabase(); });
+
+    fileMenu->addSeparator();
+
     QAction* actSave = fileMenu->addAction("&Save as...");
     actSave->setShortcut(QKeySequence("Ctrl+S"));
     actSave->setToolTip("Write the patients and the appointments to CSV files.");
@@ -150,44 +157,85 @@ void MainWindow::setupTimer() {
 }
 
 void MainWindow::onTimerTick() {
+    // The clock and the live numbers of the clinic. The timer keeps the
+    // status bar up to date, and it also refreshes the statistics of the
+    // dashboard, so that the staff always see the true numbers.
     const QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-    statusBar()->showMessage(QString("%1   |   Patients: %2   |   Waiting: %3")
-                             .arg(time)
-                             .arg(manager.getPatientCount())
-                             .arg(manager.getQueueSize()));
+
+    int pending = 0;
+    for (const model::Appointment& appointment : manager.getAllAppointments()) {
+        if (appointment.getStatus() == model::Appointment::STATUS_PENDING) {
+            ++pending;
+        }
+    }
+
+    QString message = QString("%1   |   Patients: %2   |   Waiting: %3")
+                          .arg(time)
+                          .arg(manager.getPatientCount())
+                          .arg(manager.getQueueSize());
+
+    if (pending > 0) {
+        // The reminder of the bookings that still have to take place.
+        message += QString("   |   Pending appointments: %1").arg(pending);
+    }
+    if (manager.getQueueSize() > 0) {
+        // The reminder that somebody is waiting for the doctor.
+        message += "   (patients are waiting)";
+    }
+
+    statusBar()->showMessage(message);
+
+    // The dashboard holds the statistics of the clinic, so it is redrawn on
+    // every tick of the timer.
+    adminPanel->refreshStatistics();
 }
 
 void MainWindow::loadSampleData() {
-    manager.registerPatient(
-        std::make_unique<model::GeneralPatient>("GEN-101", "Amaka Okonkwo", 28,
-                                                "+2348073451298", 4500.00));
-    manager.registerPatient(
-        std::make_unique<model::EmergencyPatient>("EMG-999", "Davies Johnson", 22,
-                                                  "+2348034874562", 1, "Acute trauma"));
-    manager.registerPatient(
-        std::make_unique<model::FollowUpPatient>("FOL-205", "Babatunde Alabi", 45,
-                                                 "+2348067624513",
-                                                 "2026-10-20", "Dr. Funke"));
-    manager.registerPatient(
-        std::make_unique<model::GeneralPatient>("GEN-005", "Chioma Eze", 19,
-                                                "+2348091837465", 5000.00));
-    manager.registerPatient(
-        std::make_unique<model::EmergencyPatient>("EMG-102", "Zainab Bello", 32,
-                                                  "+2348019283756", 2, "Fracture"));
-    manager.registerPatient(
-        std::make_unique<model::FollowUpPatient>("FOL-206", "Ngozi Emeka", 61,
-                                                 "+2348075192648",
-                                                 "2026-11-02", "Dr. Okafor"));
+    // The sample data is the starting point of the clinic, not an
+    // administrative step of the staff. It is therefore loaded without being
+    // remembered, so that the first Ctrl+Z does not delete it.
+    std::vector<std::unique_ptr<model::PatientRecord>> patients;
+    patients.push_back(std::make_unique<model::GeneralPatient>(
+        "GEN-101", "Amaka Okonkwo", 28, "+2348073451298", 4500.00));
+    patients.push_back(std::make_unique<model::EmergencyPatient>(
+        "EMG-999", "Davies Johnson", 22, "+2348034874562", 1, "Acute trauma"));
+    patients.push_back(std::make_unique<model::FollowUpPatient>(
+        "FOL-205", "Babatunde Alabi", 45, "+2348067624513", "2026-10-20", "Dr. Funke"));
+    patients.push_back(std::make_unique<model::GeneralPatient>(
+        "GEN-005", "Chioma Eze", 19, "+2348091837465", 5000.00));
+    patients.push_back(std::make_unique<model::EmergencyPatient>(
+        "EMG-102", "Zainab Bello", 32, "+2348019283756", 2, "Fracture"));
+    patients.push_back(std::make_unique<model::FollowUpPatient>(
+        "FOL-206", "Ngozi Emeka", 61, "+2348075192648", "2026-11-02", "Dr. Okafor"));
 
-    manager.scheduleAppointment(model::Appointment("APT-1001", "GEN-101", "2026-11-15",
-                                                   "10:30 AM", "Dr. Adeyemi",
-                                                   model::Appointment::STATUS_PENDING));
-    manager.scheduleAppointment(model::Appointment("APT-1002", "FOL-205", "2026-11-20",
-                                                   "02:00 PM", "Dr. Funke",
-                                                   model::Appointment::STATUS_COMPLETED));
-    manager.scheduleAppointment(model::Appointment("APT-1003", "GEN-005", "2026-11-22",
-                                                   "11:00 AM", "Dr. Adeyemi",
-                                                   model::Appointment::STATUS_PENDING));
+    std::vector<std::string> warnings;
+    manager.registerPatients(std::move(patients), &warnings);
+
+    // The sample bookings are guarded, so that a mistake in the sample data
+    // can never stop the program from starting. The clinic simply begins
+    // without the booking that could not be made.
+    try {
+        manager.scheduleAppointment(model::Appointment("APT-1001", "GEN-101", "2026-11-15",
+                                                       "10:30 AM", "Dr. Adeyemi",
+                                                       model::Appointment::STATUS_PENDING),
+                                   false);
+        manager.scheduleAppointment(model::Appointment("APT-1002", "FOL-205", "2026-11-20",
+                                                       "02:00 PM", "Dr. Funke",
+                                                       model::Appointment::STATUS_COMPLETED),
+                                   false);
+        manager.scheduleAppointment(model::Appointment("APT-1003", "GEN-005", "2026-11-22",
+                                                       "11:00 AM", "Dr. Adeyemi",
+                                                       model::Appointment::STATUS_PENDING),
+                                   false);
+    } catch (const utils::ClinicException& error) {
+        warnings.push_back(std::string("a sample appointment was skipped: ") + error.what());
+    }
+
+    // Any problem with the sample data is told to the staff, so that
+    // nothing is missing without a reason.
+    if (!warnings.empty()) {
+        showWarnings(warnings);
+    }
 }
 
 void MainWindow::refreshAll() {
