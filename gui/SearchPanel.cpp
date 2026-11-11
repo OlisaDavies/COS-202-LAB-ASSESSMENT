@@ -73,6 +73,7 @@ QWidget* SearchPanel::buildSearchBox(QWidget* parent) {
 
     cmbSearchAlgorithm = new QComboBox(group);
     cmbSearchAlgorithm->addItem("Linear search by ID (O(n))");
+    cmbSearchAlgorithm->addItem("Linear search by keyword (O(n))");
     cmbSearchAlgorithm->addItem("Binary search by ID (O(log n))");
     cmbSearchAlgorithm->addItem("Recursive search by name (O(n))");
     cmbSearchAlgorithm->addItem("Linear search by category (O(n))");
@@ -225,15 +226,30 @@ std::vector<model::PatientRecord*> SearchPanel::runSearch(
         return results;
     }
 
-    // The linear search looks at the identifier and at the name, so the
-    // staff can type either one.
-    const std::vector<int> matches =
-        controller::SearchEngine::linearSearchByText(patients, query.toStdString());
-    for (int position : matches) {
-        if (position >= 0 && position < static_cast<int>(patients.size()) &&
-            patients[position] != nullptr) {
-            results.push_back(patients[position]);
+    if (algorithm == SEARCH_LINEAR_KEYWORD) {
+        // The keyword search looks at the identifier and at the name, so the
+        // staff can type either one. It returns a part of either, which is
+        // why "GEN" finds every general outpatient.
+        const std::vector<int> matches =
+            controller::SearchEngine::linearSearchByText(patients, query.toStdString());
+        for (int position : matches) {
+            if (position >= 0 && position < static_cast<int>(patients.size()) &&
+                patients[position] != nullptr) {
+                results.push_back(patients[position]);
+            }
         }
+        return results;
+    }
+
+    // The linear search by ID answers with the one record whose identifier
+    // is exactly the text that was typed, which is what the brief asks for
+    // in requirement 4.a. The position comes back from the routine that
+    // wrote it, so the record shown is the record that was found.
+    const int found =
+        controller::SearchEngine::linearSearchByID(patients, query.toStdString());
+    if (found >= 0 && found < static_cast<int>(patients.size()) &&
+        patients[found] != nullptr) {
+        results.push_back(patients[found]);
     }
     return results;
 }
@@ -248,6 +264,16 @@ controller::SortField SearchPanel::selectedSortField() const {
         default:
             return controller::SortField::PatientID;
     }
+}
+
+int SearchPanel::runQuery(const QString& query, int algorithm) {
+    const std::vector<model::PatientRecord*> patients = manager.getAllPatients();
+    const std::vector<model::PatientRecord*> results = runSearch(patients, query, algorithm);
+
+    showResults(results);
+    lastQuery = query;
+    lastAlgorithm = algorithm;
+    return static_cast<int>(results.size());
 }
 
 void SearchPanel::onExecuteSearch() {

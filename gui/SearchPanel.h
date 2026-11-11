@@ -25,6 +25,11 @@ public:
 
     void refresh();
 
+    // Runs the given search without showing a message box, and redraws the
+    // results table. Returns the number of records that matched. The command
+    // line uses this to open the panel with a search already shown.
+    int runQuery(const QString& query, int algorithm);
+
 signals:
     void dataChanged();
 
@@ -53,11 +58,17 @@ private:
     int lastAlgorithm;
 
     // The entries of the two algorithm combo boxes.
+    //
+    // The linear search has two entries, because the brief asks for a linear
+    // search by patient ID, and a keyword search across the identifier and
+    // the name is what the staff actually type. Both are linear scans, but
+    // they compare different fields, so they are kept apart.
     enum SearchAlgorithm {
         SEARCH_LINEAR_ID = 0,
-        SEARCH_BINARY_ID = 1,
-        SEARCH_RECURSIVE_NAME = 2,
-        SEARCH_CATEGORY = 3
+        SEARCH_LINEAR_KEYWORD = 1,
+        SEARCH_BINARY_ID = 2,
+        SEARCH_RECURSIVE_NAME = 3,
+        SEARCH_CATEGORY = 4
     };
 
     // The entries of the field combo box of the sort.

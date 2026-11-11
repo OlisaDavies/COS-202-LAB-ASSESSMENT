@@ -12,19 +12,10 @@
 namespace scapms {
 namespace controller {
 
-// The controller of the clinic. It is the only class that the graphical
-// interface talks to.
-//
-// The program is built in three layers:
-//
-//   * the model layer holds the data and the rules that keep it consistent,
-//   * the controller layer holds the rules of the clinic and coordinates the
-//     work between the screen and the data,
-//   * the GUI layer draws the screens and asks this class to do the work.
-//
-// The screens never touch the database directly, and the database never
-// decides what is allowed. Everything the staff can do goes through this
-// class, so the rules are written down in one place.
+// The controller of the clinic, and the only class the graphical interface
+// talks to. The screens never touch the database directly, and the database
+// never decides what is allowed, so every rule of the clinic is written down
+// in this one place.
 class ClinicManager {
 public:
     ClinicManager();

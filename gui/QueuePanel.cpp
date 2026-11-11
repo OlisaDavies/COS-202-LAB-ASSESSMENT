@@ -96,26 +96,35 @@ void QueuePanel::onEnqueuePatient() {
         return;
     }
 
-    const QString patientID = cmbQueuePatientID->currentData().toString();
+    enqueueByID(cmbQueuePatientID->currentData().toString());
+}
+
+bool QueuePanel::enqueueByID(const QString& patientID) {
     model::PatientRecord* patient = manager.findPatientByID(patientID.toStdString());
     if (patient == nullptr) {
-        QMessageBox::warning(this, "Not found", "That patient is no longer in the clinic.");
-        return;
+        return false;
     }
 
     try {
         manager.enqueuePatient(patient);
-    } catch (const utils::ClinicException& error) {
-        QMessageBox::warning(this, "Cannot add to the queue", error.what());
-        return;
+    } catch (const utils::ClinicException&) {
+        return false;                             // already waiting
     }
 
     refresh();
     emit dataChanged();
+    return true;
 }
 
 void QueuePanel::onCallNextPatient() {
-    model::PatientRecord* next = manager.callNextPatient();
+    model::PatientRecord* next = nullptr;
+    try {
+        next = manager.callNextPatient();
+    } catch (const utils::ClinicException& error) {
+        QMessageBox::critical(this, "Call error", error.what());
+        return;                                 // the waiting room is unchanged
+    }
+
     if (next == nullptr) {
         refresh();
         QMessageBox::information(this, "Queue empty", "There are no patients waiting.");

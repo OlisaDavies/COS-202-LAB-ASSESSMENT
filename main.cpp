@@ -173,13 +173,29 @@ int main() {
     std::cout << "Undo reported: " << undone << std::endl;
     std::cout << "After the undo there are " << manager.getPatientCount() << " patients." << std::endl;
 
-    // The same summary that the dashboard of the graphical program shows in
-    // its panels. It is built by the report builder, so both programs read
-    // the numbers in the same way.
+    // The summary of the clinic and the four reports of the Clinic Reports
+    // tab. They are all built by the report builder, so the console
+    // demonstration and the graphical program read the numbers of the clinic
+    // in the same way.
     std::cout << std::endl;
     std::cout << "========== CLINIC SUMMARY ==========" << std::endl;
     std::cout << ReportBuilder::dashboardSummary(manager);
+
     std::cout << std::endl;
+    std::cout << "========== PATIENT CATEGORY DISTRIBUTION ==========" << std::endl;
+    std::cout << ReportBuilder::categoryDistribution(manager);
+
+    std::cout << std::endl;
+    std::cout << "========== PATIENTS WITH PENDING APPOINTMENTS ==========" << std::endl;
+    std::cout << ReportBuilder::pendingAppointments(manager);
+
+    std::cout << std::endl;
+    std::cout << "========== DAILY APPOINTMENT SUMMARY ==========" << std::endl;
+    std::cout << ReportBuilder::dailySummary(manager);
+
+    std::cout << std::endl;
+    std::cout << "========== FREQUENTLY ATTENDED PATIENTS ==========" << std::endl;
+    std::cout << ReportBuilder::frequentPatients(manager);
 
     return 0;
 }

@@ -14,17 +14,10 @@
 namespace scapms {
 namespace model {
 
-// The store of the clinic. It holds every patient record, every appointment,
-// the waiting room and the administrative undo history.
-//
-// The class only stores and finds. The rules of the clinic - what age a
-// patient may have, whether a booking is allowed - are not decided here but
-// in the controller layer, so that the data and the rules stay apart.
-//
-// Ownership rules, so that the memory handling stays clear:
-//   * the database owns the records in its patient list and deletes them,
-//   * the undo stack owns one copy of the record for each patient action,
-//   * the waiting room only borrows the pointers it is given.
+// The store of the clinic: the patient records, the waiting room and the
+// undo history. It only stores and finds; the rules of the clinic live in
+// the controller layer. The database owns the records and deletes them, the
+// undo stack owns one copy per action, and the waiting room only borrows.
 class ClinicDatabase {
 public:
     static constexpr int CACHE_SIZE = 10;

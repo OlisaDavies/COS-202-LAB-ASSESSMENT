@@ -251,6 +251,17 @@ void MainWindow::loadSampleData() {
     }
 }
 
+void MainWindow::showTab(int index) {
+    if (tabWidget == nullptr) {
+        return;
+    }
+    // An impossible number leaves the panel where it is, rather than closing
+    // the window or opening nothing at all.
+    if (index >= 0 && index < tabWidget->count()) {
+        tabWidget->setCurrentIndex(index);
+    }
+}
+
 void MainWindow::refreshAll() {
     patientPanel->refresh();
     appointmentPanel->refresh();
@@ -265,7 +276,13 @@ void MainWindow::onDataChanged() {
 }
 
 void MainWindow::onUndoAction() {
-    const std::string undone = manager.undoLastAction();
+    std::string undone;
+    try {
+        undone = manager.undoLastAction();
+    } catch (const utils::ClinicException& error) {
+        QMessageBox::critical(this, "Undo error", error.what());
+        return;                                 // the clinic is unchanged
+    }
 
     refreshAll();
 

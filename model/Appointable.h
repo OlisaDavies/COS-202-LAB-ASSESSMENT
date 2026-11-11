@@ -7,15 +7,10 @@
 namespace scapms {
 namespace model {
 
-// Interface for the patient types that can be booked for appointments.
-//
-// It only declares operations and holds no data, so any class that can be
+// Interface for the patient types that can be booked for appointments. It
+// only declares operations and holds no data, so any class that can be
 // scheduled can implement it. Emergency patients deliberately do not, because
 // a trauma case is never booked in advance.
-//
-// The two cancelAppointment() methods are an overload: the same name is used
-// with and without an identifier. That is compile-time polymorphism, the
-// other half of the polymorphism story.
 class Appointable {
 public:
     virtual ~Appointable() = default;

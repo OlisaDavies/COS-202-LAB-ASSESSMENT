@@ -2,6 +2,7 @@
 REM Builds the console demonstration of SCAPMS (no Qt required).
 REM The console build proves that the searching, sorting, queue, undo and
 REM reporting features work on their own.
+REM The four reports of the clinic are printed at the end of the run.
 
 setlocal
 call "C:\Program Files (x86)\Microsoft Visual Studio\2022\BuildTools\VC\Auxiliary\Build\vcvarsall.bat" x64 >nul 2>&1

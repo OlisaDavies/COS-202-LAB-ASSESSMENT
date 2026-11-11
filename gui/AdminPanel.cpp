@@ -182,7 +182,13 @@ void AdminPanel::refreshStatistics() {
 }
 
 void AdminPanel::undoLastOperation() {
-    const std::string undone = manager.undoLastAction();
+    std::string undone;
+    try {
+        undone = manager.undoLastAction();
+    } catch (const utils::ClinicException& error) {
+        QMessageBox::critical(this, "Undo error", error.what());
+        return;                                 // the clinic is unchanged
+    }
 
     refresh();
     emit dataChanged();
@@ -293,7 +299,12 @@ void AdminPanel::newDatabase() {
         return;
     }
 
-    manager.clearAll();
+    try {
+        manager.clearAll();
+    } catch (const utils::ClinicException& error) {
+        QMessageBox::critical(this, "New database error", error.what());
+        return;                                 // the clinic is unchanged
+    }
 
     refresh();
     emit dataChanged();

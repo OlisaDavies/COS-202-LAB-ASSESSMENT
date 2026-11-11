@@ -20,3 +20,7 @@ vc.pdb
 .vscode/ipch/
 .vscode/.browse*
 
+
+# Local files used while assembling the submission document.
+SCAPMS_Submission.html
+

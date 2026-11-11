@@ -42,17 +42,90 @@ model/       PatientRecord, Appointable, Billable, ScheduledPatient, GeneralPati
              EmergencyPatient, FollowUpPatient, Appointment, AdminAction, ClinicDatabase
 controller/  ClinicManager, AppointmentController, SearchEngine, SortEngine, ReportBuilder
 gui/         MainWindow, PatientPanel, AppointmentPanel, QueuePanel,
-             SearchPanel, ReportPanel, AdminPanel, style.qss, clinic.ico
+             SearchPanel, ReportPanel, AdminPanel, style.qss, clinic.ico,
+             resources.qrc
 utils/       ClinicExceptions, DateUtil, FileHandler, IDGenerator, StringUtil
 main.cpp     the console demonstration
 gui_main.cpp the entry point of the graphical program
 ```
 
-The program is built in three layers. The **model** layer holds the data and
-the rules that keep it consistent, the **controller** layer holds the rules of
-the clinic and coordinates the work, and the **GUI** layer draws the screens
-and asks the controller to do the work. The screens never touch the database
-directly: every panel holds a `ClinicManager&` and asks it to do the work.
+### The source code under the headings of the submission
+
+The submission asks for the complete source code under four headings. The files of the project
+belong to them like this:
+
+**i. Header files**
+```
+model/PatientRecord.h          model/Appointable.h        model/Billable.h
+model/ScheduledPatient.h       model/GeneralPatient.h      model/EmergencyPatient.h
+model/FollowUpPatient.h        model/Appointment.h         model/AdminAction.h
+model/ClinicDatabase.h         controller/ClinicManager.h  controller/AppointmentController.h
+controller/SearchEngine.h      controller/SortEngine.h     controller/ReportBuilder.h
+utils/ClinicExceptions.h       utils/DateUtil.h            utils/FileHandler.h
+utils/IDGenerator.h            utils/StringUtil.h          gui/MainWindow.h
+gui/PatientPanel.h             gui/AppointmentPanel.h      gui/QueuePanel.h
+gui/SearchPanel.h              gui/ReportPanel.h           gui/AdminPanel.h
+```
+
+**ii. Source files**
+```
+model/PatientRecord.cpp        model/ScheduledPatient.cpp  model/GeneralPatient.cpp
+model/EmergencyPatient.cpp     model/FollowUpPatient.cpp   model/Appointment.cpp
+model/AdminAction.cpp          model/ClinicDatabase.cpp    controller/ClinicManager.cpp
+controller/AppointmentController.cpp                       controller/SearchEngine.cpp
+controller/SortEngine.cpp      controller/ReportBuilder.cpp utils/DateUtil.cpp
+utils/FileHandler.cpp          utils/IDGenerator.cpp       main.cpp
+```
+
+**iii. GUI files and resources**
+```
+gui/MainWindow.cpp              gui/PatientPanel.cpp        gui/AppointmentPanel.cpp
+gui/QueuePanel.cpp              gui/SearchPanel.cpp         gui/ReportPanel.cpp
+gui/AdminPanel.cpp              gui_main.cpp                gui/style.qss
+gui/clinic.ico                  gui/resources.qrc           SCAPMS.pro
+build_gui.bat                   build.bat                  .vscode/tasks.json
+.vscode/launch.json
+```
+
+**iv. Data files**
+```
+patients.csv                    appointments.csv
+```
+
+`patients.csv` and `appointments.csv` hold the records that the import and the export dialogs read
+and write. The program starts with the same records built into it, so it also runs without them.
+
+The program has two entry points: `gui_main.cpp` builds the graphical program and `main.cpp` builds
+the console demonstration. They cannot be in one binary because each of them has its own `main()`,
+so the console version is built by `build.bat` with the compiler directly and is not part of
+`SCAPMS.pro`.
+
+### Opening a panel from the command line
+
+The panels of the graphical program can also be asked for on the command line, which is how the
+screenshots in the submission were produced and which makes a demonstration of any single panel
+possible without clicking:
+
+```
+SCAPMS_GUI.exe                      opens the first panel
+SCAPMS_GUI.exe 3                    opens the Waiting Queue
+SCAPMS_GUI.exe 3 GEN-101            also puts that patient in the queue
+SCAPMS_GUI.exe 2 GEN-101 0          also runs a search for GEN-101 with the
+                                    linear search by ID
+```
+
+The number is the position of the tab, in the order the tabs are shown: 0 Patient Records,
+1 Appointments, 2 Waiting Queue, 3 Search &amp; Sort, 4 Clinic Reports, 5 Administration. The second
+and the third words only mean something for the two panels they belong to, so an argument that does
+not fit the panel is ignored.
+
+## The submission document
+
+`SCAPMS_Submission.pdf` is the single document the assessment asks for. It holds, in the order the
+brief lists them: the two to three page report, the six screenshots, the UML class diagrams, and
+the complete source code under the four headings the brief names. `SUBMISSION_REPORT.md` is the
+report on its own, and the four `UML_*.png` pictures are the diagrams, because a full diagram of
+Twenty five classes do not read on one page when they are printed.
 
 ## Where each requirement is implemented
 
@@ -126,8 +199,9 @@ The binary is generated at `release\SCAPMS_GUI.exe`.
 
 `build.bat` builds the console version (`build\SCAPMS.exe`), which walks through the exception
 handling, the polymorphic calls, the searching and sorting routines, the waiting room, the undo
-stack and the reports without needing the GUI.
+stack, the summary of the clinic and the four reports without needing the GUI.
 
 ### Data files
 `patients.csv` and `appointments.csv` hold the same records the application starts with, and are
-the files the import and export dialogs read and write.
+the files the import and export dialogs read and write. The program starts with the same records
+built into it, so it also runs when these two files are not there.
