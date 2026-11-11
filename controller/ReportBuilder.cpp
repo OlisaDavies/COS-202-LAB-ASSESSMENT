@@ -100,7 +100,8 @@ std::string ReportBuilder::pendingAppointments(const ClinicManager& manager) {
         }
 
         const model::PatientRecord* patient = manager.findPatientByID(appointment.getPatientID());
-        const std::string patientName = (patient != nullptr) ? patient->getName() : "Unknown";
+        const std::string patientName = (patient != nullptr) ? patient->getName()
+                                                             : "(record not found)";
 
         out += pad(appointment.getAppointmentID(), -12)
              + pad(patientName, -24)
@@ -158,7 +159,9 @@ std::vector<std::pair<std::string, int>> ReportBuilder::completedVisitCounts(
         }
     }
 
-    // The map is turned into a list, because the list can be ranked.
+    // The map is turned into a list, because the ranking is by the number of
+    // visits and not by the identifier. The map would order the patients by
+    // their identifier, which is not the order the report asks for.
     std::vector<std::pair<std::string, int>> ranked;
     for (const auto& entry : counts) {
         ranked.push_back(std::make_pair(entry.first, entry.second));
@@ -192,7 +195,8 @@ std::string ReportBuilder::frequentPatients(const ClinicManager& manager) {
     int rank = 1;
     for (const auto& entry : ranked) {
         const model::PatientRecord* patient = manager.findPatientByID(entry.first);
-        const std::string patientName = (patient != nullptr) ? patient->getName() : "Unknown";
+        const std::string patientName = (patient != nullptr) ? patient->getName()
+                                                             : "(record not found)";
 
         out += padNumber(rank++, -8)
              + pad(entry.first, -16)

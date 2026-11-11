@@ -18,7 +18,6 @@ public:
     const char* what() const noexcept override { return errorMessage.c_str(); }
 };
 
-// Raised when a patient ID is already used by another record.
 class DuplicateIDException : public ClinicException {
 public:
     explicit DuplicateIDException(const std::string& id)

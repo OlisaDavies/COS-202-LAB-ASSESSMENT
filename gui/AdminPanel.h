@@ -1,9 +1,9 @@
 #pragma once
 
 #include <QWidget>
+#include <QLabel>
 #include <QListWidget>
 #include <QPushButton>
-#include <QTextEdit>
 
 #include "../controller/ClinicManager.h"
 
@@ -23,7 +23,6 @@ class AdminPanel : public QWidget {
 public:
     explicit AdminPanel(controller::ClinicManager& manager, QWidget* parent = nullptr);
 
-    // Redraws the dashboard and the list of recent records.
     void refresh();
 
     // Redraws only the statistics of the dashboard. The timer of the window
@@ -39,8 +38,6 @@ public:
     void newDatabase();
 
 signals:
-    // Emitted when the data changed, so that the other panels can refresh
-    // themselves.
     void dataChanged();
 
 private slots:
@@ -57,8 +54,22 @@ private:
     QPushButton* btnLoad;
     QPushButton* btnNew;
 
-    QTextEdit* txtDashboard;
+    // The numbers of the dashboard. Every one of them is a label, so the
+    // dashboard is built out of real widgets and not out of one block of
+    // text.
+    QLabel* lblPatientCount;
+    QLabel* lblWaitingCount;
+    QLabel* lblBookedCount;
+    QLabel* lblCompletedCount;
+    QLabel* lblPendingCount;
+    QLabel* lblCancelledCount;
+
     QListWidget* listRecent;
+
+    // A small label in the colour of one category, used by the table of the
+    // categories and their priorities.
+    static QLabel* buildCategoryChip(const QString& text, const QString& background,
+                                      const QString& foreground, QWidget* parent);
 };
 
 } // namespace gui

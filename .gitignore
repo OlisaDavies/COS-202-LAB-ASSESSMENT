@@ -20,6 +20,3 @@ vc.pdb
 .vscode/ipch/
 .vscode/.browse*
 
-# Agent work directories
-.kilo/
-.kilocode/

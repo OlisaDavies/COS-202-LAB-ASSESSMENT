@@ -43,7 +43,6 @@ public:
 
     std::string getTypeLabel() const override { return "General Outpatient"; }
 
-    // The full record of the patient as text.
     std::string getPatientReport() const override;
 
     std::string getSpecialDetail() const override;

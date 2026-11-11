@@ -52,9 +52,11 @@ QWidget* QueuePanel::buildControls(QWidget* parent) {
     layout->addWidget(lblQueueCount);
     layout->addStretch();
 
-    // The controls keep a fixed width, so that the queue list always has room.
-    group->setFixedWidth(360);
-    group->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    // The controls keep a minimum width, so that the queue list always has
+    // room, and they may grow when the window is wide.
+    group->setMinimumWidth(330);
+    group->setMaximumWidth(420);
+    group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     return group;
 }
 

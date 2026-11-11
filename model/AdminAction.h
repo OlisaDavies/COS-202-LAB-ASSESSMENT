@@ -30,8 +30,8 @@ public:
 
     Type type;
     std::string description;
-    std::string patientID;             // the record the action is about
-    std::unique_ptr<PatientRecord> patientBackup;   // a copy of the record
+    std::string patientID;
+    std::unique_ptr<PatientRecord> patientBackup;
     Appointment appointmentBackup;
 
     // The place the record held in the waiting queue when it was deleted,

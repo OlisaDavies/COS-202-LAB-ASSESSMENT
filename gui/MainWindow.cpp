@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QGuiApplication>
+#include <QIcon>
 #include <QKeySequence>
 #include <QMenu>
 #include <QMenuBar>
@@ -39,14 +40,34 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), centred(false) {
 void MainWindow::showEvent(QShowEvent* event) {
     QMainWindow::showEvent(event);
 
-    // The window is put in the middle of the screen once Windows has placed
-    // it, so that it never hangs over the edge of the display.
+    // Windows places the window itself, and the screen can be smaller than
+    // the window, so the size and the position are only corrected once the
+    // window is up.
     if (!centred) {
         centred = true;
         QTimer::singleShot(300, this, [this]() {
             if (QScreen* screen = QGuiApplication::primaryScreen()) {
                 const QRect available = screen->availableGeometry();
-                move(available.center() - QPoint(WINDOW_WIDTH / 2, WINDOW_HEIGHT / 2));
+
+                // A window that is wider than the screen would hang over the
+                // edge, so it is made smaller instead.
+                const int margin = 20;
+                int wantedWidth = WINDOW_WIDTH;
+                if (available.width() > 0 && wantedWidth > available.width() - margin) {
+                    wantedWidth = available.width() - margin;
+                }
+                int wantedHeight = WINDOW_HEIGHT;
+                if (available.height() > 0 && wantedHeight > available.height() - margin) {
+                    wantedHeight = available.height() - margin;
+                }
+                resize(wantedWidth, wantedHeight);
+
+                // The layout may still make the window larger than it asked
+                // for, so the window is put in the middle a second time with
+                // the size it really has.
+                QTimer::singleShot(0, this, [this, available]() {
+                    move(available.center() - QPoint(width() / 2, height() / 2));
+                });
             }
         });
     }
@@ -65,6 +86,7 @@ void MainWindow::applyStyleSheet() {
 
 void MainWindow::setupUI() {
     setWindowTitle("Smart Clinic Appointment & Patient Management System");
+    setWindowIcon(QIcon(":/clinic.ico"));
 
     tabWidget = new QTabWidget(this);
     setCentralWidget(tabWidget);
@@ -83,7 +105,6 @@ void MainWindow::setupUI() {
     tabWidget->addTab(reportPanel, "Clinic Reports");
     tabWidget->addTab(adminPanel, "Administration");
 
-    // Every panel tells the window when it changed the data.
     connect(patientPanel, &PatientPanel::dataChanged, this, &MainWindow::onDataChanged);
     connect(appointmentPanel, &AppointmentPanel::dataChanged, this, &MainWindow::onDataChanged);
     connect(queuePanel, &QueuePanel::dataChanged, this, &MainWindow::onDataChanged);
@@ -157,9 +178,8 @@ void MainWindow::setupTimer() {
 }
 
 void MainWindow::onTimerTick() {
-    // The clock and the live numbers of the clinic. The timer keeps the
-    // status bar up to date, and it also refreshes the statistics of the
-    // dashboard, so that the staff always see the true numbers.
+    // The timer keeps the status bar and the dashboard in step with the
+    // data, so the staff never read a number that has gone out of date.
     const QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
 
     int pending = 0;
@@ -175,30 +195,26 @@ void MainWindow::onTimerTick() {
                           .arg(manager.getQueueSize());
 
     if (pending > 0) {
-        // The reminder of the bookings that still have to take place.
         message += QString("   |   Pending appointments: %1").arg(pending);
     }
     if (manager.getQueueSize() > 0) {
-        // The reminder that somebody is waiting for the doctor.
         message += "   (patients are waiting)";
     }
 
     statusBar()->showMessage(message);
 
-    // The dashboard holds the statistics of the clinic, so it is redrawn on
-    // every tick of the timer.
     adminPanel->refreshStatistics();
 }
 
 void MainWindow::loadSampleData() {
-    // The sample data is the starting point of the clinic, not an
-    // administrative step of the staff. It is therefore loaded without being
-    // remembered, so that the first Ctrl+Z does not delete it.
+    // The sample data is the starting point of the clinic and not a step of
+    // the staff, so it is loaded without being remembered and the first
+    // Ctrl+Z does not delete it.
     std::vector<std::unique_ptr<model::PatientRecord>> patients;
     patients.push_back(std::make_unique<model::GeneralPatient>(
         "GEN-101", "Amaka Okonkwo", 28, "+2348073451298", 4500.00));
     patients.push_back(std::make_unique<model::EmergencyPatient>(
-        "EMG-999", "Davies Johnson", 22, "+2348034874562", 1, "Acute trauma"));
+        "EMG-999", "Daniel Ojukwu", 22, "+2348034874562", 1, "Acute trauma"));
     patients.push_back(std::make_unique<model::FollowUpPatient>(
         "FOL-205", "Babatunde Alabi", 45, "+2348067624513", "2026-10-20", "Dr. Funke"));
     patients.push_back(std::make_unique<model::GeneralPatient>(
@@ -211,9 +227,8 @@ void MainWindow::loadSampleData() {
     std::vector<std::string> warnings;
     manager.registerPatients(std::move(patients), &warnings);
 
-    // The sample bookings are guarded, so that a mistake in the sample data
-    // can never stop the program from starting. The clinic simply begins
-    // without the booking that could not be made.
+    // A booking that the sample data cannot make is skipped instead of
+    // stopping the program, so that the clinic always begins.
     try {
         manager.scheduleAppointment(model::Appointment("APT-1001", "GEN-101", "2026-11-15",
                                                        "10:30 AM", "Dr. Adeyemi",
@@ -231,8 +246,6 @@ void MainWindow::loadSampleData() {
         warnings.push_back(std::string("a sample appointment was skipped: ") + error.what());
     }
 
-    // Any problem with the sample data is told to the staff, so that
-    // nothing is missing without a reason.
     if (!warnings.empty()) {
         showWarnings(warnings);
     }

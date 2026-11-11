@@ -22,6 +22,7 @@
 #include "utils/ClinicExceptions.h"
 #include "controller/SearchEngine.h"
 #include "controller/SortEngine.h"
+#include "controller/ReportBuilder.h"
 
 using namespace scapms::model;
 using namespace scapms::controller;
@@ -36,7 +37,7 @@ int main() {
             std::make_unique<GeneralPatient>("GEN-101", "Amaka Okonkwo", 28,
                                              "+2348073451298", 4500.00));
         manager.registerPatient(
-            std::make_unique<EmergencyPatient>("EMG-999", "Davies Johnson", 22,
+            std::make_unique<EmergencyPatient>("EMG-999", "Daniel Ojukwu", 22,
                                                "+2348034874562", 1, "Acute trauma"));
         manager.registerPatient(
             std::make_unique<FollowUpPatient>("FOL-205", "Babatunde Alabi", 45,
@@ -53,7 +54,7 @@ int main() {
     // The rules of the clinic raise their own exception types.
     try {
         manager.registerPatient(
-            std::make_unique<GeneralPatient>("GEN-102", "Patient Two", -5,
+            std::make_unique<GeneralPatient>("GEN-102", "Tunde Afolabi", -5,
                                              "+2348000000000", 3000.00));
     } catch (const InvalidPatientDataException& error) {
         std::cout << "Rejected negative age: " << error.what() << std::endl;
@@ -61,7 +62,7 @@ int main() {
 
     try {
         manager.registerPatient(
-            std::make_unique<GeneralPatient>("GEN-101", "Patient Four", 30,
+            std::make_unique<GeneralPatient>("GEN-101", "Ifeoma Nwosu", 30,
                                              "+2348099999999", 5000.00));
     } catch (const DuplicateIDException& error) {
         std::cout << "Rejected duplicate ID: " << error.what() << std::endl;
@@ -171,6 +172,14 @@ int main() {
     std::string undone = manager.undoLastAction();
     std::cout << "Undo reported: " << undone << std::endl;
     std::cout << "After the undo there are " << manager.getPatientCount() << " patients." << std::endl;
+
+    // The same summary that the dashboard of the graphical program shows in
+    // its panels. It is built by the report builder, so both programs read
+    // the numbers in the same way.
+    std::cout << std::endl;
+    std::cout << "========== CLINIC SUMMARY ==========" << std::endl;
+    std::cout << ReportBuilder::dashboardSummary(manager);
+    std::cout << std::endl;
 
     return 0;
 }

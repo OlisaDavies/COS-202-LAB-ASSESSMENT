@@ -4,6 +4,7 @@
 #include <QFile>
 #include <QFormLayout>
 #include <QFont>
+#include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -55,10 +56,13 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
     // staff find out straight away that the identifier is already taken.
     connect(txtPatID, &QLineEdit::textChanged, this, &PatientPanel::onPatientIDChanged);
 
-    lblIDHint = new QLabel(group);
+    lblIDHint = new QLabel("The identifier must be unique.", group);
     lblIDHint->setToolTip("Tells you whether the identifier is free or already in use.");
     lblIDHint->setWordWrap(true);
     lblIDHint->setStyleSheet("color: #777; font-size: 11px;");
+    // The hint always carries a line, so that the fields below it keep the
+    // same place while the staff type.
+    lblIDHint->setMinimumHeight(16);
 
     btnSuggestID = new QPushButton("Suggest ID", group);
     btnSuggestID->setToolTip("Fill in the next free identifier for the chosen category.");
@@ -92,7 +96,6 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
         input->setMaximumWidth(inputWidth);
     }
     cmbPatType->setMaximumWidth(inputWidth);
-
     form->addRow("Patient ID *:", txtPatID);
     form->addRow(lblIDHint);
     form->addRow(btnSuggestID);
@@ -127,10 +130,11 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
     connect(cmbPatType, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &PatientPanel::onPatientTypeChanged);
 
-    // The form keeps a fixed width, so that the roster table always has
-    // room on a small screen.
-    group->setFixedWidth(360);
-    group->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Preferred);
+    // The form keeps a minimum width, so that the roster table always has
+    // room on a small screen, and it may grow when the window is wide.
+    group->setMinimumWidth(330);
+    group->setMaximumWidth(420);
+    group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
     return group;
 }
 
@@ -140,33 +144,41 @@ QWidget* PatientPanel::buildRoster(QWidget* parent) {
     layout->setContentsMargins(16, 20, 16, 16);
     layout->setSpacing(10);
 
-    QLabel* legend = new QLabel(
-        "<span style='color:#b71c1c;'>Emergency</span> &nbsp;&nbsp; "
-        "<span style='color:#1b5e20;'>General</span> &nbsp;&nbsp; "
-        "<span style='color:#0d47a1;'>Follow-Up</span>", group);
-    layout->addWidget(legend);
+    // The legend shows the colour of each category and the priority that goes
+    // with it, so that a row can be read without looking up the category.
+    QGridLayout* legend = new QGridLayout();
+    legend->setHorizontalSpacing(14);
+    legend->setVerticalSpacing(6);
+    legend->addWidget(buildLegendChip("Emergency", "#ffebee", "#b71c1c", group), 0, 0);
+    legend->addWidget(new QLabel("High Priority", group), 0, 1);
+    legend->addWidget(buildLegendChip("General", "#e8f5e9", "#1b5e20", group), 1, 0);
+    legend->addWidget(new QLabel("Normal", group), 1, 1);
+    legend->addWidget(buildLegendChip("Follow-Up", "#e3f2fd", "#0d47a1", group), 2, 0);
+    legend->addWidget(new QLabel("Scheduled", group), 2, 1);
+    legend->setColumnStretch(1, 1);
+    layout->addLayout(legend);
 
     tablePatients = new QTableWidget(group);
     tablePatients->setColumnCount(5);
     tablePatients->setHorizontalHeaderLabels(
         {"ID", "Full Name", "Age", "Phone", "Details"});
 
-    // The column widths are set by hand, so that the table never asks for
-    // more room than the window can give.
+    // The identifier, the name, the age and the telephone number take the
+    // width of their content, so that none of them is cut in half. The
+    // details column takes the rest of the table and lets the long text
+    // end in an ellipsis.
     QHeaderView* header = tablePatients->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Interactive);
+    header->setSectionResizeMode(0, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(2, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(3, QHeaderView::ResizeToContents);
+    header->setSectionResizeMode(4, QHeaderView::Stretch);
     header->setMinimumSectionSize(45);
-    header->resizeSection(0, 85);    // ID
-    header->resizeSection(1, 120);   // Full Name
-    header->resizeSection(2, 45);    // Age
-    header->resizeSection(3, 135);   // Phone
-    header->setStretchLastSection(true);
     tablePatients->verticalHeader()->setVisible(false);
     tablePatients->setSelectionBehavior(QAbstractItemView::SelectRows);
     tablePatients->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    // The Details column holds a long text, so the text is cut off with an
-    // ellipsis instead of being written over the next column.
     tablePatients->setTextElideMode(Qt::ElideRight);
     layout->addWidget(tablePatients);
 
@@ -191,6 +203,17 @@ QWidget* PatientPanel::buildRoster(QWidget* parent) {
     layout->addLayout(buttonRow);
 
     return group;
+}
+
+QLabel* PatientPanel::buildLegendChip(const QString& text, const QString& background,
+                                       const QString& foreground, QWidget* parent) {
+    QLabel* chip = new QLabel(text, parent);
+    chip->setStyleSheet(
+        QString("background-color: %1; color: %2; border-radius: 9px;"
+                "padding: 3px 12px; font-size: 12px; font-weight: 600;").arg(background, foreground));
+    chip->setAlignment(Qt::AlignCenter);
+    chip->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
+    return chip;
 }
 
 void PatientPanel::showCategoryFields(int index) {
@@ -294,7 +317,6 @@ void PatientPanel::onRegisterPatient() {
     // The unique pointer owns the record until it is handed over to the
     // database, so it is released even when the registration is refused.
     std::unique_ptr<model::PatientRecord> owned;
-
     if (typeIndex == EMERGENCY_INDEX) {
         owned = std::make_unique<model::EmergencyPatient>(id.toStdString(), name.toStdString(),
                                                            age, contact.toStdString(), 1, "");
@@ -321,7 +343,6 @@ void PatientPanel::onRegisterPatient() {
         QMessageBox::critical(this, "Registration error", error.what());
         return;                                 // the form is kept as it is
     }
-
     clearPatientForm();
     refresh();
     emit dataChanged();
@@ -487,8 +508,7 @@ void PatientPanel::onShowReport() {
 
 void PatientPanel::onPatientIDChanged(const QString& text) {
     // The label under the identifier field tells the staff at once whether
-    // the identifier can be used. This is the answer of the program to the
-    // change of a text field.
+    // the identifier can be used.
     const QString id = text.trimmed();
 
     if (id.isEmpty()) {

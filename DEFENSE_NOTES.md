@@ -2,7 +2,7 @@
 
 **Course:** COS202 Programming II  
 **Project:** Smart Clinic Appointment & Patient Management System (SCAPMS)  
-**Student:** Davies Johnson  
+**Student:** OlisaEmeka Davies Chinedu-Eze  
 
 This guide covers the questions you are likely to be asked in your project defense. Lecturers don't just want to see code that works - they want to verify that **you wrote it, understand every line, and know why every design choice was made**.
 
@@ -99,16 +99,16 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 
 ### Question 7a: "What is the fixed-size array for, and how does it decide which records to keep?"
 **Model Answer:**
-> *"The brief asks for a fixed-size C++ array as a cache of the frequently accessed patient records, so I used \PatientRecord* recentPatients[10]\ with a counter \ecentCount\ that says how many of the ten places are in use.
+> *"The brief asks for a fixed-size C++ array as a cache of the frequently accessed patient records, so I used `PatientRecord* recentPatients[10]` with a counter `recentCount` that says how many of the ten places are in use.
 >
-> The array is held from the **oldest** record at the front to the **newest** at the back. Every time a record is used, \	ouchRecentPatient\ is called:
+> The array is held from the **oldest** record at the front to the **newest** at the back. Every time a record is used, `touchRecentPatient` is called:
 >
 > - If the record is **already in the cache**, it is moved to the newest place, and the records in between keep their order. That is what makes it a cache of the *frequently* accessed records rather than a list of the first ten registered ones.
 > - If the record is **not in the cache**, it is added at the back. When the array is already full, the oldest record at the front is pushed out to make room - that is the classic eviction rule.
 >
 > The panel shows the list from the back to the front, so the most recently used record is the first one the staff sees.
 >
-> I found a bug here while testing. The three paths - a record that was used again, a new record, and the eviction - each used a **different** idea of which end was the newest one, so the array kept the registration order instead of the access order. On top of that, \indPatientByID\ returned a record that was already cached without recording the access. I tested it with a probe that touched twenty-five records and checked which ones stayed in the cache, and I made the order the same in all three paths."*
+> I found a bug here while testing. The three paths - a record that was used again, a new record, and the eviction - each used a **different** idea of which end was the newest one, so the array kept the registration order instead of the access order. On top of that, `findPatientByID` returned a record that was already cached without recording the access. I tested it with a probe that touched twenty-five records and checked which ones stayed in the cache, and I made the order the same in all three paths."*
 
 ---
 
@@ -181,7 +181,7 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 **Model Answer:**
 > *"The `ClinicManager` is the class that the graphical interface talks to. It is the only class the screens are allowed to call, and it owns the database and the appointment controller.
 >
-> It exists because of a problem I ran into. In the first version the panels called the database themselves, so every rule of the clinic - the age has to be between 0 and 120, the date has to be written as YYYY-MM-DD, an emergency patient may not be booked in advance - was written inside `ClinicDatabase`. That class grew to 488 lines and mixed the business logic with the data handling, which is exactly what requirement 2 asks me not to do.
+> It exists because of a problem I ran into. In the first version the panels called the database themselves, so every rule of the clinic - the age has to be between 0 and 120, the date has to be written as YYYY-MM-DD, an emergency patient may not be booked in advance - was written inside `ClinicDatabase`. That class grew past four hundred lines and mixed the business logic with the data handling, which is exactly what requirement 2 asks me not to do.
 >
 > So I moved the rules up into the controller layer. `ClinicManager` now checks the rules of a patient record, `AppointmentController` checks the rules of a booking, and `ClinicDatabase` only stores and finds. The panels were repointed from the database to the manager, and **no file in the `gui/` folder refers to the database any more**. That is the check I would point a marker to: the separation is not a claim in the report, it is a fact in the source tree."*
 
@@ -189,14 +189,13 @@ When the lecturer asks: *"Tell me about your project in one minute"*, answer:
 
 ### Question 10e: "How do you handle errors? What happens if something goes wrong?"
 **Model Answer:**
-> *"I use my own exception classes. Everything derives from one base class, \ClinicException\, which derives from \std::exception\, so the standard \what()\ works. There are four kinds: \DuplicateIDException\ for an identifier that is already registered, \InvalidPatientDataException\ for a bad age, an empty name, a bad contact number or a bad fee, \InvalidAppointmentException\ for a booking that breaks a rule, and \FileIOException\ when a file cannot be read or written.
+> *"I use my own exception classes. Everything derives from one base class, `ClinicException`, which derives from `std::exception`, so the standard `what()` works. There are four kinds: `DuplicateIDException` for an identifier that is already registered, `InvalidPatientDataException` for a bad age, an empty name, a bad contact number or a bad fee, `InvalidAppointmentException` for a booking that breaks a rule, and `FileIOException` when a file cannot be read or written.
 >
-> The rules themselves live in the controller layer, so the panels never invent their own. \ClinicManager::checkPatientRules\ is the one place that decides whether a record is allowed into the clinic, and it is run when a patient is registered, when a patient is edited and when a record is read from a file.
+> The rules themselves live in the controller layer, so the panels never invent their own. `ClinicManager::checkPatientRules` is the one place that decides whether a record is allowed into the clinic, and it is run when a patient is registered, when a patient is edited and when a record is read from a file.
 >
 > Every panel wraps the call in a try and catch and shows the message of the exception in a message box, so the staff sees what was wrong and how to fix it.
 >
-> There is also a safety net. Qt does not catch an exception that leaves a slot - it would travel out of the event loop and end the program. So my application class overrides \
-otify()\, which is the one place every event passes through, and turns anything that escapes into a message box. The clinic has to keep running after a normal mistake, so one bad action must never close the whole program."*
+> There is also a safety net. Qt does not catch an exception that leaves a slot - it would travel out of the event loop and end the program. So my application class overrides `notify()`, which is the one place every event passes through, and turns anything that escapes into a message box. The clinic has to keep running after a normal mistake, so one bad action must never close the whole program."*
 
 ---
 
@@ -222,21 +221,22 @@ if (patient.getAge() < 0 || patient.getAge() > 130)
 
 ### Exercise 2: Add a new sort order (e.g. descending order instead of ascending)
 **Where to go:** Open `controller/SortEngine.cpp`.  
-Look at `comparePatients` (line 6 onwards):
+Look at `comparePatients` (line 8 onwards):
 ```cpp
 case SortField::PatientAge:
-    return a->getAge() < b->getAge(); // Simply flip '<' to '>'!
+    return first->getAge() < second->getAge(); // Simply flip '<' to '>'!
 ```
 
 ---
 
 ### Exercise 3: Add a new shortcut to the Menu Bar
 **Where to go:** Open `gui/MainWindow.cpp`.  
-Inside `setupMenuBar()` (line 101):
+Inside `setupMenuBar()` (line 103):
 ```cpp
 QAction* actSearch = editMenu->addAction("&Quick search");
 actSearch->setShortcut(QKeySequence("Ctrl+F"));
 connect(actSearch, &QAction::triggered, this, [this]() {
-    tabWidget->setCurrentIndex(3); // Switches directly to Search/Sort tab!
+    tabWidget->setCurrentIndex(3); // Switches directly to the Search & Sort tab!
+    tabWidget->setFocus();
 });
 ```

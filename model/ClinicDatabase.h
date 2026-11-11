@@ -27,7 +27,6 @@ namespace model {
 //   * the waiting room only borrows the pointers it is given.
 class ClinicDatabase {
 public:
-    // Size of the fixed array that caches the recently accessed records.
     static constexpr int CACHE_SIZE = 10;
 
 private:
@@ -62,10 +61,8 @@ private:
                                std::unique_ptr<PatientRecord>* backupOut,
                                int* waitingPositionOut);
 
-    // The patient that holds the given appointment, or nullptr.
     PatientRecord* findOwnerOfAppointment(const std::string& appointmentID);
 
-    // True when an appointment with that identifier is already booked.
     bool appointmentIDIsTaken(const std::string& appointmentID) const;
 
     void touchRecentPatient(PatientRecord* patient);
@@ -126,16 +123,13 @@ public:
     // Every appointment of every patient, gathered into one list.
     std::vector<Appointment> getAllAppointments() const;
 
-    // Waiting room.
     void enqueuePatient(PatientRecord* patient);
     PatientRecord* callNextPatient();
     std::size_t getQueueSize() const { return waitingQueue.size(); }
     std::vector<PatientRecord*> getWaitingQueue() const;
 
-    // Appointments.
     void addAppointment(const Appointment& appointment);
 
-    // Adds an appointment without remembering the step on the undo stack.
     void addAppointmentWithoutUndo(const Appointment& appointment);
 
     bool cancelAppointment(const std::string& appointmentID);

@@ -52,9 +52,10 @@ private:
     // True once the window has been put in the middle of the screen.
     bool centred;
 
-    // The size the window is asked for.
-    static constexpr int WINDOW_WIDTH = 1080;
-    static constexpr int WINDOW_HEIGHT = 640;
+    // The size the window is asked for. The width leaves room for the
+    // roster table, whose name and details columns both hold a long text.
+    static constexpr int WINDOW_WIDTH = 1200;
+    static constexpr int WINDOW_HEIGHT = 660;
 
     PatientPanel* patientPanel;
     AppointmentPanel* appointmentPanel;

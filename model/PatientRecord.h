@@ -68,25 +68,18 @@ public:
     void setAge(int newAge) { age = newAge; }
     void setContactNumber(std::string newContact) { contactNumber = newContact; }
 
-    // ---- the appointments of this patient ----
-
     // The appointments the patient holds. This is the association that the
     // UML diagram shows as a composition.
     const std::vector<Appointment>& getAppointments() const { return appointments; }
 
-    // How many appointments the patient holds.
     std::size_t getAppointmentCount() const { return appointments.size(); }
 
-    // The appointment with the given identifier, or nullptr.
     const Appointment* findAppointment(const std::string& appointmentID) const;
 
-    // True when the patient holds an appointment with that identifier.
     bool hasAppointment(const std::string& appointmentID) const;
 
-    // The pending appointment that comes first, or nullptr when there is none.
     const Appointment* getNextPendingAppointment() const;
 
-    // How many of the appointments of this patient are still pending.
     std::size_t getPendingAppointmentCount() const;
 
     // Takes one of the patient's appointments out of the collection. The
@@ -97,14 +90,10 @@ public:
     // database uses this when a cancellation is undone.
     bool restoreAppointment(const Appointment& backup);
 
-    // ---- the abstract part ----
-
-    // The name shown to the clinic staff, for example "Emergency Patient".
     virtual std::string getTypeLabel() const = 0;
 
-    // The full record of the patient as text. Every category writes its own
-    // version, so this is one of the pure virtual functions that the
-    // polymorphic calls dispatch on.
+    // Every category writes its own version, so this is one of the pure
+    // virtual functions that the polymorphic calls dispatch on.
     virtual std::string getPatientReport() const = 0;
 
     // Category specific behaviour. These are the pure virtual functions that
@@ -136,7 +125,6 @@ protected:
     // patient already holds an appointment with that identifier.
     bool addAppointment(const Appointment& appointment);
 
-    // Puts an appointment back into the state it had before.
     bool setAppointmentStatus(const std::string& appointmentID, const std::string& status);
 
     // A writable pointer to one of the appointments of this patient.
