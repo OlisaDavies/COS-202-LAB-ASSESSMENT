@@ -11,6 +11,10 @@ Makefile*
 *.exe
 release/
 debug/
+build/
+*.obj
+*.pdb
+vc.pdb
 
 # VS Code & Cache
 .vscode/ipch/
