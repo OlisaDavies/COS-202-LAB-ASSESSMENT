@@ -217,16 +217,17 @@ classDiagram
         -database: ClinicDatabase
         +scheduleAppointment(appointment: Appointment) void
         +cancelAppointment(appointmentID: string) bool
-        +allAppointments() vector~Appointment~
-        +appointmentsFor(patientID: string) vector~Appointment~
+        +completeAppointment(appointmentID: string) bool
+        +patientCanBeBooked(appointment: Appointment) bool
         +suggestAppointmentId() string
     }
 
     class SearchEngine {
         <<controller>>
         +linearSearchByID(records, id) int
+        +linearSearchByText(records, text) vector~int~
         +binarySearchByID(sortedRecords, id) int
-        +recursiveSearchByName(records, name, idx) int
+        +recursiveSearchByName(records, name, idx) vector~int~
         +searchByCategory(records, category) vector~int~
     }
 

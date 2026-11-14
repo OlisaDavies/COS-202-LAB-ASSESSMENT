@@ -36,6 +36,17 @@ std::string line(const std::string& label, int value) {
     return pad(label, 28) + padNumber(value, 5) + "\n";
 }
 
+// Counts the appointments with one status.
+int countStatus(const ClinicManager& manager, const std::string& status) {
+    int count = 0;
+    for (const model::Appointment& appointment : manager.getAllAppointments()) {
+        if (appointment.getStatus() == status) {
+            ++count;
+        }
+    }
+    return count;
+}
+
 } // namespace
 
 std::string ReportBuilder::timestamp() {
@@ -118,19 +129,9 @@ std::string ReportBuilder::pendingAppointments(const ClinicManager& manager) {
 }
 
 std::string ReportBuilder::dailySummary(const ClinicManager& manager) {
-    int completed = 0;
-    int pending = 0;
-    int cancelled = 0;
-
-    for (const model::Appointment& appointment : manager.getAllAppointments()) {
-        if (appointment.getStatus() == model::Appointment::STATUS_COMPLETED) {
-            ++completed;
-        } else if (appointment.getStatus() == model::Appointment::STATUS_PENDING) {
-            ++pending;
-        } else if (appointment.getStatus() == model::Appointment::STATUS_CANCELLED) {
-            ++cancelled;
-        }
-    }
+    const int completed = countStatus(manager, model::Appointment::STATUS_COMPLETED);
+    const int pending = countStatus(manager, model::Appointment::STATUS_PENDING);
+    const int cancelled = countStatus(manager, model::Appointment::STATUS_CANCELLED);
 
     const std::size_t total = manager.getAllAppointments().size();
     const double completionRate = (total == 0) ? 0.0 : (completed * 100.0 / total);
@@ -212,19 +213,9 @@ std::string ReportBuilder::frequentPatients(const ClinicManager& manager) {
 }
 
 std::string ReportBuilder::dashboardSummary(const ClinicManager& manager) {
-    int completed = 0;
-    int pending = 0;
-    int cancelled = 0;
-
-    for (const model::Appointment& appointment : manager.getAllAppointments()) {
-        if (appointment.getStatus() == model::Appointment::STATUS_COMPLETED) {
-            ++completed;
-        } else if (appointment.getStatus() == model::Appointment::STATUS_PENDING) {
-            ++pending;
-        } else if (appointment.getStatus() == model::Appointment::STATUS_CANCELLED) {
-            ++cancelled;
-        }
-    }
+    const int completed = countStatus(manager, model::Appointment::STATUS_COMPLETED);
+    const int pending = countStatus(manager, model::Appointment::STATUS_PENDING);
+    const int cancelled = countStatus(manager, model::Appointment::STATUS_CANCELLED);
 
     std::string out;
     out += line("Registered patients:", static_cast<int>(manager.getPatientCount()));

@@ -24,3 +24,7 @@ vc.pdb
 # Local files used while assembling the submission document.
 SCAPMS_Submission.html
 
+# Personal VS Code settings (machine-specific paths)
+.vscode/c_cpp_properties.json
+.vscode/settings.json
+

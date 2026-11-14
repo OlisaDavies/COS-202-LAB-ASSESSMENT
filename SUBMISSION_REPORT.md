@@ -35,7 +35,7 @@ The core of the model is the **abstract base class `PatientRecord`**, which hold
 
 **Composition and association.** A patient owns its appointments: `PatientRecord` holds a `std::vector<Appointment>`, so a patient is associated with one or more appointments and they are created and destroyed together. `ClinicDatabase` owns the records in a `std::vector<std::unique_ptr<PatientRecord>>`, so each record is freed exactly once.
 
-**Encapsulation.** Every patient field is private and reached through an accessor. The rules of the clinic — a valid age, a unique ID, a date in the right format — are checked in the controller layer, so the screens and the data can never disagree about them.
+**Encapsulation.** The fields of each category — the fee, the severity and triage note, the previous visit and doctor — are private and reached through an accessor. The five fields every patient shares are protected, so the report each category writes can use them directly, and the rest of the program uses the accessors. The rules of the clinic — a valid age, a unique ID, a date in the right format — are checked in the controller layer, so the screens and the data can never disagree about them.
 
 ## 4. Data Structures Used
 

@@ -40,34 +40,27 @@ MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), centred(false) {
 void MainWindow::showEvent(QShowEvent* event) {
     QMainWindow::showEvent(event);
 
-    // Windows places the window itself, and the screen can be smaller than
-    // the window, so the size and the position are only corrected once the
-    // window is up.
+    // The window is fitted to the screen and put in the middle once it is
+    // up, because the layout only decides the real size of the window then.
     if (!centred) {
         centred = true;
-        QTimer::singleShot(300, this, [this]() {
+        QTimer::singleShot(0, this, [this]() {
             if (QScreen* screen = QGuiApplication::primaryScreen()) {
                 const QRect available = screen->availableGeometry();
-
-                // A window that is wider than the screen would hang over the
-                // edge, so it is made smaller instead.
                 const int margin = 20;
                 int wantedWidth = WINDOW_WIDTH;
-                if (available.width() > 0 && wantedWidth > available.width() - margin) {
+                if (available.width() > margin && wantedWidth > available.width() - margin) {
                     wantedWidth = available.width() - margin;
                 }
                 int wantedHeight = WINDOW_HEIGHT;
-                if (available.height() > 0 && wantedHeight > available.height() - margin) {
+                if (available.height() > margin && wantedHeight > available.height() - margin) {
                     wantedHeight = available.height() - margin;
                 }
                 resize(wantedWidth, wantedHeight);
 
-                // The layout may still make the window larger than it asked
-                // for, so the window is put in the middle a second time with
-                // the size it really has.
-                QTimer::singleShot(0, this, [this, available]() {
-                    move(available.center() - QPoint(width() / 2, height() / 2));
-                });
+                // The size the window really has is used, because the layout
+                // may still have made it larger than it was asked for.
+                move(available.center() - QPoint(width() / 2, height() / 2));
             }
         });
     }
