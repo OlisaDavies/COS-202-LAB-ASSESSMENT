@@ -15,9 +15,8 @@ private:
     double consultationFee;
 
 public:
-    // The consultation fee of the clinic. The rule lives with the data, so
-    // that the screen, the controller and the file reader all use the same
-    // numbers.
+    // The consultation fee of the clinic. The rule lives with the data, so that
+    // the screen, the controller and the file reader use the same numbers.
     static constexpr double MAX_CONSULTATION_FEE = 100000000.0;
     static constexpr double MIN_CONSULTATION_FEE = 0.0;
 
@@ -32,9 +31,9 @@ public:
     double getConsultationFee() const { return consultationFee; }
     void setConsultationFee(double fee) { consultationFee = fee; }
 
-    // True when the fee is a real amount that the clinic can bill. A value
-    // of "nan" or of infinity is not a real amount, even though every
-    // comparison with it is false.
+    // True when the fee is a real amount that the clinic can bill. A value of
+    // "nan" or of infinity is not, even though every comparison with it is
+    // false.
     static bool isValidConsultationFee(double fee) {
         return std::isfinite(fee) &&
                fee >= MIN_CONSULTATION_FEE &&
@@ -51,8 +50,7 @@ public:
     double getBillAmount() const override;
     std::string describeBill() const override;
 
-    // The covariant return type hands back a GeneralPatient, so the caller
-    // does not have to cast the copy back down.
+    // The covariant return type hands back a GeneralPatient.
     GeneralPatient* clone() const override { return new GeneralPatient(*this); }
 
     void restoreFrom(const PatientRecord& previous) override;

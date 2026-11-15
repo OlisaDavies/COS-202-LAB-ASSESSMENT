@@ -31,9 +31,8 @@ void ClinicDatabase::addPatientInternal(std::unique_ptr<PatientRecord> patient, 
         throw utils::InvalidPatientDataException("Cannot register a null patient record.");
     }
 
-    // The rule that a patient identifier is used only once belongs to the
-    // data itself, so it is kept here. The other rules of the clinic are
-    // checked by the controller before it calls this method.
+    // A patient identifier is used only once. The other rules of the clinic
+    // are checked by the controller before it calls this method.
     if (findPatientByID(patient->getPatientID()) != nullptr) {
         throw utils::DuplicateIDException(patient->getPatientID());
     }
@@ -66,8 +65,8 @@ bool ClinicDatabase::removePatientInternal(const std::string& id,
         }
 
         if (waitingPositionOut != nullptr) {
-            // The place of the record in the waiting queue is kept, so that
-            // undoing the delete can put it back where it was.
+            // The place in the waiting queue is kept, so that undoing the
+            // delete can put the record back where it was.
             *waitingPositionOut = waitingQueuePosition(target);
         }
 
@@ -100,10 +99,9 @@ void ClinicDatabase::pushPatientSnapshot(std::unique_ptr<PatientRecord> snapshot
         return;
     }
 
-    // The identifier is read into a local variable before the snapshot is
-    // moved away. The order in which the arguments of a call are evaluated
-    // is not fixed by the standard, so the move must not be written in the
-    // same call as the reads.
+    // The identifier is read before the snapshot is moved away, because the
+    // order in which the arguments of a call are evaluated is not fixed by
+    // the standard.
     const std::string patientID = snapshot->getPatientID();
 
     undoStack.push(AdminAction(AdminAction::Type::UpdatePatient,
@@ -115,9 +113,7 @@ PatientRecord* ClinicDatabase::findPatientByID(const std::string& id) {
     for (int i = 0; i < recentCount; ++i) {
         if (recentPatients[i] != nullptr && recentPatients[i]->getPatientID() == id) {
             // The record is already in the cache, but it has just been used,
-            // so it takes the place of the newest record. Without this the
-            // cache would keep the order in which the records were
-            // registered and not the order in which they were used.
+            // so it takes the place of the newest record.
             PatientRecord* cached = recentPatients[i];
             touchRecentPatient(cached);
             return cached;
@@ -260,7 +256,7 @@ void ClinicDatabase::addAppointmentInternal(const Appointment& appointment, bool
 
     // Only the categories that answer the Appointable interface can hold a
     // booking. The controller checks this rule first and reports it to the
-    // staff, so reaching this point means the booking is allowed.
+    // staff.
     Appointable* bookable = dynamic_cast<Appointable*>(patient);
     if (bookable == nullptr) {
         throw utils::InvalidAppointmentException(
@@ -291,8 +287,7 @@ bool ClinicDatabase::cancelAppointment(const std::string& appointmentID) {
         return false;
     }
 
-    // The state before the cancellation is kept, so that the step can be
-    // undone later.
+    // The state before the cancellation is kept, so that the step can be undone.
     const Appointment* current = owner->findAppointment(appointmentID);
     if (current == nullptr) {
         return false;
@@ -347,8 +342,8 @@ std::string ClinicDatabase::undoLastAction() {
 
     switch (lastAction.type) {
         case AdminAction::Type::AddPatient: {
-            // The record was added, so undoing removes it again. This does not
-            // push a new undo entry.
+            // Undoing an add removes the record again. This does not push a
+            // new undo entry.
             if (!lastAction.patientID.empty()) {
                 removePatientInternal(lastAction.patientID, nullptr, nullptr);
             }
@@ -403,7 +398,7 @@ std::string ClinicDatabase::undoLastAction() {
 
         case AdminAction::Type::CompleteAppointment: {
             // The visit was completed, so undoing it puts the booking back
-            // into the state it had before.
+            // the way it was.
             const Appointment& previous = lastAction.appointmentBackup;
             PatientRecord* owner = findOwnerOfAppointment(previous.getAppointmentID());
             if (owner != nullptr) {
@@ -442,7 +437,6 @@ void ClinicDatabase::touchRecentPatient(PatientRecord* patient) {
 
     // The cache is held from the oldest record at the front to the newest
     // one at the back. Every path below keeps that order.
-
     for (int i = 0; i < recentCount; ++i) {
         if (recentPatients[i] == patient) {
             // The record was used again, so it takes the place of the
@@ -456,8 +450,7 @@ void ClinicDatabase::touchRecentPatient(PatientRecord* patient) {
     }
 
     if (recentCount == CACHE_SIZE) {
-        // The cache is full, so the oldest record makes room for the new
-        // one. The oldest record is the one at the front.
+        // The cache is full, so the oldest record makes room for the new one.
         for (int i = 0; i < CACHE_SIZE - 1; ++i) {
             recentPatients[i] = recentPatients[i + 1];
         }
@@ -515,7 +508,7 @@ void ClinicDatabase::insertIntoWaitingQueue(PatientRecord* patient, int position
     }
 
     // A std::queue cannot put an element in the middle, so the queue is
-    // rebuilt. The record is put in front of the element that is now at the
+    // rebuilt. The record goes in front of the element that is now at the
     // given place, and the elements that follow keep their order.
     std::queue<PatientRecord*> rebuilt;
     int index = 0;
@@ -542,8 +535,7 @@ void ClinicDatabase::insertIntoWaitingQueue(PatientRecord* patient, int position
 
 std::vector<PatientRecord*> ClinicDatabase::getRecentPatients() const {
     // The newest record is at the back of the array, so the array is read
-    // from the back to the front. The most recently used record is
-    // therefore the first one of the list.
+    // from the back to the front.
     std::vector<PatientRecord*> ordered;
     for (int i = recentCount - 1; i >= 0; --i) {
         if (recentPatients[i] != nullptr) {

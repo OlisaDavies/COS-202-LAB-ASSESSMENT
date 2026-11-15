@@ -14,8 +14,8 @@ bool SortEngine::comparePatients(const model::PatientRecord* first,
 
     switch (field) {
         case SortField::PatientID:
-            // The letter case is ignored, so that an identifier that was
-            // typed in small letters does not jump to the end of the list.
+            // The letter case is ignored, so that an identifier typed in small
+            // letters does not jump to the end of the list.
             return utils::compareIgnoreCase(first->getPatientID(),
                                             second->getPatientID()) < 0;
         case SortField::PatientName:
@@ -93,7 +93,7 @@ void SortEngine::mergeHalves(std::vector<model::PatientRecord*>& records,
     while (i < leftCount && j < rightCount) {
         // The right half is only taken when it is strictly smaller. When both
         // records have the same key the left one is taken first, which is what
-        // makes merge sort stable.
+        // makes the sort stable.
         if (comparePatients(rightHalf[j], leftHalf[i], field)) {
             records[k++] = rightHalf[j++];
         } else {

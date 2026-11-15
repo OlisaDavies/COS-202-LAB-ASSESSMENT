@@ -23,9 +23,8 @@ namespace gui {
 
 // The patient panel. It holds the registration form and the roster table.
 //
-// The panel owns the form while a record is being edited. When the change is
-// saved the snapshot is handed over to the database, which keeps it on the
-// undo stack.
+// The panel owns the form while a record is being edited, and hands the
+// snapshot to the database when the change is saved.
 class PatientPanel : public QWidget {
     Q_OBJECT
 
@@ -56,9 +55,8 @@ private:
     static constexpr int EMERGENCY_INDEX = 1;
     static constexpr int FOLLOWUP_INDEX = 2;
 
-    // The two fields that change with the patient category. The panel reads
-    // them through the functions below, so it never has to ask what kind of
-    // patient it is dealing with.
+    // The two fields that change with the patient category. The panel reads them
+    // through the functions below.
     struct TypeFields {
         QString label1;
         QString value1;
@@ -90,9 +88,8 @@ private:
     QPushButton* btnReport;
     QPushButton* btnSuggestID;
 
-    // The record that is being edited and the copy taken before the edit.
-    // The copy is owned by the panel, so it is released even when the
-    // window is closed in the middle of an edit.
+    // The record that is being edited and the copy taken before the edit. The
+    // copy is owned by the panel.
     std::unique_ptr<model::PatientRecord> editSnapshot;
     std::string editingPatientID;
 
@@ -112,7 +109,7 @@ private:
     std::string selectedPatientType() const;
 
     // The empty form of a category, the values of a record, and writing the
-    // values back into a record.
+    // values back.
     static TypeFields defaultFields(int index);
     static TypeFields readFields(const model::PatientRecord* patient);
     static void writeFields(model::PatientRecord* patient, const TypeFields& fields);

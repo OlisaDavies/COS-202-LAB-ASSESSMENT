@@ -27,8 +27,8 @@ std::vector<int> SearchEngine::linearSearchByText(
         if (records[i] == nullptr) {
             continue;
         }
-        // The identifier and the name are both looked at, because the
-        // staff may type either one.
+        // The identifier and the name are both looked at, because the staff may
+        // type either one.
         if (utils::containsIgnoreCase(records[i]->getPatientID(), text) ||
             utils::containsIgnoreCase(records[i]->getName(), text)) {
             matches.push_back(i);
@@ -49,8 +49,7 @@ int SearchEngine::binarySearchByID(const std::vector<model::PatientRecord*>& sor
         const std::string& middleID = sortedRecords[middle]->getPatientID();
 
         // The comparison is the same one the sort uses, ignoring the letter
-        // case. If the two were different, the list would not really be
-        // sorted in the way the binary search expects.
+        // case. If the two were different, the list would not really be sorted.
         const int order = utils::compareIgnoreCase(middleID, targetID);
 
         if (order == 0) {

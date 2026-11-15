@@ -36,9 +36,9 @@ SearchPanel::SearchPanel(controller::ClinicManager& manager, QWidget* parent)
     tableSearchResults->setHorizontalHeaderLabels(
         {"ID", "Full Name", "Age", "Phone", "Category"});
 
-    // The identifier, the name, the age and the telephone number take the
-    // width of their content, so that none of them is cut in half. The
-    // category column takes the rest of the table.
+    // The identifier, the name, the age and the telephone number take the width
+    // of their content, so that none of them is cut in half. The category
+    // column takes the rest of the table.
     QHeaderView* header = tableSearchResults->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Interactive);
     header->setSectionResizeMode(0, QHeaderView::ResizeToContents);
@@ -97,6 +97,9 @@ QWidget* SearchPanel::buildSearchBox(QWidget* parent) {
     connect(cmbSearchAlgorithm, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &SearchPanel::onSearchAlgorithmChanged);
 
+    // The search box is capped, so that the sort box beside it keeps its
+    // room when the window is made wider.
+    group->setMaximumWidth(720);
     return group;
 }
 
@@ -125,6 +128,9 @@ QWidget* SearchPanel::buildSortBox(QWidget* parent) {
     connect(cmbSortAlgorithm, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &SearchPanel::onSortAlgorithmChanged);
 
+    // The sort box keeps a minimum width, so that its entries are never cut
+    // off on a small screen.
+    group->setMinimumWidth(430);
     return group;
 }
 
@@ -195,8 +201,7 @@ std::vector<model::PatientRecord*> SearchPanel::runSearch(
     if (algorithm == SEARCH_BINARY_ID) {
         // Binary search only works on a sorted list, so a sorted copy of the
         // records is made first. The record that is found comes out of that
-        // copy, so it is the right one and not the record that happens to
-        // have the same place in the roster.
+        // copy, so it is the right one.
         std::vector<model::PatientRecord*> sortedCopy = patients;
         controller::SortEngine::mergeSort(sortedCopy, controller::SortField::PatientID);
 
@@ -234,10 +239,9 @@ std::vector<model::PatientRecord*> SearchPanel::runSearch(
         return results;
     }
 
-    // The linear search by ID answers with the one record whose identifier
-    // is exactly the text that was typed, which is what the brief asks for
-    // in requirement 4.a. The position comes back from the routine that
-    // wrote it, so the record shown is the record that was found.
+    // The linear search by ID answers with the one record whose identifier is
+    // exactly the text that was typed. The position comes back from the
+    // routine that wrote it, so the record shown is the record that was found.
     const int found =
         controller::SearchEngine::linearSearchByID(patients, query.toStdString());
     if (found >= 0 && found < static_cast<int>(patients.size()) &&
@@ -275,8 +279,8 @@ void SearchPanel::onExecuteSearch() {
     const QString query = txtSearchQuery->text().trimmed();
 
     if (algorithm != SEARCH_CATEGORY && query.isEmpty()) {
-        // The table is cleared, so that an old result cannot be mistaken
-        // for the result of the new search.
+        // The table is cleared, so that an old result cannot be mistaken for
+        // the new one.
         showResults(std::vector<model::PatientRecord*>());
         lastQuery.clear();
         QMessageBox::warning(this, "Invalid input", "Please enter an ID or a name to look for.");
@@ -345,14 +349,13 @@ void SearchPanel::onExecuteSort() {
         controller::SortEngine::mergeSort(sorted, field);
     }
 
-    // The sorted records are shown in the results table, and the order is
-    // also kept by the controller, so that the roster and the search results
-    // show the same order.
+    // The sorted records are shown in the results table, and the order is also
+    // kept by the controller, so that the roster shows the same order.
     manager.setPatientOrder(sorted);
     showResults(sorted);
 
-    // The other panels have to be redrawn, so that the roster shows the
-    // new order as well.
+    // The other panels have to be redrawn, so that the roster shows the new
+    // order as well.
     emit dataChanged();
 
     QMessageBox::information(this, "Sorted",
@@ -360,8 +363,7 @@ void SearchPanel::onExecuteSort() {
 }
 
 void SearchPanel::refresh() {
-    // The data may have changed, so the last search is run again. Otherwise
-    // the table would still show a patient that has been deleted.
+    // The data may have changed, so the last search is run again.
     repeatLastSearch();
 }
 

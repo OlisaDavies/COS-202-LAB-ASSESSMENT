@@ -15,22 +15,20 @@ enum class SortField {
     PatientAge
 };
 
-// The sorting routines of the clinic. Both are written by hand.
-//
-// Selection sort is the simple quadratic routine, merge sort is the divide
-// and conquer routine that always needs O(n log n) comparisons.
+// The sorting routines of the clinic. Both are written by hand. Selection sort
+// is the simple quadratic routine, merge sort is the divide and conquer one.
 class SortEngine {
 public:
     static bool comparePatients(const model::PatientRecord* first,
                                 const model::PatientRecord* second,
                                 SortField field);
 
-    // Orders the records with selection sort. It sorts in place and performs
-    // at most n - 1 swaps, which suits small lists.
+    // Orders the records with selection sort. It sorts in place and performs at
+    // most n - 1 swaps.
     static void selectionSort(std::vector<model::PatientRecord*>& records, SortField field);
 
-    // Orders the records with merge sort. It is stable, so records with the
-    // same key keep the order they had before.
+    // Orders the records with merge sort. It is stable, so records with the same
+    // key keep their order.
     static void mergeSort(std::vector<model::PatientRecord*>& records, SortField field);
 
 private:

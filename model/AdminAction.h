@@ -11,12 +11,9 @@ namespace model {
 
 // One entry on the administrative undo stack.
 //
-// An entry remembers what was done, which record it was about and a copy of
-// that record. The copy is a separate object, so the undo stack and the
-// roster never share the same memory.
-//
-// The class owns a record, so it follows the rule of five: it can be moved
-// but not copied.
+// An entry remembers what was done and holds a copy of the affected record.
+// The copy is a separate object, so the undo stack and the roster never share
+// the same memory.
 class AdminAction {
 public:
     enum class Type {
@@ -34,9 +31,8 @@ public:
     std::unique_ptr<PatientRecord> patientBackup;
     Appointment appointmentBackup;
 
-    // The place the record held in the waiting queue when it was deleted,
-    // counted from the front. A value of -1 means that the record was not
-    // waiting, so undoing the delete must not put it back into the queue.
+    // The place the record held in the waiting queue when it was deleted, or
+    // -1 when it was not waiting.
     int waitingQueuePosition;
 
     AdminAction(Type actionType, const std::string& text, const std::string& affectedPatientID);
@@ -45,8 +41,7 @@ public:
     AdminAction(Type actionType, const std::string& text, const std::string& affectedPatientID,
                 const Appointment& appointment);
 
-    // The entry owns a record, so copying it would copy the ownership as
-    // well. It can be moved, which is what the stack does.
+    // The entry owns a record, so it can be moved but not copied.
     AdminAction(const AdminAction&) = delete;
     AdminAction& operator=(const AdminAction&) = delete;
     AdminAction(AdminAction&&) = default;

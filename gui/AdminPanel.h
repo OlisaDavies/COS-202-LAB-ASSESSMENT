@@ -10,11 +10,10 @@
 namespace scapms {
 namespace gui {
 
-// The administration panel. It holds the operations that belong to the
-// staff in charge of the clinic rather than to the treatment of a patient:
-// undoing the last step, saving and loading the data, and starting a new
-// day with an empty database. It also shows a small summary of the clinic
-// and the records that were used most recently.
+// The administration panel. It holds the operations that belong to the staff
+// in charge of the clinic rather than to the treatment of a patient: undoing
+// the last step, saving and loading the data, and starting a new day with an
+// empty database. It also shows a summary of the clinic.
 class AdminPanel : public QWidget {
     Q_OBJECT
 
@@ -23,8 +22,7 @@ public:
 
     void refresh();
 
-    // The administrative steps. The window connects its menu entries to
-    // these, so that the menu and the panel do the same thing.
+    // The administrative steps. The window connects its menu entries to these.
     void undoLastOperation();
     void saveData();
     void loadData();
@@ -47,8 +45,8 @@ private:
     QPushButton* btnLoad;
     QPushButton* btnNew;
 
-    // The numbers of the clinic summary. Every one of them is a plain
-    // label that is filled in when the panel is redrawn.
+    // The numbers of the clinic summary. Each one is filled in when the panel is
+    // redrawn.
     QLabel* lblPatientCount;
     QLabel* lblWaitingCount;
     QLabel* lblAppointmentCount;

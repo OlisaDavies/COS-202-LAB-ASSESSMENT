@@ -10,9 +10,8 @@ namespace scapms {
 namespace model {
 
 // Intermediate abstract class for the patient types that can be booked. It
-// inherits from the base class and from two interfaces at once, so a class
-// may implement more than one contract, and it writes the booking code once
-// for GeneralPatient and FollowUpPatient.
+// inherits from the base class and from two interfaces at once, and it writes
+// the booking code once for GeneralPatient and FollowUpPatient.
 class ScheduledPatient : public PatientRecord, public Appointable, public Billable {
 public:
     ScheduledPatient(std::string id, std::string patientName, int patientAge,
@@ -27,17 +26,16 @@ public:
 
     bool cancelAppointment() override;
 
-    // Marks the appointment with that identifier as cancelled. The booking
-    // stays in the collection, because the clinic keeps a record of it.
+    // Marks the appointment with that identifier as cancelled. The booking stays
+    // in the collection, because the clinic keeps a record of it.
     bool cancelAppointment(const std::string& appointmentID) override;
 
     bool hasScheduledAppointment() const override;
 
     std::string getAppointmentDetails() const override;
 
-    // The billing contract is answered here with the default of a category
-    // that does not charge for its visits. The categories that do charge
-    // override the two methods.
+    // The billing contract is answered here with the default of a category that
+    // does not charge. The categories that charge override the two methods.
     double getBillAmount() const override;
     std::string describeBill() const override;
 };

@@ -7,8 +7,8 @@
 namespace scapms {
 namespace utils {
 
-// Lower cases an ASCII string. Used by the name search so that the clinic
-// staff does not have to remember the exact capitalisation.
+// Lower cases an ASCII string. Used by the name search, so that the staff do
+// not have to remember the exact capitalisation.
 inline std::string toLower(const std::string& text) {
     std::string lowered = text;
     std::transform(lowered.begin(), lowered.end(), lowered.begin(),
@@ -20,13 +20,12 @@ inline bool equalsIgnoreCase(const std::string& left, const std::string& right) 
     return toLower(left) == toLower(right);
 }
 
-// Orders two strings ignoring letter case. The result is less than zero
-// when the first one comes first in the alphabet, and greater than zero
-// when the second one comes first.
+// Orders two strings ignoring letter case. The result is less than zero when
+// the first one comes first, and greater than zero when the second one does.
 //
-// The sort of the clinic uses this, so that a name that was typed in small
-// letters is not put at the end of the list. The search already ignores
-// the letter case, and the two have to agree.
+// The sort of the clinic uses this, so that a name typed in small letters is
+// not put at the end of the list. The search ignores the letter case as well,
+// and the two have to agree.
 inline int compareIgnoreCase(const std::string& left, const std::string& right) {
     const std::string loweredLeft = toLower(left);
     const std::string loweredRight = toLower(right);
@@ -40,8 +39,8 @@ inline int compareIgnoreCase(const std::string& left, const std::string& right) 
     return 0;
 }
 
-// True when the text holds the part, ignoring letter case. An empty part
-// never matches, so that a search for nothing finds nothing.
+// True when the text holds the part, ignoring letter case. An empty part never
+// matches, so that a search for nothing finds nothing.
 inline bool containsIgnoreCase(const std::string& text, const std::string& part) {
     if (part.empty()) {
         return false;

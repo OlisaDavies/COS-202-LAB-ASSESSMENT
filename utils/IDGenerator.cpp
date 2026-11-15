@@ -33,9 +33,8 @@ int IDGenerator::highestUsedNumber(const std::string& prefix,
             continue;                            // not a plain number
         }
         // The number is read with strtol and not with atoi, because atoi has
-        // undefined behaviour when the number does not fit into an int. A
-        // file with a very long number would otherwise produce a nonsense
-        // identifier such as [GEN--2147483648].
+        // undefined behaviour when the number does not fit into an int. A file
+        // with a very long number would otherwise give a nonsense identifier.
         errno = 0;
         char* end = nullptr;
         const long number = std::strtol(digits.c_str(), &end, 10);

@@ -39,8 +39,7 @@ bool AppointmentController::patientCanBeBooked(const model::Appointment& appoint
     if (patient == nullptr) {
         return false;
     }
-    // Only the categories that answer the Appointable interface can be
-    // booked. An emergency case is seen in the waiting room instead.
+    // Only the categories that answer the Appointable interface can be booked.
     return dynamic_cast<const model::Appointable*>(patient) != nullptr;
 }
 
@@ -82,8 +81,8 @@ void AppointmentController::scheduleAppointment(const model::Appointment& appoin
             appointment.getDate() + " at " + appointment.getTime() + ".");
     }
 
-    // The database stores the booking. A booking that comes from a file is
-    // not an administrative step of its own, so it is not remembered.
+    // The database stores the booking. A booking that comes from a file is not
+    // an administrative step of its own, so it is not remembered.
     if (trackUndo) {
         database.addAppointment(appointment);
     } else {

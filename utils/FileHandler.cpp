@@ -87,8 +87,7 @@ std::vector<std::string> FileHandler::splitRow(const std::string& line) {
     fields.push_back(current);
 
     // A row whose quote was never closed was cut in half by a line break
-    // inside a quoted field. The broken row is dropped, so that it cannot
-    // turn into a patient with nonsense fields.
+    // inside a quoted field. The broken row is dropped.
     if (insideQuotes) {
         fields.clear();
     }
@@ -96,9 +95,8 @@ std::vector<std::string> FileHandler::splitRow(const std::string& line) {
 }
 
 std::string FileHandler::quoteField(const std::string& value) {
-    // Only a comma and a quote have to be protected. A line break is not
-    // protected, because the reader reads the file line by line and would
-    // not be able to join a field that is spread over two lines.
+    // Only a comma and a quote have to be protected. A line break is not,
+    // because the reader reads the file line by line.
     if (value.find_first_of(",\"") == std::string::npos) {
         return value;                           // nothing to protect
     }
@@ -125,8 +123,8 @@ void FileHandler::writeCategoryFields(std::ostream& out, const model::PatientRec
             dynamic_cast<const model::GeneralPatient*>(patient);
         if (general != nullptr) {
             // The fee is written with two decimals. Without that the
-            // stream would round the number to six digits, and a fee such
-            // as 123456.78 would come back as 123457.
+            // stream would round it, and a fee such as 123456.78 would
+            // come back as 123457.
             out << std::fixed << std::setprecision(2) << general->getConsultationFee();
         }
     } else if (type == model::PatientRecord::TYPE_EMERGENCY) {
@@ -149,8 +147,8 @@ void FileHandler::writeCategoryFields(std::ostream& out, const model::PatientRec
 void FileHandler::savePatients(const std::string& filename,
                                const std::vector<model::PatientRecord*>& patients) {
     // The records are written to a temporary file first. The real file is
-    // only replaced when the writing was finished, so a disk that is full
-    // or a drive that is removed cannot leave a half written file behind.
+    // only replaced when the writing was finished, so a full disk cannot
+    // leave a half written file behind.
     const std::string temporary = filename + ".tmp";
 
     {
@@ -223,9 +221,9 @@ void FileHandler::saveAppointments(const std::string& filename,
 }
 
 void FileHandler::replaceFile(const std::string& temporary, const std::string& filename) {
-    // The writing itself already happened safely in the temporary file, so
-    // a failed write never touches the data on the disk. The old file is
-    // removed here and the temporary file is renamed into its place.
+    // The writing itself already happened safely in the temporary file,
+    // so a failed write never touches the data on the disk. The old file is
+    // removed and the temporary file is renamed into its place.
     std::remove(filename.c_str());
 
     if (std::rename(temporary.c_str(), filename.c_str()) != 0) {
@@ -279,8 +277,8 @@ std::unique_ptr<model::PatientRecord> FileHandler::readPatient(
             *warning = "patient [" + id + "] has an unreadable fee [" + feeText + "], using 0";
             fee = 0.0;
         }
-        // A fee of "nan" or of infinity is not a real amount. It is skipped,
-        // because a broken fee would be carried through every report.
+        // A fee of "nan" or of infinity is not a real amount, and a broken
+        // fee would be carried through every report.
         if (!model::GeneralPatient::isValidConsultationFee(fee)) {
             *warning = "patient [" + id + "] has a fee of [" + feeText +
                        "] that is not a real amount, and was skipped";

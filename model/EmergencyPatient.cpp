@@ -35,8 +35,7 @@ std::string EmergencyPatient::getSpecialDetail() const {
 void EmergencyPatient::restoreFrom(const PatientRecord& previous) {
     PatientRecord::restoreFrom(previous);
 
-    // The dynamic cast checks that the snapshot really is an emergency
-    // patient. A static cast would be undefined behaviour when it is not.
+    // The dynamic cast checks that the snapshot really is an emergency patient.
     if (const EmergencyPatient* snapshot = dynamic_cast<const EmergencyPatient*>(&previous)) {
         severityLevel = snapshot->severityLevel;
         triageNote = snapshot->triageNote;

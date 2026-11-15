@@ -151,8 +151,8 @@ void AdminPanel::loadData() {
     }
 
     // The appointment file is asked for as well, because the staff may have
-    // saved it under any name. When it is not wanted, the file that sits
-    // next to the patient file is used.
+    // saved it under any name. When it is not wanted, the file next to the
+    // patient file is used.
     QString appointmentFile = QFileDialog::getOpenFileName(
         this, "Open the appointment file (cancel to use the one next to the patient file)",
         QFileInfo(patientFile).absolutePath(), "CSV files (*.csv)");

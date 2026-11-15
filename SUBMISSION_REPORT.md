@@ -94,7 +94,7 @@ Every panel wraps the work it asks the controller to do in `try` / `catch` and s
 
 ## 11. Challenges Encountered
 
-1. **One class that did too much.** The panels first called the database directly, so every rule of the clinic ended up in `ClinicDatabase`, which grew to 488 lines and mixed the data handling with the business logic — the very thing the brief forbids.
+1. **One class that did too much.** The panels first called the database directly, so every rule of the clinic ended up in `ClinicDatabase`, which grew to almost 500 lines and mixed the data handling with the business logic — the very thing the brief forbids.
 2. **The binary search showed the wrong patient.** The search returned a position, and the panel used that position in the *unsorted* roster, so the wrong patient appeared.
 3. **The cache did not behave like a cache.** Three different ideas of the order were used at once, so the panel showed the records in registration order rather than use order.
 4. **A failed save could destroy the data that was already saved.** The file was opened for writing straight away, so an ofstream emptied it before the writing had even begun.

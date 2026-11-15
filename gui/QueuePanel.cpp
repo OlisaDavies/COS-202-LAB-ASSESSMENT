@@ -49,8 +49,7 @@ QWidget* QueuePanel::buildControls(QWidget* parent) {
     layout->addWidget(lblQueueCount);
     layout->addStretch();
 
-    // The controls keep a minimum width, so that the queue list always has
-    // room, and they may grow when the window is wide.
+    // The controls keep a minimum width, so that the queue list always has room.
     group->setMinimumWidth(330);
     group->setMaximumWidth(420);
     group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);

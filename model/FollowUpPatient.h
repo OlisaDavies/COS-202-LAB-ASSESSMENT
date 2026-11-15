@@ -36,7 +36,6 @@ public:
 
     std::string getSpecialDetail() const override;
 
-    // The covariant return type hands back a FollowUpPatient.
     FollowUpPatient* clone() const override { return new FollowUpPatient(*this); }
 
     void restoreFrom(const PatientRecord& previous) override;

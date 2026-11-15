@@ -28,8 +28,7 @@ void ClinicManager::checkPatientRules(const model::PatientRecord& patient) const
     }
 
     // The contact number is checked when it is given. It may be left empty,
-    // because the clinic does not always have it, but when it is written it
-    // has to look like a telephone number.
+    // but when it is written it has to look like a telephone number.
     const std::string& contact = patient.getContactNumber();
     if (!contact.empty()) {
         bool allowed = false;
@@ -51,8 +50,7 @@ void ClinicManager::checkPatientRules(const model::PatientRecord& patient) const
 
     // The identifier of a patient carries the category, so that a general
     // patient is GEN-101, an emergency case is EMG-999 and a follow-up
-    // patient is FOL-205. A record that breaks the rule is refused, so
-    // that the list is not mixed up later on.
+    // patient is FOL-205.
     const std::string expectedPrefix = utils::IDGenerator::patientPrefix(patient.getPatientType());
     if (patient.getPatientID().compare(0, expectedPrefix.size(), expectedPrefix) != 0) {
         throw utils::InvalidPatientDataException(
@@ -62,8 +60,7 @@ void ClinicManager::checkPatientRules(const model::PatientRecord& patient) const
     }
 
     // The consultation fee has to be a real amount. A value of "nan" or of
-    // infinity would pass every comparison, because every comparison with
-    // it is false, and it would then be written into the data file.
+    // infinity would pass every comparison and end up in the data file.
     const model::GeneralPatient* general =
         dynamic_cast<const model::GeneralPatient*>(&patient);
     if (general != nullptr &&
@@ -79,8 +76,8 @@ void ClinicManager::registerPatient(std::unique_ptr<model::PatientRecord> patien
         throw utils::InvalidPatientDataException("Cannot register a null patient record.");
     }
 
-    // The rules of the clinic are checked before the record is stored, so
-    // the database only ever holds records that are allowed to exist.
+    // The rules of the clinic are checked before the record is stored, so the
+    // database only holds records that are allowed to exist.
     checkPatientRules(*patient);
 
     clinicDatabase.addPatient(std::move(patient));
@@ -90,8 +87,8 @@ void ClinicManager::registerPatients(std::vector<std::unique_ptr<model::PatientR
                                      std::vector<std::string>* warnings) {
     for (std::unique_ptr<model::PatientRecord>& patient : patients) {
         if (patient == nullptr) {
-            // An empty record is skipped, so that a mistake in the file
-            // cannot crash the program.
+            // An empty record is skipped, so that a mistake in the file cannot
+            // crash the program.
             if (warnings != nullptr) {
                 warnings->push_back("a patient was skipped: the record was empty");
             }
@@ -100,9 +97,9 @@ void ClinicManager::registerPatients(std::vector<std::unique_ptr<model::PatientR
 
         try {
             checkPatientRules(*patient);
-            // The load is one administrative step as a whole, so the
-            // records are not remembered one by one. Otherwise the undo
-            // button would delete the records that were just loaded.
+            // The load is one administrative step, so the records are not
+            // remembered one by one. Otherwise the undo button would delete
+            // what was just loaded.
             clinicDatabase.addPatientWithoutUndo(std::move(patient));
         } catch (const utils::ClinicException& error) {
             if (warnings != nullptr) {
@@ -168,8 +165,8 @@ void ClinicManager::enqueuePatient(model::PatientRecord* patient) {
         return;
     }
 
-    // The same patient may not wait twice, otherwise the queue would show
-    // the patient twice and the counter would not match the clinic.
+    // The same patient may not wait twice, otherwise the counter would not
+    // match the clinic.
     for (const model::PatientRecord* waiting : clinicDatabase.getWaitingQueue()) {
         if (waiting != nullptr && waiting->getPatientID() == patient->getPatientID()) {
             throw utils::InvalidAppointmentException(
@@ -219,8 +216,8 @@ void ClinicManager::loadFromFiles(const std::string& patientFile, const std::str
         booked = utils::FileHandler::loadAppointments(appointmentFile, warnings);
     } catch (const utils::FileIOException& error) {
         // The patient file is the important one. When the appointment file
-        // cannot be read, the patients are still loaded, but the real reason
-        // is passed on to the staff instead of being thrown away.
+        // cannot be read, the patients are still loaded and the reason is
+        // passed on to the staff.
         if (warnings != nullptr) {
             warnings->push_back("the appointment file could not be loaded (" +
                                 std::string(error.what()) +
@@ -232,9 +229,8 @@ void ClinicManager::loadFromFiles(const std::string& patientFile, const std::str
     registerPatients(std::move(patients), warnings);
 
     // The appointments are added after the patients, because a booking needs
-    // a patient to belong to. A booking that comes from a file is not an
-    // administrative step of its own, so it is not remembered on the undo
-    // stack.
+    // a patient to belong to. A booking that comes from a file is not
+    // remembered on the undo stack.
     for (const model::Appointment& appointment : booked) {
         try {
             appointmentController.scheduleAppointment(appointment, false);

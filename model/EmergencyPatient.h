@@ -40,7 +40,6 @@ public:
 
     std::string getSpecialDetail() const override;
 
-    // The covariant return type hands back an EmergencyPatient.
     EmergencyPatient* clone() const override { return new EmergencyPatient(*this); }
 
     void restoreFrom(const PatientRecord& previous) override;

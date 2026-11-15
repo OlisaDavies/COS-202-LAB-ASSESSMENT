@@ -65,7 +65,7 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
     txtTypeField2 = new QLineEdit(group);
 
     // The inputs keep a fixed width, so that the form never squeezes the
-    // roster table on a small screen.
+    // roster table.
     const int inputWidth = 190;
     for (QLineEdit* input : {txtPatID, txtPatName, txtPatAge, txtPatContact,
                               txtTypeField1, txtTypeField2}) {
@@ -102,9 +102,11 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
     connect(cmbPatType, QOverload<int>::of(&QComboBox::currentIndexChanged),
             this, &PatientPanel::onPatientTypeChanged);
 
-    // The form keeps a minimum width, so that the roster table always has
-    // room on a small screen.
+    // The form keeps a minimum width, so that the roster table always has room.
+    // It is also capped, because the roster is the part that has to grow when
+    // the window is made wider.
     group->setMinimumWidth(320);
+    group->setMaximumWidth(430);
     return group;
 }
 
@@ -117,9 +119,9 @@ QWidget* PatientPanel::buildRoster(QWidget* parent) {
     tablePatients->setHorizontalHeaderLabels(
         {"ID", "Full Name", "Age", "Phone", "Details"});
 
-    // The identifier, the name, the age and the telephone number take the
-    // width of their content, so that none of them is cut in half. The
-    // details column takes the rest of the table.
+    // The identifier, the name, the age and the telephone number take the width
+    // of their content, so that none of them is cut in half. The details
+    // column takes the rest of the table.
     QHeaderView* header = tablePatients->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Interactive);
     header->setSectionResizeMode(0, QHeaderView::ResizeToContents);
@@ -171,8 +173,8 @@ void PatientPanel::showCategoryFields(int index) {
 void PatientPanel::onPatientTypeChanged(int index) {
     showCategoryFields(index);
 
-    // The identifier carries the category, so the placeholder shows the
-    // prefix that the chosen category needs.
+    // The identifier carries the category, so the placeholder shows the prefix
+    // that the chosen category needs.
     const std::string type = selectedPatientType();
     const std::string prefix = utils::IDGenerator::patientPrefix(type);
     txtPatID->setPlaceholderText(QString::fromStdString(
@@ -347,8 +349,8 @@ void PatientPanel::onUpdatePatient() {
     fields.value2 = txtTypeField2->text().trimmed();
     fields.hasSecondField = txtTypeField2->isVisible();
 
-    // The change is first tried out on a copy of the record. That way an
-    // invalid value cannot leave the live record half changed.
+    // The change is first tried out on a copy of the record, so that an invalid
+    // value cannot leave the live record half changed.
     std::unique_ptr<model::PatientRecord> candidate(patient->clone());
 
     try {
@@ -358,8 +360,8 @@ void PatientPanel::onUpdatePatient() {
         writeFields(candidate.get(), fields);
 
         // The rules of the clinic are checked on the copy as well, so that an
-        // edit cannot put an illegal contact number or an illegal age into
-        // a record that was registered properly.
+        // edit cannot put an illegal value into a record that was registered
+        // properly.
         manager.validatePatient(*candidate);
     } catch (const utils::ClinicException& error) {
         QMessageBox::critical(this, "Update error", error.what());
@@ -536,9 +538,8 @@ void PatientPanel::writeGeneral(model::GeneralPatient* patient, const TypeFields
     const double fee = fields.value1.trimmed().toDouble(&ok);
 
     // A number that is not a number at all, a value that is infinite and a
-    // value that is far too large are all refused. Without this check a
-    // fee of "nan" would be accepted, because every comparison with nan is
-    // false, and it would then be written into the data file.
+    // value that is far too large are all refused. Without this check a fee
+    // of "nan" would be accepted, because every comparison with nan is false.
     if (!ok || !model::GeneralPatient::isValidConsultationFee(fee)) {
         throw utils::InvalidPatientDataException(
             "The consultation fee must be a number of naira between 0 and 100,000,000, "
@@ -612,8 +613,8 @@ void PatientPanel::refresh() {
             }
         }
 
-        // A patient can hold more than one appointment, so the number of
-        // them is shown as well.
+        // A patient can hold more than one appointment, so the number of them is
+        // shown as well.
         const std::size_t total = patient->getAppointmentCount();
         if (total > 1) {
             details += " | " + QString::number(total) + " appointments";

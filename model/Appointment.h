@@ -7,21 +7,21 @@ namespace model {
 
 // One booked consultation.
 //
-// The appointment belongs to a patient. The patient holds the appointment in
-// its own collection, so a patient can have several appointments at the
-// same time. The identifier of the patient is kept in the appointment as
-// well, because the flat schedule that is written to the data file needs it.
+// The appointment belongs to a patient, which holds it in its own collection,
+// so a patient can have several appointments at the same time. The patient
+// identifier is kept in the appointment as well, because the flat schedule
+// that is written to the data file needs it.
 class Appointment {
 public:
-    // The three states an appointment can be in. They are kept here so that
-    // the same word is used everywhere in the program.
+    // The three states an appointment can be in. They are kept here so that the
+    // same word is used everywhere.
     static constexpr const char* STATUS_PENDING   = "Pending";
     static constexpr const char* STATUS_COMPLETED = "Completed";
     static constexpr const char* STATUS_CANCELLED = "Cancelled";
 
-    // True when the first appointment happens before the second one. The
-    // times are compared as minutes since midnight, so that "09:00 AM" is
-    // correctly placed before "10:30 AM".
+    // True when the first appointment happens before the second one. The times
+    // are compared as minutes since midnight, so that "09:00 AM" is placed
+    // before "10:30 AM".
     static bool happensBefore(const Appointment& first, const Appointment& second);
 
 private:
@@ -50,8 +50,7 @@ public:
     const std::string& getDoctorName() const { return doctorName; }
     const std::string& getStatus() const { return status; }
 
-    // The patient that owns the appointment. It is set by the patient itself
-    // when the appointment is stored, so that the two always agree.
+    // The patient that owns the appointment. It is set by the patient itself.
     void setPatientID(std::string id) { patientID = id; }
 
     void setDate(std::string newDate) { date = newDate; }

@@ -109,9 +109,8 @@ void MainWindow::setupMenuBar() {
 }
 
 void MainWindow::loadSampleData() {
-    // The sample data is the starting point of the clinic and not a step of
-    // the staff, so it is loaded without being remembered and the first
-    // Ctrl+Z does not delete it.
+    // The sample data is the starting point of the clinic and not a step of the
+    // staff, so it is loaded without being remembered.
     std::vector<std::unique_ptr<model::PatientRecord>> patients;
     patients.push_back(std::make_unique<model::GeneralPatient>(
         "GEN-101", "Amaka Okonkwo", 28, "+2348073451298", 4500.00));
@@ -129,8 +128,8 @@ void MainWindow::loadSampleData() {
     std::vector<std::string> warnings;
     manager.registerPatients(std::move(patients), &warnings);
 
-    // A booking that the sample data cannot make is skipped instead of
-    // stopping the program, so that the clinic always begins.
+    // A booking that the sample data cannot make is skipped, so that the
+    // clinic always begins.
     try {
         manager.scheduleAppointment(model::Appointment("APT-1001", "GEN-101", "2026-11-15",
                                                        "10:30 AM", "Dr. Adeyemi",
@@ -157,8 +156,7 @@ void MainWindow::showTab(int index) {
     if (tabWidget == nullptr) {
         return;
     }
-    // An impossible number leaves the panel where it is, rather than closing
-    // the window or opening nothing at all.
+    // An impossible number leaves the panel where it is.
     if (index >= 0 && index < tabWidget->count()) {
         tabWidget->setCurrentIndex(index);
     }

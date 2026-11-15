@@ -10,19 +10,16 @@ namespace controller {
 
 // Builds the clinic reports.
 //
-// The reports are plain text so that they can be printed by the console
-// demonstration and shown in the GUI without the report code depending on the
-// user interface.
+// The reports are plain text, so that the console demonstration can print them
+// and the report code does not depend on the user interface.
 class ReportBuilder {
 public:
     static std::string categoryDistribution(const ClinicManager& manager);
 
-    // Every appointment that is still pending. The cancelled and the
-    // completed ones are left out.
+    // Every appointment that is still pending.
     static std::string pendingAppointments(const ClinicManager& manager);
 
-    // How many appointments were scheduled, completed, cancelled or are still
-    // pending.
+    // How many appointments were scheduled, completed, cancelled or are pending.
     static std::string dailySummary(const ClinicManager& manager);
 
     // The patients with the most completed visits, best first.

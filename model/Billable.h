@@ -7,9 +7,8 @@ namespace model {
 
 // Interface for the patient types that the clinic can send a bill to.
 //
-// Like Appointable it is an abstract class: it declares the operations
-// and holds no member variables. A class may implement more than one
-// interface, and ScheduledPatient implements both of them.
+// Like Appointable it is an abstract class: it declares the operations and
+// holds no member variables. ScheduledPatient implements both interfaces.
 class Billable {
 public:
     virtual ~Billable() = default;

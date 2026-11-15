@@ -9,8 +9,7 @@ namespace utils {
 // Produces the identifiers the clinic hands out.
 //
 // The generator is stateless: it looks at the identifiers that are already in
-// use and returns the next free one. That keeps the number generation in one
-// place instead of spreading counters across the GUI.
+// use and returns the next free one. That keeps the counters out of the GUI.
 class IDGenerator {
 public:
     // Next free "APT-####" identifier.

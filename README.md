@@ -44,6 +44,8 @@ controller/  ClinicManager, AppointmentController, SearchEngine, SortEngine, Rep
 gui/         MainWindow, PatientPanel, AppointmentPanel, QueuePanel,
              SearchPanel, ReportPanel, AdminPanel, clinic.ico, resources.qrc
 utils/       ClinicExceptions, DateUtil, FileHandler, IDGenerator, StringUtil
+uml/         the class diagram split by layer, for the submission document
+tools/       the scripts that build the submission document and the screenshots
 main.cpp     the console demonstration
 gui_main.cpp the entry point of the graphical program
 ```
@@ -82,8 +84,7 @@ gui/MainWindow.cpp              gui/PatientPanel.cpp        gui/AppointmentPanel
 gui/QueuePanel.cpp              gui/SearchPanel.cpp         gui/ReportPanel.cpp
 gui/AdminPanel.cpp              gui_main.cpp                gui/clinic.ico
 gui/resources.qrc               SCAPMS.pro                  build_gui.bat
-build_gui.bat                   build.bat                  .vscode/tasks.json
-.vscode/launch.json
+build.bat                       .vscode/tasks.json          .vscode/launch.json
 ```
 
 **iv. Data files**
@@ -126,9 +127,10 @@ the UML class diagrams and the two to three page report. `SUBMISSION_REPORT.md` 
 report on its own, and `UML_DIAGRAM.png` is the diagram: every class of every layer drawn in the
 layered style of draw.io, with a legend, and with the inheritance, the interfaces, the compositions
 and the associations labelled. The document also carries the same diagram split by layer, so each
-one is readable on its own. It was drawn in draw.io, and
-`UML_DIAGRAM.drawio` is the editable source of the full picture, so the diagram can be opened and
-changed in draw.io (app.diagrams.net) or in VS Code with the Draw.io Integration extension.
+one is readable on its own. Those four pictures are kept in the `uml/` folder, and it was drawn in
+draw.io, with `UML_DIAGRAM.drawio` as the editable source of the full picture, so the diagram can
+be opened and changed in draw.io (app.diagrams.net) or in VS Code with the Draw.io Integration
+extension.
 
 ## Where each requirement is implemented
 
@@ -208,3 +210,25 @@ stack, the summary of the clinic and the four reports without needing the GUI.
 `patients.csv` and `appointments.csv` hold the same records the application starts with, and are
 the files the import and export dialogs read and write. The program starts with the same records
 built into it, so it also runs when these two files are not there.
+
+### The submission document
+`SCAPMS_Submission.pdf` is built from the sources, the screenshots, the diagrams and the report, so
+it has to be rebuilt whenever one of those changes:
+
+```cmd
+tools\build_submission_pdf.bat
+```
+
+The script needs Python with the `markdown` package, and Chrome or Edge to print the document. It
+writes the result straight over `SCAPMS_Submission.pdf`.
+
+### The screenshots
+The six pictures in `screenshots/` are taken from the program itself:
+
+```cmd
+powershell -ExecutionPolicy Bypass -File tools\capture_screenshots.ps1
+```
+
+The script opens each panel of the program in turn and takes the picture of the window, so the
+pictures always show the program as it is now. Run `build_gui.bat` first, because the script
+captures the built program.

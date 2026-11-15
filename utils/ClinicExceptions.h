@@ -6,9 +6,8 @@
 namespace scapms {
 namespace utils {
 
-// Base class for every error the clinic system raises on purpose.
-// The GUI catches this one type and turns it into a message box, so a new
-// error type never needs a new catch block.
+// Base class for every error the clinic system raises on purpose. The GUI
+// catches this one type, so a new error type never needs a new catch block.
 class ClinicException : public std::exception {
 protected:
     std::string errorMessage;

@@ -5,10 +5,9 @@
 // It shows that the exception handling, the searching and sorting routines,
 // the waiting room and the undo stack all work on their own.
 //
-// The console demonstration talks to the controller, exactly like the
-// graphical interface does. The two listings of the whole clinic are the
-// exception: the model writes those itself, so they read the database
-// directly.
+// The console demonstration talks to the controller, like the GUI does. The
+// two listings of the whole clinic are the exception: the model writes those
+// itself, so they read the database directly.
 
 #include <iostream>
 #include <memory>
@@ -70,8 +69,8 @@ int main() {
         std::cout << "Rejected duplicate ID: " << error.what() << std::endl;
     }
 
-    // The records are shown through a PatientRecord pointer, so the report
-    // of the category of each patient is built at run time.
+    // The records are shown through a PatientRecord pointer, so the report of
+    // the category of each patient is built at run time.
     manager.database().displayAllPatients();
 
     // Only the bookable categories answer the Appointable interface.
@@ -88,7 +87,7 @@ int main() {
     }
 
     // A class may implement more than one interface: the scheduled patients
-    // answer both Appointable and Billable.
+    // answer both Appointable and Billable at the same time.
     for (const PatientRecord* patient : manager.getAllPatients()) {
         const Billable* billable = dynamic_cast<const Billable*>(patient);
         if (billable != nullptr) {
@@ -112,7 +111,7 @@ int main() {
     manager.database().displayAllAppointments();
 
     // An emergency patient is never booked in advance, so the controller
-    // refuses the booking and explains why.
+    // refuses the booking and says why.
     try {
         manager.scheduleAppointment(
             Appointment("APT-1003", "EMG-999", "2026-11-18", "09:00 AM", "Dr. Trauma"));
@@ -132,8 +131,7 @@ int main() {
     index = SearchEngine::binarySearchByID(sorted, "FOL-205");
     std::cout << "Binary search on the sorted list found index " << index << std::endl;
 
-    // The recursive search walks the list itself and collects every patient
-    // whose name holds the text.
+    // The recursive search walks the list itself and collects every match.
     const std::vector<int> nameMatches = SearchEngine::recursiveSearchByName(records, "Chioma Eze");
     index = nameMatches.empty() ? -1 : nameMatches.front();
     std::cout << "Recursive search for Chioma Eze found index " << index << std::endl;
@@ -175,10 +173,9 @@ int main() {
     std::cout << "Undo reported: " << undone << std::endl;
     std::cout << "After the undo there are " << manager.getPatientCount() << " patients." << std::endl;
 
-    // The summary of the clinic and the four reports of the Clinic Reports
-    // tab. They are all built by the report builder, so the console
-    // demonstration and the graphical program read the numbers of the clinic
-    // in the same way.
+    // The summary of the clinic and the four reports of the Clinic Reports tab.
+    // They are all built by the report builder, so the console demonstration
+    // and the graphical program read the numbers in the same way.
     std::cout << std::endl;
     std::cout << "========== CLINIC SUMMARY ==========" << std::endl;
     std::cout << ReportBuilder::dashboardSummary(manager);

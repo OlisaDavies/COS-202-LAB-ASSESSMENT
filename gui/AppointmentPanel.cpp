@@ -48,7 +48,7 @@ QWidget* AppointmentPanel::buildForm(QWidget* parent) {
     txtAptDoctor = new QLineEdit("Dr. Adeyemi", group);
 
     // The inputs keep a fixed width, so that the form never squeezes the
-    // schedule table on a small screen.
+    // schedule table.
     const int inputWidth = 190;
     for (QLineEdit* input : {txtAptID, txtAptDate, txtAptTime, txtAptDoctor}) {
         input->setMaximumWidth(inputWidth);
@@ -67,8 +67,7 @@ QWidget* AppointmentPanel::buildForm(QWidget* parent) {
     connect(btnBook, &QPushButton::clicked, this, &AppointmentPanel::onScheduleAppointment);
     form->addRow(btnBook);
 
-    // The form keeps a minimum width, so that the schedule table always has
-    // room on a small screen, and it may grow when the window is wide.
+    // The form keeps a minimum width, so that the schedule table always has room.
     group->setMinimumWidth(330);
     group->setMaximumWidth(420);
     group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
@@ -86,9 +85,8 @@ QWidget* AppointmentPanel::buildSchedule(QWidget* parent) {
     tableAppointments->setHorizontalHeaderLabels(
         {"ID", "Patient ID", "Date", "Time", "Doctor", "Status"});
 
-    // The short columns take the width of their content, so that an
-    // identifier or a date is never cut in half. The status column takes
-    // the rest of the table.
+    // The short columns take the width of their content, so that an identifier
+    // or a date is never cut in half. The status column takes the rest.
     QHeaderView* header = tableAppointments->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::ResizeToContents);
     header->setSectionResizeMode(5, QHeaderView::Stretch);

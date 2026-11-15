@@ -27,8 +27,7 @@ std::string FollowUpPatient::getSpecialDetail() const {
 void FollowUpPatient::restoreFrom(const PatientRecord& previous) {
     ScheduledPatient::restoreFrom(previous);
 
-    // The dynamic cast checks that the snapshot really is a follow-up
-    // patient. A static cast would be undefined behaviour when it is not.
+    // The dynamic cast checks that the snapshot really is a follow-up patient.
     if (const FollowUpPatient* snapshot = dynamic_cast<const FollowUpPatient*>(&previous)) {
         previousVisitDate = snapshot->previousVisitDate;
         assignedDoctor = snapshot->assignedDoctor;

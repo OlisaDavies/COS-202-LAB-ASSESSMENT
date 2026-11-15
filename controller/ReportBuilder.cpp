@@ -12,8 +12,7 @@ namespace {
 
 const char* RULE = "------------------------------------------------------------";
 
-// Pads a value to the given width. A negative width keeps the value on the
-// left and fills the rest with spaces.
+// Pads a value to the given width. A negative width keeps the value on the left.
 std::string pad(const std::string& value, int width) {
     const std::size_t target = (width < 0) ? static_cast<std::size_t>(-width)
                                             : static_cast<std::size_t>(width);
@@ -161,8 +160,7 @@ std::vector<std::pair<std::string, int>> ReportBuilder::completedVisitCounts(
     }
 
     // The map is turned into a list, because the ranking is by the number of
-    // visits and not by the identifier. The map would order the patients by
-    // their identifier, which is not the order the report asks for.
+    // visits and not by the identifier.
     std::vector<std::pair<std::string, int>> ranked;
     for (const auto& entry : counts) {
         ranked.push_back(std::make_pair(entry.first, entry.second));

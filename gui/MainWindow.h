@@ -16,9 +16,8 @@ namespace gui {
 
 // The main window of the clinic application.
 //
-// It owns the controller and the panels, puts the panels into the tabs and
-// keeps them in step with each other. The panels themselves do the work, so
-// this class stays small.
+// It owns the controller and the panels, and keeps the panels in step with each
+// other. The panels themselves do the work.
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
@@ -26,18 +25,14 @@ public:
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override;
 
-    // Opens the given tab, counted from zero, and does nothing when the
-    // number is out of range. The command line uses this, so that any
-    // panel can be opened or demonstrated directly.
+    // Opens the given tab, counted from zero. The command line uses this.
     void showTab(int index);
 
-    // The two panels the command line also fills in, so that the entry
-    // point does not have to reach into the widgets of a panel itself.
+    // The two panels the command line also fills in.
     QueuePanel* queuePanelWidget() { return queuePanel; }
     SearchPanel* searchPanelWidget() { return searchPanel; }
 
 private slots:
-    // Called when a panel changed the data.
     void onDataChanged();
 
     // The undo of the last administrative operation.

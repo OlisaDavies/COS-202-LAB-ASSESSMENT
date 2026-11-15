@@ -24,7 +24,6 @@ public:
 
     // Puts the given patient into the waiting room and redraws the panel.
     // Returns false when that patient is not registered or is already waiting.
-    // The command line uses this to open the panel with a patient in it.
     bool enqueueByID(const QString& patientID);
 
 signals:
