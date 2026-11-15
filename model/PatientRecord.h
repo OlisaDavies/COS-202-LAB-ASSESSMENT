@@ -90,9 +90,12 @@ public:
     // virtual functions that the polymorphic calls dispatch on.
     virtual std::string getPatientReport() const = 0;
 
-    // Category specific behaviour. These are the pure virtual functions that
-    // make PatientRecord an abstract class.
+    // Prints the report of the category. It is a concrete method of the
+    // abstract class, so it works for every category.
     virtual void displayPatient() const;
+
+    // The detail that only this category has. It is one of the pure virtual
+    // functions that make PatientRecord an abstract class.
     virtual std::string getSpecialDetail() const = 0;
 
     // Deep copy of the record, used by the undo stack and by the edit

@@ -4,215 +4,387 @@
       <root>
         <mxCell id="0" />
         <mxCell id="1" parent="0" />
-        <mxCell id="2" value="&lt;&lt;interface&gt;&gt;&amp;#10;&lt;b&gt;Appointable&lt;/b&gt;&amp;#10;+scheduleAppointment(a: Appointment): bool&amp;#10;+cancelAppointment(): bool&amp;#10;+cancelAppointment(id: string): bool&amp;#10;+hasScheduledAppointment(): bool&amp;#10;+getAppointmentDetails(): string" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#ede9fe;strokeColor=#6d28d9;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="350" width="300.7" height="141" as="geometry" />
-        </mxCell>
-        <mxCell id="3" value="&lt;&lt;interface&gt;&gt;&amp;#10;&lt;b&gt;Billable&lt;/b&gt;&amp;#10;+getBillAmount(): double&amp;#10;+describeBill(): string" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#ede9fe;strokeColor=#6d28d9;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="540" width="186.39999999999998" height="90" as="geometry" />
-        </mxCell>
-        <mxCell id="4" value="&lt;b&gt;ClinicException&lt;/b&gt;&amp;#10;#errorMessage: string&amp;#10;————————&amp;#10;+what(): const char*" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#f1f5f9;strokeColor=#475569;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="700" width="167.35" height="96" as="geometry" />
-        </mxCell>
-        <mxCell id="5" value="&lt;b&gt;DuplicateIDException&lt;/b&gt;&amp;#10;+DuplicateIDException(id: string)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#f1f5f9;strokeColor=#475569;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="820" width="243.54999999999998" height="73" as="geometry" />
-        </mxCell>
-        <mxCell id="6" value="&lt;b&gt;InvalidPatientDataException&lt;/b&gt;&amp;#10;+InvalidPatientDataException(msg: string)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#f1f5f9;strokeColor=#475569;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="920" width="294.34999999999997" height="73" as="geometry" />
-        </mxCell>
-        <mxCell id="7" value="&lt;b&gt;InvalidAppointmentException&lt;/b&gt;&amp;#10;+InvalidAppointmentException(msg: string)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#f1f5f9;strokeColor=#475569;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="1020" width="294.34999999999997" height="73" as="geometry" />
-        </mxCell>
-        <mxCell id="8" value="&lt;b&gt;FileIOException&lt;/b&gt;&amp;#10;+FileIOException(msg: string)" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#f1f5f9;strokeColor=#475569;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="30" y="1120" width="218.14999999999998" height="73" as="geometry" />
-        </mxCell>
-        <mxCell id="9" value="&lt;b&gt;MainWindow&lt;/b&gt;&amp;#10;-manager: ClinicManager&amp;#10;-tabWidget: QTabWidget*&amp;#10;————————&amp;#10;+setupUI(): void&amp;#10;+setupMenuBar(): void&amp;#10;+loadSampleData(): void&amp;#10;+refreshAll(): void&amp;#10;+onDataChanged(): void&amp;#10;+onUndoAction(): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dbeafe;strokeColor=#1d4ed8;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="720" y="30" width="180.04999999999998" height="198" as="geometry" />
-        </mxCell>
-        <mxCell id="10" value="&lt;b&gt;PatientPanel&lt;/b&gt;&amp;#10;-manager: ClinicManager&amp;#10;-editSnapshot: unique_ptr&amp;lt;PatientRecord&amp;gt;&amp;#10;————————&amp;#10;+refresh(): void&amp;#10;+onRegisterPatient(): void&amp;#10;+onEditSelectedPatient(): void&amp;#10;+onUpdatePatient(): void&amp;#10;+onDeleteSelectedPatient(): void&amp;#10;+onShowReport(): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dbeafe;strokeColor=#1d4ed8;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="1330" y="30" width="288.0" height="198" as="geometry" />
-        </mxCell>
-        <mxCell id="11" value="&lt;b&gt;QueuePanel&lt;/b&gt;&amp;#10;-manager: ClinicManager&amp;#10;————————&amp;#10;+refresh(): void&amp;#10;+onEnqueuePatient(): void&amp;#10;+onCallNextPatient(): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dbeafe;strokeColor=#1d4ed8;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="1700" y="30" width="199.1" height="130" as="geometry" />
-        </mxCell>
-        <mxCell id="12" value="&lt;b&gt;AdminPanel&lt;/b&gt;&amp;#10;-manager: ClinicManager&amp;#10;-lblPatientCount: QLabel*&amp;#10;-listRecent: QListWidget*&amp;#10;————————&amp;#10;+refresh(): void&amp;#10;+undoLastOperation(): void&amp;#10;+saveData(): void&amp;#10;+loadData(): void&amp;#10;+newDatabase(): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dbeafe;strokeColor=#1d4ed8;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="2030" y="30" width="199.1" height="198" as="geometry" />
-        </mxCell>
-        <mxCell id="13" value="&lt;b&gt;AppointmentPanel&lt;/b&gt;&amp;#10;-manager: ClinicManager&amp;#10;————————&amp;#10;+refresh(): void&amp;#10;+onScheduleAppointment(): void&amp;#10;+onCancelSelectedAppointment(): void&amp;#10;+onCompleteSelectedAppointment(): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dbeafe;strokeColor=#1d4ed8;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="1330" y="330" width="275.29999999999995" height="147" as="geometry" />
-        </mxCell>
-        <mxCell id="14" value="&lt;b&gt;SearchPanel&lt;/b&gt;&amp;#10;-manager: ClinicManager&amp;#10;————————&amp;#10;+refresh(): void&amp;#10;+onExecuteSearch(): void&amp;#10;+onExecuteSort(): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dbeafe;strokeColor=#1d4ed8;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="1330" y="640" width="186.39999999999998" height="130" as="geometry" />
-        </mxCell>
-        <mxCell id="15" value="&lt;b&gt;ReportPanel&lt;/b&gt;&amp;#10;-manager: ClinicManager&amp;#10;————————&amp;#10;+refresh(): void&amp;#10;+onGenerateReport(): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dbeafe;strokeColor=#1d4ed8;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="1330" y="950" width="192.75" height="113" as="geometry" />
-        </mxCell>
-        <mxCell id="16" value="&lt;b&gt;ClinicManager&lt;/b&gt;&amp;#10;-clinicDatabase: ClinicDatabase&amp;#10;-appointmentController: AppointmentController&amp;#10;————————&amp;#10;+registerPatient(p: unique_ptr&amp;lt;PatientRecord&amp;gt;): void&amp;#10;+deletePatient(id: string): bool&amp;#10;+findPatientByID(id: string): PatientRecord*&amp;#10;+getAllPatients(): vector&amp;lt;PatientRecord*&amp;gt;&amp;#10;+validatePatient(p: PatientRecord): void&amp;#10;+scheduleAppointment(a: Appointment): void&amp;#10;+enqueuePatient(p: PatientRecord*): void&amp;#10;+undoLastAction(): string&amp;#10;+saveToFiles(pf: string, af: string): void&amp;#10;+loadFromFiles(pf: string, af: string): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dcfce7;strokeColor=#15803d;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="820" y="330" width="364.2" height="266" as="geometry" />
-        </mxCell>
-        <mxCell id="17" value="&lt;b&gt;AppointmentController&lt;/b&gt;&amp;#10;-database: ClinicDatabase&amp;#10;————————&amp;#10;+scheduleAppointment(a: Appointment): void&amp;#10;+cancelAppointment(id: string): bool&amp;#10;+completeAppointment(id: string): bool&amp;#10;+patientCanBeBooked(a: Appointment): bool&amp;#10;+suggestAppointmentId(): string" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dcfce7;strokeColor=#15803d;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="820" y="640" width="300.7" height="164" as="geometry" />
-        </mxCell>
-        <mxCell id="18" value="&lt;b&gt;SearchEngine&lt;/b&gt;&amp;#10;+linearSearchByID(recs, id): int&amp;#10;+linearSearchByText(recs, text): vector&amp;lt;int&amp;gt;&amp;#10;+binarySearchByID(recs, id): int&amp;#10;+recursiveSearchByName(recs, name): vector&amp;lt;int&amp;gt;&amp;#10;+searchByCategory(recs, cat): vector&amp;lt;int&amp;gt;" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dcfce7;strokeColor=#15803d;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="1700" y="330" width="332.45" height="141" as="geometry" />
-        </mxCell>
-        <mxCell id="19" value="&lt;b&gt;SortEngine&lt;/b&gt;&amp;#10;+comparePatients(a, b, f): bool&amp;#10;+selectionSort(recs, f): void&amp;#10;+mergeSort(recs, f): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dcfce7;strokeColor=#15803d;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="1700" y="640" width="230.85" height="107" as="geometry" />
-        </mxCell>
-        <mxCell id="20" value="&lt;b&gt;ReportBuilder&lt;/b&gt;&amp;#10;+categoryDistribution(m): string&amp;#10;+pendingAppointments(m): string&amp;#10;+dailySummary(m): string&amp;#10;+frequentPatients(m): string&amp;#10;+dashboardSummary(m): string" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#dcfce7;strokeColor=#15803d;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="2100" y="330" width="237.2" height="141" as="geometry" />
-        </mxCell>
-        <mxCell id="21" value="&lt;b&gt;FileHandler&lt;/b&gt;&amp;#10;+savePatients(fn, patients): void&amp;#10;+loadPatients(fn, warns): vector&amp;lt;unique_ptr&amp;lt;PatientRecord&amp;gt;&amp;gt;&amp;#10;+saveAppointments(fn, apts): void&amp;#10;+loadAppointments(fn, warns): vector&amp;lt;Appointment&amp;gt;" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#f1f5f9;strokeColor=#475569;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="2450" y="30" width="408.65" height="124" as="geometry" />
-        </mxCell>
-        <mxCell id="22" value="&lt;b&gt;IDGenerator&lt;/b&gt;&amp;#10;+nextAppointmentId(taken): string&amp;#10;+nextPatientId(prefix, taken): string&amp;#10;+patientPrefix(type): string" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#f1f5f9;strokeColor=#475569;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="2450" y="330" width="268.95" height="107" as="geometry" />
-        </mxCell>
-        <mxCell id="23" value="&lt;b&gt;DateUtil&lt;/b&gt;&amp;#10;+isValidDate(text): bool&amp;#10;+timeToMinutes(text): int" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#f1f5f9;strokeColor=#475569;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="2450" y="520" width="192.75" height="90" as="geometry" />
-        </mxCell>
-        <mxCell id="24" value="&lt;b&gt;StringUtil&lt;/b&gt;&amp;#10;+toLower(text): string&amp;#10;+containsIgnoreCase(hay, needle): bool" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#f1f5f9;strokeColor=#475569;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="2450" y="640" width="275.29999999999995" height="90" as="geometry" />
-        </mxCell>
-        <mxCell id="25" value="&lt;&lt;abstract&gt;&gt;&amp;#10;&lt;b&gt;PatientRecord&lt;/b&gt;&amp;#10;#patientID: string&amp;#10;#name: string&amp;#10;#age: int&amp;#10;#contactNumber: string&amp;#10;#patientType: string&amp;#10;#appointments: vector&amp;lt;Appointment&amp;gt;&amp;#10;————————&amp;#10;+getPatientID(): string&amp;#10;+getName(): string&amp;#10;+getAge(): int&amp;#10;+getContactNumber(): string&amp;#10;+setName(n: string): void&amp;#10;+setAge(n: int): void&amp;#10;+setContactNumber(c: string): void&amp;#10;+getAppointmentCount(): size_t&amp;#10;+getTypeLabel()*: string&amp;#10;+getPatientReport()*: string&amp;#10;+getSpecialDetail()*: string&amp;#10;+clone()*: PatientRecord*&amp;#10;+displayPatient(): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#ffedd5;strokeColor=#c2410c;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="820" y="980" width="249.89999999999998" height="385" as="geometry" />
-        </mxCell>
-        <mxCell id="26" value="&lt;&lt;abstract&gt;&gt;&amp;#10;&lt;b&gt;ScheduledPatient&lt;/b&gt;&amp;#10;+scheduleAppointment(a: Appointment): bool&amp;#10;+cancelAppointment(): bool&amp;#10;+cancelAppointment(id: string): bool&amp;#10;+hasScheduledAppointment(): bool&amp;#10;+getBillAmount(): double&amp;#10;+describeBill(): string" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#ffedd5;strokeColor=#c2410c;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="900" y="1390" width="300.7" height="158" as="geometry" />
-        </mxCell>
-        <mxCell id="27" value="&lt;b&gt;GeneralPatient&lt;/b&gt;&amp;#10;-consultationFee: double&amp;#10;————————&amp;#10;+getConsultationFee(): double&amp;#10;+setConsultationFee(f: double): void&amp;#10;+getTypeLabel(): string&amp;#10;+getPatientReport(): string&amp;#10;+clone(): PatientRecord*" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#ffedd5;strokeColor=#c2410c;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="1480" y="1390" width="262.6" height="164" as="geometry" />
-        </mxCell>
-        <mxCell id="28" value="&lt;b&gt;EmergencyPatient&lt;/b&gt;&amp;#10;-severityLevel: int&amp;#10;-triageNote: string&amp;#10;————————&amp;#10;+getSeverityLevel(): int&amp;#10;+setSeverityLevel(l: int): void&amp;#10;+getTriageNote(): string&amp;#10;+setTriageNote(n: string): void&amp;#10;+getTypeLabel(): string&amp;#10;+getPatientReport(): string&amp;#10;+clone(): PatientRecord*" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#ffedd5;strokeColor=#c2410c;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="900" y="1660" width="230.85" height="215" as="geometry" />
-        </mxCell>
-        <mxCell id="29" value="&lt;b&gt;FollowUpPatient&lt;/b&gt;&amp;#10;-previousVisitDate: string&amp;#10;-assignedDoctor: string&amp;#10;————————&amp;#10;+getPreviousVisitDate(): string&amp;#10;+setPreviousVisitDate(d: string): void&amp;#10;+getAssignedDoctor(): string&amp;#10;+setAssignedDoctor(d: string): void&amp;#10;+getTypeLabel(): string&amp;#10;+getPatientReport(): string&amp;#10;+clone(): PatientRecord*" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#ffedd5;strokeColor=#c2410c;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="1480" y="1660" width="275.29999999999995" height="215" as="geometry" />
-        </mxCell>
-        <mxCell id="30" value="&lt;b&gt;Appointment&lt;/b&gt;&amp;#10;-appointmentID: string&amp;#10;-patientID: string&amp;#10;-date: string&amp;#10;-time: string&amp;#10;-doctorName: string&amp;#10;-status: string&amp;#10;————————&amp;#10;+getAppointmentID(): string&amp;#10;+getDate(): string&amp;#10;+getTime(): string&amp;#10;+getDoctorName(): string&amp;#10;+getStatus(): string&amp;#10;+setStatus(s: string): void" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#ffedd5;strokeColor=#c2410c;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="430" y="1330" width="205.45" height="266" as="geometry" />
-        </mxCell>
-        <mxCell id="31" value="&lt;b&gt;AdminAction&lt;/b&gt;&amp;#10;+type: ActionType&amp;#10;+description: string&amp;#10;+patientID: string&amp;#10;+patientBackup: unique_ptr&amp;lt;PatientRecord&amp;gt;&amp;#10;+appointmentBackup: Appointment&amp;#10;+waitingQueuePosition: int" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#ffedd5;strokeColor=#c2410c;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="430" y="1660" width="294.34999999999997" height="158" as="geometry" />
-        </mxCell>
-        <mxCell id="32" value="&lt;b&gt;ClinicDatabase&lt;/b&gt;&amp;#10;-patients: vector&amp;lt;unique_ptr&amp;lt;PatientRecord&amp;gt;&amp;gt;&amp;#10;-waitingQueue: queue&amp;lt;PatientRecord*&amp;gt;&amp;#10;-undoStack: stack&amp;lt;AdminAction&amp;gt;&amp;#10;-recentPatients: PatientRecord*[10]&amp;#10;————————&amp;#10;+addPatient(p: unique_ptr&amp;lt;PatientRecord&amp;gt;): void&amp;#10;+removePatient(id: string): bool&amp;#10;+findPatientByID(id: string): PatientRecord*&amp;#10;+getAllPatients(): vector&amp;lt;PatientRecord*&amp;gt;&amp;#10;+enqueuePatient(p: PatientRecord*): void&amp;#10;+callNextPatient(): PatientRecord*&amp;#10;+addAppointment(a: Appointment): void&amp;#10;+undoLastAction(): string&amp;#10;+getRecentPatients(): vector&amp;lt;PatientRecord*&amp;gt;" style="rounded=1;arcSize=4;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=8;spacingTop=2;fillColor=#ffedd5;strokeColor=#c2410c;fontSize=12;fontFamily=Helvetica;" vertex="1" parent="1">
-          <mxGeometry x="430" y="1990" width="332.45" height="283" as="geometry" />
-        </mxCell>
-        <mxCell id="33" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="9" target="10">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="34" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="9" target="13">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="35" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="9" target="11">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="36" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="9" target="14">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="37" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="9" target="15">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="38" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="9" target="12">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="39" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" edge="1" parent="1" source="9" target="16">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="40" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" edge="1" parent="1" source="10" target="16">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="41" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" edge="1" parent="1" source="13" target="16">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="42" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" edge="1" parent="1" source="11" target="16">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="43" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" edge="1" parent="1" source="14" target="16">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="44" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" edge="1" parent="1" source="15" target="16">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="45" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" edge="1" parent="1" source="12" target="16">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="46" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1" source="10" target="18">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="47" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1" source="14" target="18">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="48" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1" source="14" target="19">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="49" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1" source="15" target="20">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="50" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="16" target="32">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="51" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="16" target="17">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="52" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=open;" edge="1" parent="1" source="17" target="32">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="53" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="32" target="25">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="54" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="32" target="31">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="55" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="25" target="30">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="56" value="backup" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=diamondThinLong;endFill=1;" edge="1" parent="1" source="31" target="25">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="57" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=0;" edge="1" parent="1" source="25" target="26">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="58" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=0;" edge="1" parent="1" source="26" target="27">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="59" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=0;" edge="1" parent="1" source="26" target="29">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="60" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=0;" edge="1" parent="1" source="25" target="28">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="61" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=block;endFill=0;" edge="1" parent="1" source="26" target="2">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="62" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=block;endFill=0;" edge="1" parent="1" source="26" target="3">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="63" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1" source="16" target="21">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="64" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1" source="16" target="22">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="65" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1" source="17" target="22">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="66" value="throws" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1" source="16" target="4">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="67" value="throws" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;dashed=1;endArrow=open;" edge="1" parent="1" source="17" target="4">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="68" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=0;" edge="1" parent="1" source="4" target="5">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="69" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=0;" edge="1" parent="1" source="4" target="6">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="70" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=0;" edge="1" parent="1" source="4" target="7">
-          <mxGeometry relative="1" as="geometry" />
-        </mxCell>
-        <mxCell id="71" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;endArrow=block;endFill=0;" edge="1" parent="1" source="4" target="8">
-          <mxGeometry relative="1" as="geometry" />
+        <mxCell id="n11" value="SCAPMS Class Diagram" style="text;html=1;strokeColor=none;fillColor=none;align=left;verticalAlign=middle;fontSize=28;fontStyle=1;fontColor=#0f172a;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="38" width="700" height="44" as="geometry" /></mxCell>
+        <mxCell id="n12" value="&lt;b&gt;MainWindow&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#1d4ed8;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1799" y="118" width="321" height="46" as="geometry" /></mxCell>
+        <mxCell id="n13" value="-manager: ClinicManager&#10;-tabWidget: QTabWidget*&#10;────────────────&#10;+setupUI(): void&#10;+setupMenuBar(): void&#10;+loadSampleData(): void&#10;+refreshAll(): void&#10;+showTab(index: int): void&#10;+onUndoAction(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e3a8a;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1799" y="164" width="321" height="321" as="geometry" /></mxCell>
+        <mxCell id="n14" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1d4ed8;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1799" y="118" width="321" height="367" as="geometry" /></mxCell>
+        <mxCell id="n15" value="&lt;b&gt;PatientPanel&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#1d4ed8;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="688" y="589" width="390" height="46" as="geometry" /></mxCell>
+        <mxCell id="n16" value="-manager: ClinicManager&#10;-editingPatientID: string&#10;────────────────&#10;+refresh(): void&#10;+onRegisterPatient(): void&#10;+onEditSelectedPatient(): void&#10;+onUpdatePatient(): void&#10;+onDeleteSelectedPatient(): void&#10;+onShowReport(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e3a8a;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="688" y="635" width="390" height="321" as="geometry" /></mxCell>
+        <mxCell id="n17" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1d4ed8;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="688" y="589" width="390" height="367" as="geometry" /></mxCell>
+        <mxCell id="n18" value="&lt;b&gt;AppointmentPanel&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#1d4ed8;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1124" y="589" width="480" height="46" as="geometry" /></mxCell>
+        <mxCell id="n19" value="-manager: ClinicManager&#10;────────────────&#10;+refresh(): void&#10;+onScheduleAppointment(): void&#10;+onCancelSelectedAppointment(): void&#10;+onCompleteSelectedAppointment(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e3a8a;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1124" y="635" width="480" height="222" as="geometry" /></mxCell>
+        <mxCell id="n20" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1d4ed8;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1124" y="589" width="480" height="268" as="geometry" /></mxCell>
+        <mxCell id="n21" value="&lt;b&gt;QueuePanel&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#1d4ed8;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1650" y="589" width="386" height="46" as="geometry" /></mxCell>
+        <mxCell id="n22" value="-manager: ClinicManager&#10;────────────────&#10;+refresh(): void&#10;+enqueueByID(id: QString): bool&#10;+onEnqueuePatient(): void&#10;+onCallNextPatient(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e3a8a;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1650" y="635" width="386" height="222" as="geometry" /></mxCell>
+        <mxCell id="n23" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1d4ed8;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1650" y="589" width="386" height="268" as="geometry" /></mxCell>
+        <mxCell id="n24" value="&lt;b&gt;SearchPanel&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#1d4ed8;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2082" y="589" width="398" height="46" as="geometry" /></mxCell>
+        <mxCell id="n25" value="-manager: ClinicManager&#10;-lastAlgorithm: int&#10;────────────────&#10;+refresh(): void&#10;+runQuery(q: QString, alg: int): int&#10;+onExecuteSearch(): void&#10;+onExecuteSort(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e3a8a;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2082" y="635" width="398" height="255" as="geometry" /></mxCell>
+        <mxCell id="n26" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1d4ed8;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2082" y="589" width="398" height="301" as="geometry" /></mxCell>
+        <mxCell id="n27" value="&lt;b&gt;ReportPanel&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#1d4ed8;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2526" y="589" width="326" height="46" as="geometry" /></mxCell>
+        <mxCell id="n28" value="-manager: ClinicManager&#10;────────────────&#10;+refresh(): void&#10;+onGenerateReport(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e3a8a;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2526" y="635" width="326" height="156" as="geometry" /></mxCell>
+        <mxCell id="n29" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1d4ed8;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2526" y="589" width="326" height="202" as="geometry" /></mxCell>
+        <mxCell id="n30" value="&lt;b&gt;AdminPanel&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#1d4ed8;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2898" y="589" width="332" height="46" as="geometry" /></mxCell>
+        <mxCell id="n31" value="-manager: ClinicManager&#10;-listRecent: QListWidget*&#10;────────────────&#10;+refresh(): void&#10;+undoLastOperation(): void&#10;+saveData(): void&#10;+loadData(): void&#10;+newDatabase(): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e3a8a;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2898" y="635" width="332" height="288" as="geometry" /></mxCell>
+        <mxCell id="n32" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#1d4ed8;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2898" y="589" width="332" height="334" as="geometry" /></mxCell>
+        <mxCell id="n33" value="&lt;b&gt;ClinicManager&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#15803d;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2680" y="1074" width="593" height="46" as="geometry" /></mxCell>
+        <mxCell id="n34" value="-clinicDatabase: ClinicDatabase&#10;-appointmentController: AppointmentController&#10;────────────────&#10;+registerPatient(p: unique_ptr&lt;PatientRecord&gt;): void&#10;+deletePatient(id: string): bool&#10;+findPatientByID(id: string): PatientRecord*&#10;+getAllPatients(): vector&lt;PatientRecord*&gt;&#10;+suggestPatientId(type: string): string&#10;+scheduleAppointment(a: Appointment): void&#10;+enqueuePatient(p: PatientRecord*): void&#10;+undoLastAction(): string&#10;+saveToFiles(pf: string, af: string): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#14532d;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2680" y="1120" width="593" height="420" as="geometry" /></mxCell>
+        <mxCell id="n35" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#15803d;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2680" y="1074" width="593" height="466" as="geometry" /></mxCell>
+        <mxCell id="n36" value="&lt;b&gt;AppointmentController&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#15803d;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="646" y="1074" width="514" height="46" as="geometry" /></mxCell>
+        <mxCell id="n37" value="-database: ClinicDatabase&#10;────────────────&#10;+scheduleAppointment(a: Appointment): void&#10;+cancelAppointment(id: string): bool&#10;+completeAppointment(id: string): bool&#10;+patientCanBeBooked(a: Appointment): bool&#10;+checkBookingRules(a: Appointment): void&#10;+suggestAppointmentId(): string" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#14532d;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="646" y="1120" width="514" height="288" as="geometry" /></mxCell>
+        <mxCell id="n38" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#15803d;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="646" y="1074" width="514" height="334" as="geometry" /></mxCell>
+        <mxCell id="n39" value="&lt;b&gt;SearchEngine&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#15803d;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1206" y="1074" width="576" height="46" as="geometry" /></mxCell>
+        <mxCell id="n40" value="+linearSearchByID(recs, id): int&#10;+linearSearchByText(recs, text): vector&lt;int&gt;&#10;+binarySearchByID(recs, id): int&#10;+recursiveSearchByName(recs, name): vector&lt;int&gt;&#10;+searchByCategory(recs, cat): vector&lt;int&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#14532d;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1206" y="1120" width="576" height="189" as="geometry" /></mxCell>
+        <mxCell id="n41" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#15803d;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1206" y="1074" width="576" height="235" as="geometry" /></mxCell>
+        <mxCell id="n42" value="&lt;b&gt;SortEngine&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#15803d;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1828" y="1074" width="368" height="46" as="geometry" /></mxCell>
+        <mxCell id="n43" value="+comparePatients(a, b, f): bool&#10;+selectionSort(recs, f): void&#10;+mergeSort(recs, f): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#14532d;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1828" y="1120" width="368" height="123" as="geometry" /></mxCell>
+        <mxCell id="n44" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#15803d;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1828" y="1074" width="368" height="169" as="geometry" /></mxCell>
+        <mxCell id="n45" value="&lt;b&gt;ReportBuilder&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#15803d;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2242" y="1074" width="392" height="46" as="geometry" /></mxCell>
+        <mxCell id="n46" value="+categoryDistribution(m): string&#10;+pendingAppointments(m): string&#10;+dailySummary(m): string&#10;+frequentPatients(m): string&#10;+dashboardSummary(m): string" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#14532d;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2242" y="1120" width="392" height="189" as="geometry" /></mxCell>
+        <mxCell id="n47" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#15803d;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2242" y="1074" width="392" height="235" as="geometry" /></mxCell>
+        <mxCell id="n48" value="&lt;b&gt;ClinicDatabase&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#b45309;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1682" y="1658" width="555" height="46" as="geometry" /></mxCell>
+        <mxCell id="n49" value="-patients: vector&lt;unique_ptr&lt;PatientRecord&gt;&gt;&#10;-waitingQueue: queue&lt;PatientRecord*&gt;&#10;-undoStack: stack&lt;AdminAction&gt;&#10;-recentPatients: PatientRecord*[10]&#10;────────────────&#10;+addPatient(p: unique_ptr&lt;PatientRecord&gt;): void&#10;+removePatient(id: string): bool&#10;+findPatientByID(id: string): PatientRecord*&#10;+getAllPatients(): vector&lt;PatientRecord*&gt;&#10;+enqueuePatient(p: PatientRecord*): void&#10;+callNextPatient(): PatientRecord*&#10;+undoLastAction(): string" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#78350f;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1682" y="1704" width="555" height="420" as="geometry" /></mxCell>
+        <mxCell id="n50" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b45309;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1682" y="1658" width="555" height="466" as="geometry" /></mxCell>
+        <mxCell id="n51" value="&lt;&lt;abstract&gt;&gt;&#10;&lt;b&gt;PatientRecord&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#b45309;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1629" y="2220" width="486" height="46" as="geometry" /></mxCell>
+        <mxCell id="n52" value="#patientID: string&#10;#name: string&#10;#age: int&#10;#contactNumber: string&#10;#patientType: string&#10;#appointments: vector&lt;Appointment&gt;&#10;────────────────&#10;+getPatientID(): string&#10;+getName(): string&#10;+getAge(): int&#10;+getAppointmentCount(): size_t&#10;+findAppointment(id: string): Appointment*&#10;+addAppointment(a: Appointment): bool&#10;+getTypeLabel(): string {abstract}&#10;+getPatientReport(): string {abstract}&#10;+getSpecialDetail(): string {abstract}&#10;+clone(): PatientRecord* {abstract}" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#78350f;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1629" y="2266" width="486" height="585" as="geometry" /></mxCell>
+        <mxCell id="n53" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b45309;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1629" y="2220" width="486" height="631" as="geometry" /></mxCell>
+        <mxCell id="n54" value="&lt;&lt;abstract&gt;&gt;&#10;&lt;b&gt;ScheduledPatient&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#b45309;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1791" y="2947" width="515" height="46" as="geometry" /></mxCell>
+        <mxCell id="n55" value="+scheduleAppointment(a: Appointment): bool&#10;+cancelAppointment(): bool&#10;+cancelAppointment(id: string): bool&#10;+hasScheduledAppointment(): bool&#10;+getAppointmentDetails(): string&#10;+getBillAmount(): double&#10;+describeBill(): string" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#78350f;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1791" y="2993" width="515" height="255" as="geometry" /></mxCell>
+        <mxCell id="n56" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b45309;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1791" y="2947" width="515" height="301" as="geometry" /></mxCell>
+        <mxCell id="n57" value="&lt;b&gt;GeneralPatient&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#b45309;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1262" y="3380" width="449" height="46" as="geometry" /></mxCell>
+        <mxCell id="n58" value="-consultationFee: double&#10;────────────────&#10;+getConsultationFee(): double&#10;+setConsultationFee(fee: double): void&#10;+getTypeLabel(): string&#10;+getPatientReport(): string&#10;+clone(): GeneralPatient*" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#78350f;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1262" y="3426" width="449" height="255" as="geometry" /></mxCell>
+        <mxCell id="n59" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b45309;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1262" y="3380" width="449" height="301" as="geometry" /></mxCell>
+        <mxCell id="n60" value="&lt;b&gt;EmergencyPatient&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#b45309;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1775" y="3380" width="382" height="46" as="geometry" /></mxCell>
+        <mxCell id="n61" value="-severityLevel: int&#10;-triageNote: string&#10;────────────────&#10;+getSeverityLevel(): int&#10;+getTriageNote(): string&#10;+getUrgencyDescription(): string&#10;+getTypeLabel(): string&#10;+getPatientReport(): string&#10;+clone(): EmergencyPatient*" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#78350f;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1775" y="3426" width="382" height="321" as="geometry" /></mxCell>
+        <mxCell id="n62" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b45309;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1775" y="3380" width="382" height="367" as="geometry" /></mxCell>
+        <mxCell id="n63" value="&lt;b&gt;FollowUpPatient&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#b45309;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2221" y="3380" width="435" height="46" as="geometry" /></mxCell>
+        <mxCell id="n64" value="-previousVisitDate: string&#10;-assignedDoctor: string&#10;────────────────&#10;+getPreviousVisitDate(): string&#10;+getAssignedDoctor(): string&#10;+setAssignedDoctor(doc: string): void&#10;+getTypeLabel(): string&#10;+clone(): FollowUpPatient*" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#78350f;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2221" y="3426" width="435" height="288" as="geometry" /></mxCell>
+        <mxCell id="n65" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b45309;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2221" y="3380" width="435" height="334" as="geometry" /></mxCell>
+        <mxCell id="n66" value="&lt;b&gt;Appointment&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#b45309;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1105" y="2220" width="334" height="46" as="geometry" /></mxCell>
+        <mxCell id="n67" value="-appointmentID: string&#10;-patientID: string&#10;-date: string&#10;-time: string&#10;-doctorName: string&#10;-status: string&#10;────────────────&#10;+getAppointmentID(): string&#10;+getPatientID(): string&#10;+getDate(): string&#10;+getDoctorName(): string&#10;+getStatus(): string&#10;+setStatus(s: string): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#78350f;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1105" y="2266" width="334" height="453" as="geometry" /></mxCell>
+        <mxCell id="n68" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b45309;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1105" y="2220" width="334" height="499" as="geometry" /></mxCell>
+        <mxCell id="n69" value="&lt;b&gt;AdminAction&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#b45309;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2305" y="2220" width="508" height="46" as="geometry" /></mxCell>
+        <mxCell id="n70" value="+type: ActionType&#10;+description: string&#10;+patientID: string&#10;+patientBackup: unique_ptr&lt;PatientRecord&gt;&#10;+waitingQueuePosition: int" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#78350f;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2305" y="2266" width="508" height="189" as="geometry" /></mxCell>
+        <mxCell id="n71" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#b45309;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2305" y="2220" width="508" height="235" as="geometry" /></mxCell>
+        <mxCell id="n72" value="&lt;&lt;interface&gt;&gt;&#10;&lt;b&gt;Appointable&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#6d28d9;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1158" y="2947" width="515" height="46" as="geometry" /></mxCell>
+        <mxCell id="n73" value="+scheduleAppointment(a: Appointment): bool&#10;+cancelAppointment(): bool&#10;+cancelAppointment(id: string): bool&#10;+hasScheduledAppointment(): bool&#10;+getAppointmentDetails(): string" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#4c1d95;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1158" y="2993" width="515" height="189" as="geometry" /></mxCell>
+        <mxCell id="n74" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#6d28d9;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="1158" y="2947" width="515" height="235" as="geometry" /></mxCell>
+        <mxCell id="n75" value="&lt;&lt;interface&gt;&gt;&#10;&lt;b&gt;Billable&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#6d28d9;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2424" y="2947" width="337" height="46" as="geometry" /></mxCell>
+        <mxCell id="n76" value="+getBillAmount(): double&#10;+describeBill(): string" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#4c1d95;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2424" y="2993" width="337" height="90" as="geometry" /></mxCell>
+        <mxCell id="n77" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#6d28d9;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="2424" y="2947" width="337" height="136" as="geometry" /></mxCell>
+        <mxCell id="n78" value="&lt;b&gt;ClinicException&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#475569;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="543" width="280" height="46" as="geometry" /></mxCell>
+        <mxCell id="n79" value="#errorMessage: string&#10;────────────────&#10;+what(): const char*&#10;+ClinicException(msg)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e293b;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="589" width="280" height="156" as="geometry" /></mxCell>
+        <mxCell id="n80" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#475569;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="543" width="280" height="202" as="geometry" /></mxCell>
+        <mxCell id="n81" value="&lt;b&gt;DuplicateIDException&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#475569;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="785" width="327" height="46" as="geometry" /></mxCell>
+        <mxCell id="n82" value="+DuplicateIDException(id)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e293b;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="831" width="327" height="57" as="geometry" /></mxCell>
+        <mxCell id="n83" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#475569;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="785" width="327" height="103" as="geometry" /></mxCell>
+        <mxCell id="n84" value="&lt;b&gt;InvalidPatientDataException&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#475569;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="914" width="413" height="46" as="geometry" /></mxCell>
+        <mxCell id="n85" value="+InvalidPatientDataException(msg)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e293b;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="960" width="413" height="57" as="geometry" /></mxCell>
+        <mxCell id="n86" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#475569;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="914" width="413" height="103" as="geometry" /></mxCell>
+        <mxCell id="n87" value="&lt;b&gt;InvalidAppointmentException&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#475569;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="1043" width="431" height="46" as="geometry" /></mxCell>
+        <mxCell id="n88" value="+InvalidAppointmentException(msg)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e293b;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="1089" width="431" height="57" as="geometry" /></mxCell>
+        <mxCell id="n89" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#475569;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="1043" width="431" height="103" as="geometry" /></mxCell>
+        <mxCell id="n90" value="&lt;b&gt;FileIOException&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#475569;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="1172" width="285" height="46" as="geometry" /></mxCell>
+        <mxCell id="n91" value="+FileIOException(msg)" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e293b;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="1218" width="285" height="57" as="geometry" /></mxCell>
+        <mxCell id="n92" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#475569;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="44" y="1172" width="285" height="103" as="geometry" /></mxCell>
+        <mxCell id="n93" value="&lt;b&gt;FileHandler&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#475569;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="1658" width="682" height="46" as="geometry" /></mxCell>
+        <mxCell id="n94" value="+savePatients(fn: string, patients): void&#10;+saveAppointments(fn: string, apts): void&#10;+loadPatients(fn: string): vector&lt;unique_ptr&lt;PatientRecord&gt;&gt;&#10;+loadAppointments(fn: string): vector&lt;Appointment&gt;&#10;+replaceFile(tmp: string, fn: string): void" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e293b;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="1704" width="682" height="189" as="geometry" /></mxCell>
+        <mxCell id="n95" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#475569;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="1658" width="682" height="235" as="geometry" /></mxCell>
+        <mxCell id="n96" value="&lt;b&gt;IDGenerator&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#475569;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="1937" width="480" height="46" as="geometry" /></mxCell>
+        <mxCell id="n97" value="+nextPatientId(prefix: string, taken): string&#10;+nextAppointmentId(taken): string&#10;+patientPrefix(type: string): const char*" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e293b;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="1983" width="480" height="123" as="geometry" /></mxCell>
+        <mxCell id="n98" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#475569;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="1937" width="480" height="169" as="geometry" /></mxCell>
+        <mxCell id="n99" value="&lt;b&gt;DateUtil&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#475569;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="2150" width="374" height="46" as="geometry" /></mxCell>
+        <mxCell id="n100" value="+isValidDate(text: string): bool&#10;+timeToMinutes(text: string): int" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e293b;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="2196" width="374" height="90" as="geometry" /></mxCell>
+        <mxCell id="n101" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#475569;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="2150" width="374" height="136" as="geometry" /></mxCell>
+        <mxCell id="n102" value="&lt;b&gt;StringUtil&lt;/b&gt;" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=middle;spacingLeft=14;fillColor=#475569;strokeColor=none;fontColor=#ffffff;fontSize=14;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="2330" width="471" height="46" as="geometry" /></mxCell>
+        <mxCell id="n103" value="+toLower(text: string): string&#10;+equalsIgnoreCase(l, r: string): bool&#10;+compareIgnoreCase(l, r: string): int&#10;+containsIgnoreCase(t, part: string): bool&#10;+trim(text: string): string" style="rounded=0;whiteSpace=wrap;html=1;align=left;verticalAlign=top;spacingLeft=14;spacingTop=6;fillColor=#ffffff;strokeColor=none;fontColor=#1e293b;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="2376" width="471" height="189" as="geometry" /></mxCell>
+        <mxCell id="n104" value="" style="rounded=1;arcSize=6;whiteSpace=wrap;html=1;fillColor=none;strokeColor=#475569;fontSize=11;fontFamily=Helvetica;" vertex="1" parent="1"><mxGeometry x="3405" y="2330" width="471" height="235" as="geometry" /></mxCell>
+        <mxCell id="n105" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n14" target="n17">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1959" y="537" />
+              <mxPoint x="883" y="537" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n106" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n14" target="n20">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1959" y="537" />
+              <mxPoint x="1364" y="537" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n107" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n14" target="n23">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1959" y="537" />
+              <mxPoint x="1843" y="537" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n108" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n14" target="n26">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1959" y="537" />
+              <mxPoint x="2281" y="537" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n109" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n14" target="n29">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1959" y="537" />
+              <mxPoint x="2689" y="537" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n110" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n14" target="n32">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1959" y="537" />
+              <mxPoint x="3064" y="537" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n111" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;" edge="1" parent="1" source="n17" target="n35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="883" y="1015" />
+              <mxPoint x="2976" y="1015" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n112" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;" edge="1" parent="1" source="n20" target="n35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1364" y="1015" />
+              <mxPoint x="2976" y="1015" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n113" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;" edge="1" parent="1" source="n23" target="n35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1843" y="1015" />
+              <mxPoint x="2976" y="1015" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n114" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;" edge="1" parent="1" source="n26" target="n35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2281" y="1015" />
+              <mxPoint x="2976" y="1015" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n115" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;" edge="1" parent="1" source="n29" target="n35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2689" y="1015" />
+              <mxPoint x="2976" y="1015" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n116" value="uses" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;" edge="1" parent="1" source="n32" target="n35">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3064" y="1015" />
+              <mxPoint x="2976" y="1015" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n117" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n35" target="n50">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2976" y="1599" />
+              <mxPoint x="1959" y="1599" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n118" value="owns" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n35" target="n38">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1920" y="1307" />
+              <mxPoint x="1920" y="1241" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n119" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="n35" target="n41">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2231" y="1307" />
+              <mxPoint x="2231" y="1191" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n120" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="n35" target="n44">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2438" y="1307" />
+              <mxPoint x="2438" y="1158" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n121" value="calls" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="n35" target="n47">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2657" y="1307" />
+              <mxPoint x="2657" y="1191" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n122" value="saves /
+loads" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="n35" target="n95">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3339" y="1307" />
+              <mxPoint x="3339" y="1775" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n123" value="suggests
+IDs" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="n35" target="n98">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3339" y="1307" />
+              <mxPoint x="3339" y="2021" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n124" value="compares
+text" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="n41" target="n104">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3339" y="1191" />
+              <mxPoint x="3339" y="2447" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n125" value="sorts
+by date" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="n44" target="n101">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3339" y="1158" />
+              <mxPoint x="3339" y="2218" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n126" value="validates" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="n95" target="n101">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="3339" y="1775" />
+              <mxPoint x="3339" y="2218" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n127" value="1 .. *   vector&lt;unique_ptr&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n50" target="n53">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1959" y="2172" />
+              <mxPoint x="1872" y="2172" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n128" value="0 .. *   the bookings of the clinic" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n50" target="n68">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1765" y="2172" />
+              <mxPoint x="1338" y="2172" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n129" value="stack&lt;AdminAction&gt;" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n50" target="n71">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2153" y="2172" />
+              <mxPoint x="2457" y="2172" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n130" value="0 .. *" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;startArrow=diamond;startFill=1;endArrow=none;" edge="1" parent="1" source="n53" target="n68">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1534" y="2535" />
+              <mxPoint x="1534" y="2469" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n131" value="1   backup" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;" edge="1" parent="1" source="n71" target="n53">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="2210" y="2337" />
+              <mxPoint x="2210" y="2535" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n132" value="Inheritance" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=block;endFill=0;" edge="1" parent="1" source="n53" target="n62">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="1731" y="3310" />
+              <mxPoint x="1966" y="3310" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n133" value="Inheritance" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=block;endFill=0;" edge="1" parent="1" source="n53" target="n56">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n134" value="Inheritance" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=block;endFill=0;" edge="1" parent="1" source="n56" target="n59">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n135" value="Inheritance" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=block;endFill=0;" edge="1" parent="1" source="n56" target="n65">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n136" value="implements interface" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=block;endFill=0;dashed=1;" edge="1" parent="1" source="n56" target="n74">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n137" value="implements interface" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=block;endFill=0;dashed=1;" edge="1" parent="1" source="n56" target="n77">
+          <mxGeometry relative="1" as="geometry">
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n138" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=block;endFill=0;" edge="1" parent="1" source="n80" target="n83">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="184" y="765" />
+              <mxPoint x="207" y="765" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n139" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=block;endFill=0;" edge="1" parent="1" source="n80" target="n86">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="184" y="829" />
+              <mxPoint x="250" y="829" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n140" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=block;endFill=0;" edge="1" parent="1" source="n80" target="n89">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="184" y="894" />
+              <mxPoint x="259" y="894" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n141" value="" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=block;endFill=0;" edge="1" parent="1" source="n80" target="n92">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="184" y="958" />
+              <mxPoint x="186" y="958" />
+            </Array>
+          </mxGeometry>
+        </mxCell>
+        <mxCell id="n142" value="throws" style="edgeStyle=orthogonalEdgeStyle;rounded=0;html=1;strokeColor=#334155;fontSize=11;fontColor=#334155;fontFamily=Helvetica;endArrow=open;endFill=0;dashed=1;" edge="1" parent="1" source="n38" target="n80">
+          <mxGeometry relative="1" as="geometry">
+            <Array as="points">
+              <mxPoint x="580" y="1241" />
+              <mxPoint x="580" y="644" />
+            </Array>
+          </mxGeometry>
         </mxCell>
       </root>
     </mxGraphModel>

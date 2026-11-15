@@ -59,10 +59,11 @@ private:
 
     // The entries of the two algorithm combo boxes.
     //
-    // The linear search has two entries, because the brief asks for a linear
-    // search by patient ID, and a keyword search across the identifier and
-    // the name is what the staff actually type. Both are linear scans, but
-    // they compare different fields, so they are kept apart.
+    // The linear search has three entries, because the brief asks for a
+    // linear search by patient ID, a keyword search across the identifier
+    // and the name is what the staff actually type, and the search by
+    // category is a linear scan as well. All three compare different
+    // fields, so they are kept apart.
     enum SearchAlgorithm {
         SEARCH_LINEAR_ID = 0,
         SEARCH_LINEAR_KEYWORD = 1,

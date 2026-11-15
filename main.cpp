@@ -6,7 +6,9 @@
 // the waiting room and the undo stack all work on their own.
 //
 // The console demonstration talks to the controller, exactly like the
-// graphical interface does. The data itself is never reached directly.
+// graphical interface does. The two listings of the whole clinic are the
+// exception: the model writes those itself, so they read the database
+// directly.
 
 #include <iostream>
 #include <memory>
@@ -68,8 +70,8 @@ int main() {
         std::cout << "Rejected duplicate ID: " << error.what() << std::endl;
     }
 
-    // The records are shown through a PatientRecord pointer, so the version
-    // of displayPatient() that runs is chosen at run time.
+    // The records are shown through a PatientRecord pointer, so the report
+    // of the category of each patient is built at run time.
     manager.database().displayAllPatients();
 
     // Only the bookable categories answer the Appointable interface.

@@ -223,8 +223,9 @@ void FileHandler::saveAppointments(const std::string& filename,
 }
 
 void FileHandler::replaceFile(const std::string& temporary, const std::string& filename) {
-    // The old file is only removed when the new one is ready, so the clinic
-    // never loses its data because of a failed save.
+    // The writing itself already happened safely in the temporary file, so
+    // a failed write never touches the data on the disk. The old file is
+    // removed here and the temporary file is renamed into its place.
     std::remove(filename.c_str());
 
     if (std::rename(temporary.c_str(), filename.c_str()) != 0) {

@@ -79,7 +79,6 @@ AdminPanel::AdminPanel(controller::ClinicManager& manager, QWidget* parent)
 }
 
 void AdminPanel::refresh() {
-    // The summary is counted from the data of the clinic.
     int pending = 0;
     for (const model::Appointment& appointment : manager.getAllAppointments()) {
         if (appointment.getStatus() == model::Appointment::STATUS_PENDING) {

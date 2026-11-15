@@ -17,7 +17,8 @@ class ReportBuilder {
 public:
     static std::string categoryDistribution(const ClinicManager& manager);
 
-    // Every appointment that has not been completed yet.
+    // Every appointment that is still pending. The cancelled and the
+    // completed ones are left out.
     static std::string pendingAppointments(const ClinicManager& manager);
 
     // How many appointments were scheduled, completed, cancelled or are still

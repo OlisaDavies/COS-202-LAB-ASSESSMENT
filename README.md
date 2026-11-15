@@ -29,8 +29,8 @@ console demonstration (`main.cpp`) and in the graphical program (`gui_main.cpp`)
 - Appointment scheduling and cancellation
 - Waiting room queue, served first in first out
 - Undo for the last change to a patient or an appointment
-- Patient search by linear, binary, recursive and category search, and sorting by selection sort
-  and merge sort
+- Patient search by linear (exact ID), keyword, binary, recursive and category search, and sorting
+  by selection sort and merge sort
 - CSV import and export for patients and appointments
 - Reports on category distribution, pending appointments, the daily schedule and frequently
   attended patients
@@ -109,7 +109,7 @@ possible without clicking:
 SCAPMS_GUI.exe                      opens the first panel
 SCAPMS_GUI.exe 3                    opens the Waiting Queue
 SCAPMS_GUI.exe 3 GEN-101            also puts that patient in the queue
-SCAPMS_GUI.exe 2 GEN-101 0          also runs a search for GEN-101 with the
+SCAPMS_GUI.exe 3 GEN-101 0          also runs a search for GEN-101 with the
                                     linear search by ID
 ```
 
@@ -120,12 +120,14 @@ not fit the panel is ignored.
 
 ## The submission document
 
-`SCAPMS_Submission.pdf` is the single document the assessment asks for. It holds, in the order the
-brief lists them: the two to three page report, the six screenshots, the UML class diagram, and
-the complete source code under the four headings the brief names. `SUBMISSION_REPORT.md` is the
-report on its own, and `UML_DIAGRAM.png` is the diagram: every class of the four layers, with the
-inheritance, the interfaces, the compositions and the associations. It was drawn in draw.io, and
-`UML_DIAGRAM.drawio` is the editable source of the same picture, so the diagram can be opened and
+`SCAPMS_Submission.pdf` is the single document the assessment asks for. It holds the four sections
+the brief names: the complete source code under its four headings, the six screenshots of the GUI,
+the UML class diagrams and the two to three page report. `SUBMISSION_REPORT.md` is the
+report on its own, and `UML_DIAGRAM.png` is the diagram: every class of every layer drawn in the
+layered style of draw.io, with a legend, and with the inheritance, the interfaces, the compositions
+and the associations labelled. The document also carries the same diagram split by layer, so each
+one is readable on its own. It was drawn in draw.io, and
+`UML_DIAGRAM.drawio` is the editable source of the full picture, so the diagram can be opened and
 changed in draw.io (app.diagrams.net) or in VS Code with the Draw.io Integration extension.
 
 ## Where each requirement is implemented
@@ -175,8 +177,8 @@ submission asks for them:
 
 | File | View |
 | --- | --- |
-| `1_patient_registration.png` | The registration form and the roster of the patients |
-| `2_appointment_management.png` | The booking form and the schedule of the clinic |
+| `1_patient_records.png` | The registration form and the roster of the patients |
+| `2_appointments.png` | The booking form and the schedule of the clinic |
 | `3_waiting_queue.png` | The waiting room and the patients that are waiting |
 | `4_search_and_sort.png` | The search and the sort, with the result of a search |
 | `5_clinic_reports.png` | The report of the clinic |

@@ -51,9 +51,9 @@ private:
     static std::unique_ptr<model::PatientRecord> readPatient(
         const std::vector<std::string>& fields, std::string* warning);
 
-    // Puts the temporary file over the real file. The old file is only
-    // removed when the new one is ready, so a failed write cannot destroy
-    // the data that is already on the disk.
+    // Puts the temporary file over the real file. The old file is removed
+    // and the temporary file is renamed into its place, so a write that
+    // fails leaves the data on the disk untouched.
     static void replaceFile(const std::string& temporary, const std::string& filename);
 };
 

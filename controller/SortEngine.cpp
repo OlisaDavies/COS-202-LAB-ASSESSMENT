@@ -14,8 +14,8 @@ bool SortEngine::comparePatients(const model::PatientRecord* first,
 
     switch (field) {
         case SortField::PatientID:
-            // The letter case is ignored, so that a name that was typed in
-            // small letters does not jump to the end of the list.
+            // The letter case is ignored, so that an identifier that was
+            // typed in small letters does not jump to the end of the list.
             return utils::compareIgnoreCase(first->getPatientID(),
                                             second->getPatientID()) < 0;
         case SortField::PatientName:
