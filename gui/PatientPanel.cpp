@@ -1,10 +1,6 @@
 #include "PatientPanel.h"
 
-#include <QColor>
-#include <QFile>
 #include <QFormLayout>
-#include <QFont>
-#include <QGridLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
 #include <QHeaderView>
@@ -28,8 +24,8 @@ namespace gui {
 PatientPanel::PatientPanel(controller::ClinicManager& manager, QWidget* parent)
     : QWidget(parent), manager(manager) {
     QHBoxLayout* layout = new QHBoxLayout(this);
-    layout->setContentsMargins(16, 16, 16, 16);
-    layout->setSpacing(16);
+    layout->setContentsMargins(12, 12, 12, 12);
+    layout->setSpacing(12);
 
     layout->addWidget(buildForm(this));
     layout->addWidget(buildRoster(this));
@@ -42,30 +38,11 @@ PatientPanel::PatientPanel(controller::ClinicManager& manager, QWidget* parent)
 QWidget* PatientPanel::buildForm(QWidget* parent) {
     QGroupBox* group = new QGroupBox("Register New Patient", parent);
     QFormLayout* form = new QFormLayout(group);
-    form->setContentsMargins(16, 20, 16, 16);
-    form->setVerticalSpacing(12);
-    form->setLabelAlignment(Qt::AlignLeft | Qt::AlignVCenter);
-    form->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
 
     txtPatID = new QLineEdit(group);
     txtPatID->setPlaceholderText("e.g. GEN-201, EMG-801");
-    txtPatID->setToolTip("The identifier of the patient. It has to begin with the prefix "
-                          "of the chosen category, and it may only be used once.");
-
-    // The program answers while the identifier is being typed, so that the
-    // staff find out straight away that the identifier is already taken.
-    connect(txtPatID, &QLineEdit::textChanged, this, &PatientPanel::onPatientIDChanged);
-
-    lblIDHint = new QLabel("The identifier must be unique.", group);
-    lblIDHint->setToolTip("Tells you whether the identifier is free or already in use.");
-    lblIDHint->setWordWrap(true);
-    lblIDHint->setStyleSheet("color: #777; font-size: 11px;");
-    // The hint always carries a line, so that the fields below it keep the
-    // same place while the staff type.
-    lblIDHint->setMinimumHeight(16);
 
     btnSuggestID = new QPushButton("Suggest ID", group);
-    btnSuggestID->setToolTip("Fill in the next free identifier for the chosen category.");
     connect(btnSuggestID, &QPushButton::clicked, this, &PatientPanel::onSuggestPatientID);
 
     txtPatName = new QLineEdit(group);
@@ -81,7 +58,6 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
     cmbPatType->addItem("General Outpatient");
     cmbPatType->addItem("Emergency Patient");
     cmbPatType->addItem("Follow-Up Patient");
-    cmbPatType->setToolTip("The category decides which extra details the form asks for.");
 
     lblTypeField1 = new QLabel(group);
     txtTypeField1 = new QLineEdit(group);
@@ -96,9 +72,9 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
         input->setMaximumWidth(inputWidth);
     }
     cmbPatType->setMaximumWidth(inputWidth);
+
     form->addRow("Patient ID *:", txtPatID);
-    form->addRow(lblIDHint);
-    form->addRow(btnSuggestID);
+    form->addRow("", btnSuggestID);
     form->addRow("Full Name *:", txtPatName);
     form->addRow("Age *:", txtPatAge);
     form->addRow("Contact Phone:", txtPatContact);
@@ -107,19 +83,15 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
     form->addRow(lblTypeField2, txtTypeField2);
 
     btnRegister = new QPushButton("Register Patient", group);
-    btnRegister->setToolTip("Add the patient to the clinic roster.");
     connect(btnRegister, &QPushButton::clicked, this, &PatientPanel::onRegisterPatient);
 
     btnSaveChanges = new QPushButton("Save Changes", group);
-    btnSaveChanges->setToolTip("Store the changes that were made to the record.");
     connect(btnSaveChanges, &QPushButton::clicked, this, &PatientPanel::onUpdatePatient);
 
     btnCancelEdit = new QPushButton("Cancel Edit", group);
-    btnCancelEdit->setToolTip("Throw the changes away and close the record.");
     connect(btnCancelEdit, &QPushButton::clicked, this, &PatientPanel::onCancelEdit);
 
     btnUndo = new QPushButton("Undo (Ctrl+Z)", group);
-    btnUndo->setToolTip("Reverse the last change to a patient or an appointment.");
     connect(btnUndo, &QPushButton::clicked, this, [this]() { emit undoRequested(); });
 
     form->addRow(btnRegister);
@@ -131,32 +103,14 @@ QWidget* PatientPanel::buildForm(QWidget* parent) {
             this, &PatientPanel::onPatientTypeChanged);
 
     // The form keeps a minimum width, so that the roster table always has
-    // room on a small screen, and it may grow when the window is wide.
-    group->setMinimumWidth(330);
-    group->setMaximumWidth(420);
-    group->setSizePolicy(QSizePolicy::Preferred, QSizePolicy::Preferred);
+    // room on a small screen.
+    group->setMinimumWidth(320);
     return group;
 }
 
 QWidget* PatientPanel::buildRoster(QWidget* parent) {
     QGroupBox* group = new QGroupBox("Registered Patients", parent);
     QVBoxLayout* layout = new QVBoxLayout(group);
-    layout->setContentsMargins(16, 20, 16, 16);
-    layout->setSpacing(10);
-
-    // The legend shows the colour of each category and the priority that goes
-    // with it, so that a row can be read without looking up the category.
-    QGridLayout* legend = new QGridLayout();
-    legend->setHorizontalSpacing(14);
-    legend->setVerticalSpacing(6);
-    legend->addWidget(buildLegendChip("Emergency", "#ffebee", "#b71c1c", group), 0, 0);
-    legend->addWidget(new QLabel("High Priority", group), 0, 1);
-    legend->addWidget(buildLegendChip("General", "#e8f5e9", "#1b5e20", group), 1, 0);
-    legend->addWidget(new QLabel("Normal", group), 1, 1);
-    legend->addWidget(buildLegendChip("Follow-Up", "#e3f2fd", "#0d47a1", group), 2, 0);
-    legend->addWidget(new QLabel("Scheduled", group), 2, 1);
-    legend->setColumnStretch(1, 1);
-    layout->addLayout(legend);
 
     tablePatients = new QTableWidget(group);
     tablePatients->setColumnCount(5);
@@ -165,8 +119,7 @@ QWidget* PatientPanel::buildRoster(QWidget* parent) {
 
     // The identifier, the name, the age and the telephone number take the
     // width of their content, so that none of them is cut in half. The
-    // details column takes the rest of the table and lets the long text
-    // end in an ellipsis.
+    // details column takes the rest of the table.
     QHeaderView* header = tablePatients->horizontalHeader();
     header->setSectionResizeMode(QHeaderView::Interactive);
     header->setSectionResizeMode(0, QHeaderView::ResizeToContents);
@@ -179,21 +132,17 @@ QWidget* PatientPanel::buildRoster(QWidget* parent) {
     tablePatients->setSelectionBehavior(QAbstractItemView::SelectRows);
     tablePatients->setEditTriggers(QAbstractItemView::NoEditTriggers);
 
-    tablePatients->setTextElideMode(Qt::ElideRight);
     layout->addWidget(tablePatients);
 
     QHBoxLayout* buttonRow = new QHBoxLayout();
 
     btnEdit = new QPushButton("Edit", group);
-    btnEdit->setToolTip("Put the selected patient into the form so that it can be changed.");
     connect(btnEdit, &QPushButton::clicked, this, &PatientPanel::onEditSelectedPatient);
 
     btnDelete = new QPushButton("Delete", group);
-    btnDelete->setToolTip("Remove the selected patient. The step can be undone.");
     connect(btnDelete, &QPushButton::clicked, this, &PatientPanel::onDeleteSelectedPatient);
 
     btnReport = new QPushButton("Full Report", group);
-    btnReport->setToolTip("Show the full report of the selected patient.");
     connect(btnReport, &QPushButton::clicked, this, &PatientPanel::onShowReport);
 
     buttonRow->addWidget(btnEdit);
@@ -203,17 +152,6 @@ QWidget* PatientPanel::buildRoster(QWidget* parent) {
     layout->addLayout(buttonRow);
 
     return group;
-}
-
-QLabel* PatientPanel::buildLegendChip(const QString& text, const QString& background,
-                                       const QString& foreground, QWidget* parent) {
-    QLabel* chip = new QLabel(text, parent);
-    chip->setStyleSheet(
-        QString("background-color: %1; color: %2; border-radius: 9px;"
-                "padding: 3px 12px; font-size: 12px; font-weight: 600;").arg(background, foreground));
-    chip->setAlignment(Qt::AlignCenter);
-    chip->setSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed);
-    return chip;
 }
 
 void PatientPanel::showCategoryFields(int index) {
@@ -322,10 +260,10 @@ void PatientPanel::onRegisterPatient() {
                                                            age, contact.toStdString(), 1, "");
     } else if (typeIndex == FOLLOWUP_INDEX) {
         owned = std::make_unique<model::FollowUpPatient>(id.toStdString(), name.toStdString(),
-                                                          age, contact.toStdString(), "", "");
+                                                         age, contact.toStdString(), "", "");
     } else {
         owned = std::make_unique<model::GeneralPatient>(id.toStdString(), name.toStdString(),
-                                                         age, contact.toStdString(), 0.0);
+                                                        age, contact.toStdString(), 0.0);
     }
 
     try {
@@ -511,35 +449,6 @@ void PatientPanel::onShowReport() {
     box.exec();
 }
 
-void PatientPanel::onPatientIDChanged(const QString& text) {
-    // The label under the identifier field tells the staff at once whether
-    // the identifier can be used.
-    const QString id = text.trimmed();
-
-    if (id.isEmpty()) {
-        lblIDHint->setText("The identifier is required.");
-        lblIDHint->setStyleSheet("color: #777; font-size: 11px;");
-        return;
-    }
-
-    const std::string prefix = utils::IDGenerator::patientPrefix(selectedPatientType());
-    if (!id.startsWith(QString::fromStdString(prefix))) {
-        lblIDHint->setText("An identifier of this category begins with [" +
-                           QString::fromStdString(prefix) + "].");
-        lblIDHint->setStyleSheet("color: #b06000; font-size: 11px;");
-        return;
-    }
-
-    if (manager.findPatientByID(id.toStdString()) != nullptr) {
-        lblIDHint->setText("This identifier is already in the clinic.");
-        lblIDHint->setStyleSheet("color: #b00020; font-size: 11px;");
-        return;
-    }
-
-    lblIDHint->setText("This identifier is free.");
-    lblIDHint->setStyleSheet("color: #1b7a2f; font-size: 11px;");
-}
-
 void PatientPanel::onSuggestPatientID() {
     // The controller knows which identifiers are already in use.
     const std::string suggestion = manager.suggestPatientId(selectedPatientType());
@@ -678,36 +587,6 @@ void PatientPanel::writeFields(model::PatientRecord* patient, const TypeFields& 
     }
 }
 
-void PatientPanel::applyRowFormatting(int row, const std::string& patientType) {
-    QColor background;
-    QColor foreground;
-
-    if (patientType == model::PatientRecord::TYPE_EMERGENCY) {
-        background = QColor("#ffebee");
-        foreground = QColor("#b71c1c");
-    } else if (patientType == model::PatientRecord::TYPE_GENERAL) {
-        background = QColor("#e8f5e9");
-        foreground = QColor("#1b5e20");
-    } else {
-        background = QColor("#e3f2fd");
-        foreground = QColor("#0d47a1");
-    }
-
-    for (int column = 0; column < tablePatients->columnCount(); ++column) {
-        QTableWidgetItem* item = tablePatients->item(row, column);
-        if (item == nullptr) {
-            continue;
-        }
-        item->setBackground(background);
-        if (column == 4) {
-            item->setForeground(foreground);
-            QFont font = item->font();
-            font.setBold(true);
-            item->setFont(font);
-        }
-    }
-}
-
 void PatientPanel::refresh() {
     const std::vector<model::PatientRecord*> patients = manager.getAllPatients();
     tablePatients->setRowCount(static_cast<int>(patients.size()));
@@ -741,8 +620,6 @@ void PatientPanel::refresh() {
         }
 
         tablePatients->setItem(i, 4, new QTableWidgetItem(details));
-
-        applyRowFormatting(i, patient->getPatientType());
     }
 }
 

@@ -42,8 +42,7 @@ model/       PatientRecord, Appointable, Billable, ScheduledPatient, GeneralPati
              EmergencyPatient, FollowUpPatient, Appointment, AdminAction, ClinicDatabase
 controller/  ClinicManager, AppointmentController, SearchEngine, SortEngine, ReportBuilder
 gui/         MainWindow, PatientPanel, AppointmentPanel, QueuePanel,
-             SearchPanel, ReportPanel, AdminPanel, style.qss, clinic.ico,
-             resources.qrc
+             SearchPanel, ReportPanel, AdminPanel, clinic.ico, resources.qrc
 utils/       ClinicExceptions, DateUtil, FileHandler, IDGenerator, StringUtil
 main.cpp     the console demonstration
 gui_main.cpp the entry point of the graphical program
@@ -81,8 +80,8 @@ utils/FileHandler.cpp          utils/IDGenerator.cpp       main.cpp
 ```
 gui/MainWindow.cpp              gui/PatientPanel.cpp        gui/AppointmentPanel.cpp
 gui/QueuePanel.cpp              gui/SearchPanel.cpp         gui/ReportPanel.cpp
-gui/AdminPanel.cpp              gui_main.cpp                gui/style.qss
-gui/clinic.ico                  gui/resources.qrc           SCAPMS.pro
+gui/AdminPanel.cpp              gui_main.cpp                gui/clinic.ico
+gui/resources.qrc               SCAPMS.pro                  build_gui.bat
 build_gui.bat                   build.bat                  .vscode/tasks.json
 .vscode/launch.json
 ```
@@ -144,10 +143,10 @@ Twenty five classes do not read on one page when they are printed.
 | 3.d Fixed-size array | `model/ClinicDatabase.h` - `PatientRecord* recentPatients[10]`, shown in the Administration panel. The array is held from the oldest record at the front to the newest at the back, the most recently used record is shown first, and when the cache is full the record that was used the longest time ago makes room for a new one |
 | 4 Searching | `controller/SearchEngine.h` - linear by ID or name, binary by ID on sorted records, recursive by name, linear by category. The text is matched without regard to letter case, and a part of the identifier or the name is enough |
 | 5 Sorting | `controller/SortEngine.h` - selection sort and merge sort, chosen from a combo box on the Search & Sort panel. The chosen order is kept by the controller, so the roster and the results show the same order. The names and the identifiers are compared without regard to letter case |
-| 6 Events | `gui/MainWindow.cpp` and the panels - button clicks, menu actions, combo box changes, text field changes and a `QTimer` that refreshes the status bar and the dashboard. The File menu holds New, Save as, Load and Exit |
+| 6 Events | `gui/MainWindow.cpp` and the panels - button clicks, menu actions, combo box changes and text field changes, all connected with signals and slots. The File menu holds New, Save as, Load and Exit |
 | 7 Panels | Patient Records, Appointments, Waiting Queue, Search & Sort, Clinic Reports, Administration |
-| 8 Layout | `QFormLayout` for the forms, `QHBoxLayout` and `QVBoxLayout` for the panels, `QGridLayout` for the tables of the categories and their priorities |
-| 9 Advanced GUI | 9.a colour coded rows with a table of the categories and their priorities, 9.b fields that change with the patient type, 9.c file dialogs, 9.d status bar timer, 9.e validation messages, 9.f shortcuts, 9.g tooltips |
+| 8 Layout | `QFormLayout` for the forms, `QHBoxLayout` and `QVBoxLayout` for the panels |
+| 9 Advanced GUI | fields that change with the patient type, file dialogs for the import and the export, validation messages in dialogs and keyboard shortcuts |
 | 10 Exceptions | `utils/ClinicExceptions.h` - `DuplicateIDException`, `InvalidPatientDataException`, `InvalidAppointmentException`, `FileIOException`. `gui_main.cpp` also catches anything that escapes a slot, so that the program never stops by itself |
 | 11 Persistence | `utils/FileHandler.h` - CSV read and write for both patients and appointments. A file is written to a temporary name first, so a failed save cannot destroy the data that is already on the disk |
 
@@ -174,12 +173,12 @@ submission asks for them:
 
 | File | View |
 | --- | --- |
-| `1_main_dashboard.png` | The dashboard of the clinic, with the live figures and the categories |
-| `2_patient_registration.png` | The registration form and the roster of the patients |
-| `3_appointment_management.png` | The booking form and the schedule of the clinic |
+| `1_patient_registration.png` | The registration form and the roster of the patients |
+| `2_appointment_management.png` | The booking form and the schedule of the clinic |
+| `3_waiting_queue.png` | The waiting room and the patients that are waiting |
 | `4_search_and_sort.png` | The search and the sort, with the result of a search |
-| `5_waiting_queue.png` | The waiting room and the patients that are waiting |
-| `6_clinic_reports.png` | The report of the clinic |
+| `5_clinic_reports.png` | The report of the clinic |
+| `6_administration.png` | The administrative operations and the summary of the clinic |
 
 ## Build & Run
 

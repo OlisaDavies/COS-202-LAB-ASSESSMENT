@@ -23,7 +23,7 @@ A clinic running on paper records suffers double bookings, a waiting room nobody
 | Undo the last change to a patient or an appointment | Administration panel, or Ctrl+Z |
 | Save and load the clinic files | Administration panel, or Ctrl+S / Ctrl+O |
 | Four clinic reports | Clinic Reports panel |
-| Live dashboard and the recently accessed records | Administration panel |
+| Clinic summary and the recently accessed records | Administration panel |
 
 ## 3. Class Hierarchy
 
@@ -75,9 +75,9 @@ Records are ordered by patient ID, patient name or patient age. Names and IDs ar
 
 The interface is built in Qt Widgets and split into six tabs, one class per tab: Patient Records, Appointments, Waiting Queue, Search & Sort, Clinic Reports and Administration.
 
-- **Events.** Button clicks, menu actions, combo box changes, text field changes and a one-second timer all go through signals and slots. The File menu holds New, Save as…, Load… and Exit; the Edit menu holds Undo last operation and Quick search.
-- **Layouts.** No pixel positioning is used. `QFormLayout` keeps a label with its field, `QHBoxLayout` and `QVBoxLayout` divide the panels into rows and columns, and `QGridLayout` lines up the tables of figures and of category priorities. Using four techniques rather than one means each part of the window is laid out by the one that suits its shape.
-- **Advanced techniques.** Rows are colour-coded by category (red for emergency, green for general, blue for follow-up) with a table of categories and priorities beside the roster; the form fields change with the chosen patient type; file dialogs choose the import and export files; the timer keeps the status bar and the dashboard live; every invalid entry raises a message naming the field; shortcuts cover Ctrl+N, Ctrl+S, Ctrl+O, Ctrl+Z, Ctrl+F and Ctrl+Q; and every control carries a tooltip.
+- **Events.** Button clicks, menu actions, combo box changes and text field changes all go through signals and slots. The File menu holds New, Save as…, Load… and Exit; the Edit menu holds Undo last operation and Quick search.
+- **Layouts.** No pixel positioning is used. `QFormLayout` keeps a label with its field, and `QHBoxLayout` and `QVBoxLayout` divide the panels into rows and columns, so each part of the window is laid out by the one that suits its shape.
+- **Advanced techniques.** The form fields change with the chosen patient type, file dialogs choose the import and export files, every invalid entry raises a message naming the field, and shortcuts cover Ctrl+N, Ctrl+S, Ctrl+O, Ctrl+Z, Ctrl+F and Ctrl+Q.
 
 ## 9. Exception Handling Approach
 

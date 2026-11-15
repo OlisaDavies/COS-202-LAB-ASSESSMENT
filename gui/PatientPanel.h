@@ -49,7 +49,6 @@ private slots:
     void onDeleteSelectedPatient();
     void onShowReport();
     void onSuggestPatientID();
-    void onPatientIDChanged(const QString& text);
 
 private:
     // The order of the entries in the category combo box.
@@ -80,10 +79,6 @@ private:
     QLabel* lblTypeField2;
     QLineEdit* txtTypeField2;
 
-    // The line under the identifier field. It tells the staff while they
-    // type whether the identifier is free or already in use.
-    QLabel* lblIDHint;
-
     QTableWidget* tablePatients;
 
     QPushButton* btnRegister;
@@ -107,13 +102,7 @@ private:
     void clearPatientForm();
     void loadPatientIntoForm(const model::PatientRecord* patient);
     void showCategoryFields(int index);
-    void applyRowFormatting(int row, const std::string& patientType);
     void setEditingMode(bool editing);
-
-    // A small label in the colour of one category, used by the legend above
-    // the roster table.
-    static QLabel* buildLegendChip(const QString& text, const QString& background,
-                                    const QString& foreground, QWidget* parent);
 
     // The combo box entry of a record and of a category name.
     static int categoryIndex(const model::PatientRecord* patient);

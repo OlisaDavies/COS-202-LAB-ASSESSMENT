@@ -2,7 +2,6 @@
 
 #include <QMainWindow>
 #include <QTabWidget>
-#include <QTimer>
 
 #include "PatientPanel.h"
 #include "AppointmentPanel.h"
@@ -28,23 +27,16 @@ public:
     ~MainWindow() override;
 
     // Opens the given tab, counted from zero, and does nothing when the
-    // number is out of range. The command line uses this, so that any panel
-    // can be opened, photographed or demonstrated directly.
+    // number is out of range. The command line uses this, so that any
+    // panel can be opened or demonstrated directly.
     void showTab(int index);
 
-    // The two panels the command line also fills in, so that the entry point
-    // does not have to reach into the widgets of a panel itself.
+    // The two panels the command line also fills in, so that the entry
+    // point does not have to reach into the widgets of a panel itself.
     QueuePanel* queuePanelWidget() { return queuePanel; }
     SearchPanel* searchPanelWidget() { return searchPanel; }
 
-protected:
-    // Used to put the window in the middle of the screen once it is shown.
-    void showEvent(QShowEvent* event) override;
-
 private slots:
-    // The clock in the status bar.
-    void onTimerTick();
-
     // Called when a panel changed the data.
     void onDataChanged();
 
@@ -57,15 +49,10 @@ private:
     controller::ClinicManager manager;
 
     QTabWidget* tabWidget;
-    QTimer* dashboardTimer;
 
-    // True once the window has been put in the middle of the screen.
-    bool centred;
-
-    // The size the window is asked for. The width leaves room for the
-    // roster table, whose name and details columns both hold a long text.
-    static constexpr int WINDOW_WIDTH = 1200;
-    static constexpr int WINDOW_HEIGHT = 660;
+    // The size the window is asked for.
+    static constexpr int WINDOW_WIDTH = 1100;
+    static constexpr int WINDOW_HEIGHT = 620;
 
     PatientPanel* patientPanel;
     AppointmentPanel* appointmentPanel;
@@ -76,8 +63,6 @@ private:
 
     void setupUI();
     void setupMenuBar();
-    void setupTimer();
-    void applyStyleSheet();
 
     // The records the application starts with.
     void loadSampleData();

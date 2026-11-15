@@ -69,11 +69,10 @@ the Utilities, and the patient classes and `Appointment` in the Model.
 
 The **`AdminPanel`** is a sixth tab that holds the operations that belong to the person in charge
 of the clinic rather than to the treatment of a patient: undoing the last step, saving and loading
-the data, and starting a new day with an empty database. It also shows the live dashboard of the
-clinic and the records that were used most recently, which are the ten records held in the fixed
-size cache. The dashboard is built out of real widgets rather than out of one block of text: a
-table of the six figures of the clinic, and a table of the three categories with the priority that
-goes with each of them.
+the data, and starting a new day with an empty database. It also shows a small summary of the
+clinic - the number of registered patients, the number of patients waiting, the number of booked
+appointments and the number that are still pending - and the records that were used most
+recently, which are the ten records held in the fixed size cache.
 
 ### 2.1 Abstract Base Class & Inheritance Hierarchy
 At the core of the clinical model is the abstract base class `PatientRecord`
@@ -175,30 +174,27 @@ The brief rules out the STL algorithms, so every search and sort below is writte
 ## 5. Graphical User Interface (GUI) & Event Architecture
 
 The graphical frontend was built natively using **Qt 6.5.3 (C++17)**:
-- **Layout Management (Req. 8):** Hardcoded pixel coordinates were strictly avoided. Responsive layouts adapt dynamically to window resizing using `QVBoxLayout`, `QHBoxLayout`, `QFormLayout` and `QGridLayout`. The forms use `QFormLayout`, so a label and its field stay together and the form grows with its longest label; the panels use `QHBoxLayout` and `QVBoxLayout`, so the columns and the rows share the space that is left; and the three tables of figures and of categories and priorities use `QGridLayout`, so the entries line up under each other in both directions.
+- **Layout Management (Req. 8):** Hardcoded pixel coordinates were strictly avoided. Responsive layouts adapt dynamically to window resizing using `QVBoxLayout`, `QHBoxLayout` and `QFormLayout`. The forms use `QFormLayout`, so a label and its field stay together and the form grows with its longest label; the panels use `QHBoxLayout` and `QVBoxLayout`, so the columns and the rows share the space that is left.
 - **Event-Driven Programming (Req. 6):** User actions trigger Qt Signals connected to C++ Member Slots.
   - *Button events (6.a):* Add, Edit, Delete, Undo, Book, Mark as Completed, Cancel, Search, Sort, Save, Load and New Database are all wired to a slot.
   - *Menu events (6.b):* The File menu holds **New**, **Save as...** (`Ctrl+S`), **Load...** (`Ctrl+O`) and **Exit** (`Ctrl+Q`); the Edit menu holds **Undo last operation** (`Ctrl+Z`) and **Quick search** (`Ctrl+F`); the Help menu holds **About**.
-  - *Text field events (6.c):* the appointment identifier field records that the staff typed it, so that the free identifier is not written over their work; and the patient identifier field answers while it is being typed, telling the staff whether the identifier is free or already in the clinic.
-  - *Timer events (6.d):* a one-second `QTimer` keeps the clock and the live numbers of the clinic in the status bar, shows a reminder of the bookings that are still pending, and refreshes the statistics of the dashboard.
+  - *Text field events (6.c):* the appointment identifier field records that the staff typed it, so that the free identifier is not written over their work.
 - **Multi-Panel Navigation (Req. 7):** Organized via a central `QTabWidget` containing:
-  - *Panel 1:* Patient Registration form and color-coded Roster table (`gui/PatientPanel.cpp`).
+  - *Panel 1:* Patient Registration form and patient roster table (`gui/PatientPanel.cpp`).
   - *Panel 2:* Appointment booking form and schedule grid (`gui/AppointmentPanel.cpp`).
   - *Panel 3:* Waiting room line manager with FIFO calling dialogs (`gui/QueuePanel.cpp`).
   - *Panel 4:* Search and sort engine with real-time algorithm selection dropdowns (`gui/SearchPanel.cpp`).
   - *Panel 5:* Clinic Reports generator (`gui/ReportPanel.cpp`).
-  - *Panel 6:* Administration panel with the administrative steps, the live dashboard of the clinic and the recently accessed records (`gui/AdminPanel.cpp`).
+  - *Panel 6:* Administration panel with the administrative steps, the clinic summary and the recently accessed records (`gui/AdminPanel.cpp`).
 - **Separation of concerns (Req. 2):** Every tab is its own panel class that owns its widgets and
   talks to the `ClinicManager`, never to the database. `gui/MainWindow.cpp` only builds the tabs,
   the menu bar and the status bar, and it refreshes the panels when one of them reports a change.
 - **Advanced GUI Techniques (Req. 9):**
-  - Custom table cell presentation using soft colors (`#ffebee` for Emergency, `#e8f5e9` for General, `#e3f2fd` for Follow-Up), with a table of the categories and their priorities beside the roster and beside the dashboard.
-  - Fields that appear and disappear with the selected patient type.
-  - Background `QTimer` maintaining live clock synchronization, queue size updates, a reminder of the pending appointments and a live refresh of the dashboard statistics.
+  - Fields that appear and disappear with the selected patient type, so the registration form
+    only asks for the details that the chosen category has.
   - Standard file dialog integration via `QFileDialog` for custom file import/export.
   - Accessible keyboard shortcuts (`Ctrl+N`, `Ctrl+S`, `Ctrl+O`, `Ctrl+Z`, `Ctrl+F`, `Ctrl+Q`).
-  - A live hint under the patient identifier field that says whether the identifier can be used.
-  - A tooltip on every button, every field and every list, which says what the control does in one short sentence.
+  - A validation message in a dialog that names the field that refused the entry.
 
 ## 6. Exception Handling
 

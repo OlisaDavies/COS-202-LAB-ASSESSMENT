@@ -64,7 +64,10 @@ int main(int argc, char* argv[]) {
     if (argc > 1) {
         bool numberOk = false;
         const int requested = QString::fromLocal8Bit(argv[1]).toInt(&numberOk);
-        if (numberOk && requested >= 0 && requested <= 4) {
+        // The six tabs of the window are counted from zero: 0 Patient
+        // Records, 1 Appointments, 2 Waiting Queue, 3 Search & Sort,
+        // 4 Clinic Reports, 5 Administration.
+        if (numberOk && requested >= 0 && requested <= 5) {
             mainWindow.showTab(requested);
 
             if (requested == 2 && argc > 2) {

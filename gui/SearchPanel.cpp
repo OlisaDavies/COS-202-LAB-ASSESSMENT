@@ -26,8 +26,8 @@ SearchPanel::SearchPanel(controller::ClinicManager& manager, QWidget* parent)
     layout->addLayout(controlRow);
 
     lblAlgorithmExplanation = new QLabel(
-        "<b>Selection sort:</b> O(n^2) comparisons, sorts in place.<br>"
-        "<b>Merge sort:</b> O(n log n) comparisons, needs an extra array.", this);
+        "Selection sort: O(n^2) comparisons, sorts in place.\n"
+        "Merge sort: O(n log n) comparisons, needs an extra array.", this);
     lblAlgorithmExplanation->setWordWrap(true);
     layout->addWidget(lblAlgorithmExplanation);
 
@@ -69,7 +69,6 @@ QWidget* SearchPanel::buildSearchBox(QWidget* parent) {
 
     txtSearchQuery = new QLineEdit(group);
     txtSearchQuery->setPlaceholderText("ID or name");
-    txtSearchQuery->setToolTip("What the search should look for.");
 
     cmbSearchAlgorithm = new QComboBox(group);
     cmbSearchAlgorithm->addItem("Linear search by ID (O(n))");
@@ -77,20 +76,17 @@ QWidget* SearchPanel::buildSearchBox(QWidget* parent) {
     cmbSearchAlgorithm->addItem("Binary search by ID (O(log n))");
     cmbSearchAlgorithm->addItem("Recursive search by name (O(n))");
     cmbSearchAlgorithm->addItem("Linear search by category (O(n))");
-    cmbSearchAlgorithm->setToolTip("The searching routine that is used.");
 
     cmbSearchCategory = new QComboBox(group);
     cmbSearchCategory->addItem("General Outpatient");
     cmbSearchCategory->addItem("Emergency Patient");
     cmbSearchCategory->addItem("Follow-Up Patient");
-    cmbSearchCategory->setToolTip("The category that is looked for.");
     cmbSearchCategory->setVisible(false);
 
     lblSearchCategory = new QLabel("Category:", group);
     lblSearchCategory->setVisible(false);
 
     QPushButton* btnSearch = new QPushButton("Search", group);
-    btnSearch->setToolTip("Run the chosen searching routine.");
     connect(btnSearch, &QPushButton::clicked, this, &SearchPanel::onExecuteSearch);
 
     form->addRow("Query:", txtSearchQuery);
@@ -113,16 +109,13 @@ QWidget* SearchPanel::buildSortBox(QWidget* parent) {
     cmbSortAlgorithm = new QComboBox(group);
     cmbSortAlgorithm->addItem("Selection sort (O(n^2))");
     cmbSortAlgorithm->addItem("Merge sort (O(n log n))");
-    cmbSortAlgorithm->setToolTip("The sorting routine that is used.");
 
     cmbSortField = new QComboBox(group);
     cmbSortField->addItem("Patient ID");
     cmbSortField->addItem("Patient Name");
     cmbSortField->addItem("Patient Age");
-    cmbSortField->setToolTip("The field the records are ordered by.");
 
     QPushButton* btnSort = new QPushButton("Sort", group);
-    btnSort->setToolTip("Order the records with the chosen routine.");
     connect(btnSort, &QPushButton::clicked, this, &SearchPanel::onExecuteSort);
 
     form->addRow("Algorithm:", cmbSortAlgorithm);
@@ -146,11 +139,11 @@ void SearchPanel::onSearchAlgorithmChanged(int index) {
 void SearchPanel::onSortAlgorithmChanged(int index) {
     if (index == 0) {
         lblAlgorithmExplanation->setText(
-            "<b>Selection sort:</b> O(n^2) comparisons, sorts in place and needs no "
+            "Selection sort: O(n^2) comparisons, sorts in place and needs no "
             "extra memory. It is a good choice for the short lists of a clinic.");
     } else {
         lblAlgorithmExplanation->setText(
-            "<b>Merge sort:</b> O(n log n) comparisons, splits the list in half and "
+            "Merge sort: O(n log n) comparisons, splits the list in half and "
             "joins it back together. It is stable and keeps the order of equal records.");
     }
 }

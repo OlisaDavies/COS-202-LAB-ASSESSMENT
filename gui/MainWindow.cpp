@@ -1,19 +1,11 @@
 #include "MainWindow.h"
 
 #include <QAction>
-#include <QApplication>
-#include <QDateTime>
-#include <QFile>
-#include <QFileDialog>
-#include <QFileInfo>
-#include <QGuiApplication>
 #include <QIcon>
 #include <QKeySequence>
 #include <QMenu>
 #include <QMenuBar>
 #include <QMessageBox>
-#include <QScreen>
-#include <QShowEvent>
 #include <QStatusBar>
 
 #include <memory>
@@ -27,55 +19,15 @@
 namespace scapms {
 namespace gui {
 
-MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent), centred(false) {
-    applyStyleSheet();
+MainWindow::MainWindow(QWidget* parent) : QMainWindow(parent) {
     setupUI();
     setupMenuBar();
-    setupTimer();
 
     loadSampleData();
     refreshAll();
 }
 
-void MainWindow::showEvent(QShowEvent* event) {
-    QMainWindow::showEvent(event);
-
-    // The window is fitted to the screen and put in the middle once it is
-    // up, because the layout only decides the real size of the window then.
-    if (!centred) {
-        centred = true;
-        QTimer::singleShot(0, this, [this]() {
-            if (QScreen* screen = QGuiApplication::primaryScreen()) {
-                const QRect available = screen->availableGeometry();
-                const int margin = 20;
-                int wantedWidth = WINDOW_WIDTH;
-                if (available.width() > margin && wantedWidth > available.width() - margin) {
-                    wantedWidth = available.width() - margin;
-                }
-                int wantedHeight = WINDOW_HEIGHT;
-                if (available.height() > margin && wantedHeight > available.height() - margin) {
-                    wantedHeight = available.height() - margin;
-                }
-                resize(wantedWidth, wantedHeight);
-
-                // The size the window really has is used, because the layout
-                // may still have made it larger than it was asked for.
-                move(available.center() - QPoint(width() / 2, height() / 2));
-            }
-        });
-    }
-}
-
 MainWindow::~MainWindow() = default;
-
-void MainWindow::applyStyleSheet() {
-    // The look and feel is kept in a resource file, so it is always the same.
-    QFile styleFile(":/style.qss");
-    if (styleFile.open(QIODevice::ReadOnly | QIODevice::Text)) {
-        qApp->setStyleSheet(QString::fromUtf8(styleFile.readAll()));
-        styleFile.close();
-    }
-}
 
 void MainWindow::setupUI() {
     setWindowTitle("Smart Clinic Appointment & Patient Management System");
@@ -106,8 +58,7 @@ void MainWindow::setupUI() {
     connect(adminPanel, &AdminPanel::dataChanged, this, &MainWindow::onDataChanged);
     connect(patientPanel, &PatientPanel::undoRequested, this, &MainWindow::onUndoAction);
 
-    // The window is sized after the panels are in place, so that it is big
-    // enough for the tables.
+    // The window is big enough for the tables of the panels.
     resize(WINDOW_WIDTH, WINDOW_HEIGHT);
 
     statusBar()->showMessage("Ready");
@@ -120,38 +71,32 @@ void MainWindow::setupMenuBar() {
 
     QAction* actNew = fileMenu->addAction("&New");
     actNew->setShortcut(QKeySequence("Ctrl+N"));
-    actNew->setToolTip("Clear every record and start again with an empty clinic.");
     connect(actNew, &QAction::triggered, this, [this]() { adminPanel->newDatabase(); });
 
     fileMenu->addSeparator();
 
     QAction* actSave = fileMenu->addAction("&Save as...");
     actSave->setShortcut(QKeySequence("Ctrl+S"));
-    actSave->setToolTip("Write the patients and the appointments to CSV files.");
     connect(actSave, &QAction::triggered, this, [this]() { adminPanel->saveData(); });
 
     QAction* actLoad = fileMenu->addAction("&Load...");
     actLoad->setShortcut(QKeySequence("Ctrl+O"));
-    actLoad->setToolTip("Read the patients and the appointments from CSV files.");
     connect(actLoad, &QAction::triggered, this, [this]() { adminPanel->loadData(); });
 
     fileMenu->addSeparator();
 
     QAction* actExit = fileMenu->addAction("E&xit");
     actExit->setShortcut(QKeySequence("Ctrl+Q"));
-    actExit->setToolTip("Close the application.");
     connect(actExit, &QAction::triggered, this, &QWidget::close);
 
     QMenu* editMenu = bar->addMenu("&Edit");
 
     QAction* actUndo = editMenu->addAction("&Undo last operation");
     actUndo->setShortcut(QKeySequence("Ctrl+Z"));
-    actUndo->setToolTip("Reverse the last change to a patient or an appointment.");
     connect(actUndo, &QAction::triggered, this, &MainWindow::onUndoAction);
 
     QAction* actSearch = editMenu->addAction("&Quick search");
     actSearch->setShortcut(QKeySequence("Ctrl+F"));
-    actSearch->setToolTip("Go to the search and sort panel.");
     connect(actSearch, &QAction::triggered, this, [this]() {
         tabWidget->setCurrentIndex(3);
         tabWidget->setFocus();
@@ -160,43 +105,7 @@ void MainWindow::setupMenuBar() {
     QMenu* helpMenu = bar->addMenu("&Help");
 
     QAction* actAbout = helpMenu->addAction("&About");
-    actAbout->setToolTip("Show the information about this program.");
     connect(actAbout, &QAction::triggered, this, &MainWindow::onAbout);
-}
-
-void MainWindow::setupTimer() {
-    dashboardTimer = new QTimer(this);
-    connect(dashboardTimer, &QTimer::timeout, this, &MainWindow::onTimerTick);
-    dashboardTimer->start(1000);
-}
-
-void MainWindow::onTimerTick() {
-    // The timer keeps the status bar and the dashboard in step with the
-    // data, so the staff never read a number that has gone out of date.
-    const QString time = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss");
-
-    int pending = 0;
-    for (const model::Appointment& appointment : manager.getAllAppointments()) {
-        if (appointment.getStatus() == model::Appointment::STATUS_PENDING) {
-            ++pending;
-        }
-    }
-
-    QString message = QString("%1   |   Patients: %2   |   Waiting: %3")
-                          .arg(time)
-                          .arg(manager.getPatientCount())
-                          .arg(manager.getQueueSize());
-
-    if (pending > 0) {
-        message += QString("   |   Pending appointments: %1").arg(pending);
-    }
-    if (manager.getQueueSize() > 0) {
-        message += "   (patients are waiting)";
-    }
-
-    statusBar()->showMessage(message);
-
-    adminPanel->refreshStatistics();
 }
 
 void MainWindow::loadSampleData() {
@@ -226,15 +135,15 @@ void MainWindow::loadSampleData() {
         manager.scheduleAppointment(model::Appointment("APT-1001", "GEN-101", "2026-11-15",
                                                        "10:30 AM", "Dr. Adeyemi",
                                                        model::Appointment::STATUS_PENDING),
-                                   false);
+                                    false);
         manager.scheduleAppointment(model::Appointment("APT-1002", "FOL-205", "2026-11-20",
                                                        "02:00 PM", "Dr. Funke",
                                                        model::Appointment::STATUS_COMPLETED),
-                                   false);
+                                    false);
         manager.scheduleAppointment(model::Appointment("APT-1003", "GEN-005", "2026-11-22",
                                                        "11:00 AM", "Dr. Adeyemi",
                                                        model::Appointment::STATUS_PENDING),
-                                   false);
+                                    false);
     } catch (const utils::ClinicException& error) {
         warnings.push_back(std::string("a sample appointment was skipped: ") + error.what());
     }

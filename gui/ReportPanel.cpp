@@ -26,7 +26,6 @@ ReportPanel::ReportPanel(controller::ClinicManager& manager, QWidget* parent)
     cmbReportType->addItem("Patients with pending appointments");
     cmbReportType->addItem("Daily appointment summary");
     cmbReportType->addItem("Frequently attended patients");
-    cmbReportType->setToolTip("The report that is built.");
     cmbReportType->setMaximumWidth(340);
     topRow->addWidget(cmbReportType);
 
@@ -36,7 +35,6 @@ ReportPanel::ReportPanel(controller::ClinicManager& manager, QWidget* parent)
             this, &ReportPanel::onGenerateReport);
 
     QPushButton* btnGenerate = new QPushButton("Generate", this);
-    btnGenerate->setToolTip("Build the chosen report from the clinic data.");
     connect(btnGenerate, &QPushButton::clicked, this, &ReportPanel::onGenerateReport);
     topRow->addWidget(btnGenerate);
 

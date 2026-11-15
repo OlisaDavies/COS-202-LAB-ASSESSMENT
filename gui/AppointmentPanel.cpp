@@ -1,7 +1,5 @@
 #include "AppointmentPanel.h"
 
-#include <QColor>
-#include <QDate>
 #include <QFormLayout>
 #include <QGroupBox>
 #include <QHBoxLayout>
@@ -38,10 +36,8 @@ QWidget* AppointmentPanel::buildForm(QWidget* parent) {
     form->setFieldGrowthPolicy(QFormLayout::FieldsStayAtSizeHint);
 
     txtAptID = new QLineEdit(group);
-    txtAptID->setToolTip("The identifier of the booking. A free one is filled in for you.");
 
     cmbAptPatientID = new QComboBox(group);
-    cmbAptPatientID->setToolTip("The patient that the appointment is for.");
 
     txtAptDate = new QLineEdit("2026-11-25", group);
     txtAptDate->setPlaceholderText("YYYY-MM-DD");
@@ -68,7 +64,6 @@ QWidget* AppointmentPanel::buildForm(QWidget* parent) {
     // A free identifier is filled in, unless the staff types one of their own.
     connect(txtAptID, &QLineEdit::textEdited, this, [this]() { aptIdEdited = true; });
     QPushButton* btnBook = new QPushButton("Book Appointment", group);
-    btnBook->setToolTip("Store the booking in the schedule.");
     connect(btnBook, &QPushButton::clicked, this, &AppointmentPanel::onScheduleAppointment);
     form->addRow(btnBook);
 
@@ -105,12 +100,9 @@ QWidget* AppointmentPanel::buildSchedule(QWidget* parent) {
 
     QHBoxLayout* buttonRow = new QHBoxLayout();
     btnComplete = new QPushButton("Mark as Completed", group);
-    btnComplete->setToolTip("Record that the visit took place, so that it counts "
-                            "towards the attendance of the patient.");
     connect(btnComplete, &QPushButton::clicked, this,
             &AppointmentPanel::onCompleteSelectedAppointment);
     QPushButton* btnCancel = new QPushButton("Cancel Appointment", group);
-    btnCancel->setToolTip("Cancel the selected booking. The step can be undone.");
     connect(btnCancel, &QPushButton::clicked,
             this, &AppointmentPanel::onCancelSelectedAppointment);
     buttonRow->addWidget(btnComplete);
@@ -279,21 +271,8 @@ void AppointmentPanel::refresh() {
         tableAppointments->setItem(i, 4, new QTableWidgetItem(
             QString::fromStdString(appointment.getDoctorName())));
 
-        QTableWidgetItem* status = new QTableWidgetItem(
-            QString::fromStdString(appointment.getStatus()));
-        tableAppointments->setItem(i, 5, status);
-
-        // The colour of the status cell shows at a glance what happened.
-        if (appointment.getStatus() == model::Appointment::STATUS_COMPLETED) {
-            status->setBackground(QColor("#e9f3ed"));
-            status->setForeground(QColor("#2c7a52"));
-        } else if (appointment.getStatus() == model::Appointment::STATUS_CANCELLED) {
-            status->setBackground(QColor("#f9ebeb"));
-            status->setForeground(QColor("#ad3838"));
-        } else {
-            status->setBackground(QColor("#fbf3e3"));
-            status->setForeground(QColor("#96701d"));
-        }
+        tableAppointments->setItem(i, 5, new QTableWidgetItem(
+            QString::fromStdString(appointment.getStatus())));
     }
 }
 

@@ -274,8 +274,6 @@ classDiagram
         <<GUI>>
         -manager: ClinicManager
         -tabWidget: QTabWidget*
-        -dashboardTimer: QTimer*
-        -centred: bool
         -patientPanel: PatientPanel*
         -appointmentPanel: AppointmentPanel*
         -queuePanel: QueuePanel*
@@ -284,8 +282,6 @@ classDiagram
         -adminPanel: AdminPanel*
         +setupUI() void
         +setupMenuBar() void
-        +setupTimer() void
-        +applyStyleSheet() void
         +loadSampleData() void
         +refreshAll() void
         +onDataChanged() void
@@ -345,13 +341,10 @@ classDiagram
         -manager: ClinicManager
         -lblPatientCount: QLabel*
         -lblWaitingCount: QLabel*
-        -lblBookedCount: QLabel*
-        -lblCompletedCount: QLabel*
+        -lblAppointmentCount: QLabel*
         -lblPendingCount: QLabel*
-        -lblCancelledCount: QLabel*
         -listRecent: QListWidget*
         +refresh() void
-        +refreshStatistics() void
         +undoLastOperation() void
         +saveData() void
         +loadData() void

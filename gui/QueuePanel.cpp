@@ -32,19 +32,16 @@ QWidget* QueuePanel::buildControls(QWidget* parent) {
     layout->addWidget(new QLabel("Patient:", group));
 
     cmbQueuePatientID = new QComboBox(group);
-    cmbQueuePatientID->setToolTip("The patient that should join the queue.");
     cmbQueuePatientID->setMaximumWidth(190);
     layout->addWidget(cmbQueuePatientID);
 
     QPushButton* btnEnqueue = new QPushButton("Add to Queue", group);
-    btnEnqueue->setToolTip("Put the patient at the end of the waiting room.");
     connect(btnEnqueue, &QPushButton::clicked, this, &QueuePanel::onEnqueuePatient);
     layout->addWidget(btnEnqueue);
 
     layout->addSpacing(20);
 
     QPushButton* btnCallNext = new QPushButton("Call Next", group);
-    btnCallNext->setToolTip("Call the patient that has been waiting the longest.");
     connect(btnCallNext, &QPushButton::clicked, this, &QueuePanel::onCallNextPatient);
     layout->addWidget(btnCallNext);
 
@@ -66,7 +63,6 @@ QWidget* QueuePanel::buildList(QWidget* parent) {
     layout->setContentsMargins(16, 20, 16, 16);
 
     listQueueView = new QListWidget(group);
-    listQueueView->setToolTip("The patients that are waiting, the longest wait first.");
     layout->addWidget(listQueueView);
 
     return group;
@@ -151,7 +147,7 @@ void QueuePanel::refresh() {
                                " (" + QString::fromStdString(patient->getTypeLabel()) + ")");
     }
 
-    lblQueueCount->setText("<b>Waiting: " + QString::number(manager.getQueueSize()) + "</b>");
+    lblQueueCount->setText("Waiting: " + QString::number(manager.getQueueSize()));
 }
 
 } // namespace gui
