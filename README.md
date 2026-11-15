@@ -121,10 +121,12 @@ not fit the panel is ignored.
 ## The submission document
 
 `SCAPMS_Submission.pdf` is the single document the assessment asks for. It holds, in the order the
-brief lists them: the two to three page report, the six screenshots, the UML class diagrams, and
+brief lists them: the two to three page report, the six screenshots, the UML class diagram, and
 the complete source code under the four headings the brief names. `SUBMISSION_REPORT.md` is the
-report on its own, and the four `UML_*.png` pictures are the diagrams, because a full diagram of
-Twenty five classes do not read on one page when they are printed.
+report on its own, and `UML_DIAGRAM.png` is the diagram: every class of the four layers, with the
+inheritance, the interfaces, the compositions and the associations. It was drawn in draw.io, and
+`UML_DIAGRAM.drawio` is the editable source of the same picture, so the diagram can be opened and
+changed in draw.io (app.diagrams.net) or in VS Code with the Draw.io Integration extension.
 
 ## Where each requirement is implemented
 
