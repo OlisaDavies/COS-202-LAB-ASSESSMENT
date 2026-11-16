@@ -108,8 +108,8 @@ possible without clicking:
 
 ```
 SCAPMS_GUI.exe                      opens the first panel
-SCAPMS_GUI.exe 3                    opens the Waiting Queue
-SCAPMS_GUI.exe 3 GEN-101            also puts that patient in the queue
+SCAPMS_GUI.exe 2                    opens the Waiting Queue
+SCAPMS_GUI.exe 2 GEN-101            also puts that patient in the queue
 SCAPMS_GUI.exe 3 GEN-101 0          also runs a search for GEN-101 with the
                                     linear search by ID
 ```
