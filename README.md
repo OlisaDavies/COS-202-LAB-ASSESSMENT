@@ -38,14 +38,16 @@ console demonstration (`main.cpp`) and in the graphical program (`gui_main.cpp`)
 ## Folder layout
 
 ```
-model/       PatientRecord, Appointable, Billable, ScheduledPatient, GeneralPatient,
-             EmergencyPatient, FollowUpPatient, Appointment, AdminAction, ClinicDatabase
 controller/  ClinicManager, AppointmentController, SearchEngine, SortEngine, ReportBuilder
+data/        patients.csv, appointments.csv
+docs/        the report, the class diagram, the screenshots and the layer views
 gui/         MainWindow, PatientPanel, AppointmentPanel, QueuePanel,
              SearchPanel, ReportPanel, AdminPanel, clinic.ico, resources.qrc
+model/       PatientRecord, Appointable, Billable, ScheduledPatient, GeneralPatient,
+             EmergencyPatient, FollowUpPatient, Appointment, AdminAction, ClinicDatabase
 utils/       ClinicExceptions, DateUtil, FileHandler, IDGenerator, StringUtil
-uml/         the class diagram split by layer, for the submission document
-tools/       the scripts that build the submission document, the screenshots and the overview sheet
+tools/       the build scripts, and the scripts that make the submission document,
+             the screenshots and the overview sheet
 main.cpp     the console demonstration
 gui_main.cpp the entry point of the graphical program
 ```
@@ -83,22 +85,22 @@ utils/FileHandler.cpp          utils/IDGenerator.cpp       main.cpp
 gui/MainWindow.cpp              gui/PatientPanel.cpp        gui/AppointmentPanel.cpp
 gui/QueuePanel.cpp              gui/SearchPanel.cpp         gui/ReportPanel.cpp
 gui/AdminPanel.cpp              gui_main.cpp                gui/clinic.ico
-gui/resources.qrc               SCAPMS.pro                  build_gui.bat
-build.bat                       .vscode/tasks.json          .vscode/launch.json
+gui/resources.qrc               CMakeLists.txt              tools/build_gui.bat
+tools/build.bat                 .vscode/tasks.json          .vscode/launch.json
 ```
 
-**iv. Data files**
+**iv. Data files required to run the application**
 ```
-patients.csv                    appointments.csv
+data/patients.csv               data/appointments.csv
 ```
 
-`patients.csv` and `appointments.csv` hold the records that the import and the export dialogs read
-and write. The program starts with the same records built into it, so it also runs without them.
+`data/patients.csv` and `data/appointments.csv` hold the records that the import and the export
+dialogs read and write. The program starts with the same records built into it, so it also runs
+without them.
 
 The program has two entry points: `gui_main.cpp` builds the graphical program and `main.cpp` builds
 the console demonstration. They cannot be in one binary because each of them has its own `main()`,
-so the console version is built by `build.bat` with the compiler directly and is not part of
-`SCAPMS.pro`.
+so `CMakeLists.txt` gives the project two targets: `SCAPMS_GUI` and `SCAPMS`.
 
 ### Opening a panel from the command line
 
@@ -123,14 +125,14 @@ not fit the panel is ignored.
 
 `SCAPMS_Submission.pdf` is the single document the assessment asks for. It holds the four sections
 the brief names: the complete source code under its four headings, the six screenshots of the GUI,
-the UML class diagrams and the two to three page report. `SUBMISSION_REPORT.md` is the
-report on its own, and `UML_DIAGRAM.png` is the diagram: every class of every layer drawn in the
+the UML class diagrams and the two to three page report. `docs/SUBMISSION_REPORT.md` is the
+report on its own, and `docs/UML_DIAGRAM.png` is the diagram: every class of every layer drawn in the
 layered style of draw.io, with a legend, and with the inheritance, the interfaces, the compositions
 and the associations labelled. The document also carries the same diagram split by layer, so each
-one is readable on its own. Those four pictures are kept in the `uml/` folder, and it was drawn in
-draw.io, with `UML_DIAGRAM.drawio` as the editable source of the full picture, so the diagram can
-be opened and changed in draw.io (app.diagrams.net) or in VS Code with the Draw.io Integration
-extension.
+one is readable on its own. Those four pictures are kept in the `docs/uml/` folder, and it was drawn
+in draw.io, with `docs/UML_DIAGRAM.drawio` as the editable source of the full picture, so the
+diagram can be opened and changed in draw.io (app.diagrams.net) or in VS Code with the Draw.io
+Integration extension.
 
 ## Where each requirement is implemented
 
@@ -174,8 +176,8 @@ The rules live in the controller layer, so that the screens and the data always 
 
 ## Screenshots
 
-The `screenshots/` folder holds the six views of the graphical program, in the order in which the
-submission asks for them:
+The `docs/screenshots/` folder holds the six views of the graphical program, in the order in which
+the submission asks for them:
 
 | File | View |
 | --- | --- |
@@ -192,24 +194,39 @@ submission asks for them:
 - Windows 10/11 (x64)
 - Visual Studio 2022 C++ Build Tools
 - Qt 6.5+
+- CMake 3.21 or newer (`pip install cmake` is enough)
 
-### Compilation
-Run the build script for the graphical program:
+The build scripts expect Qt in `C:\Qt\6.5.3\msvc2019_64`. Set the `QT_DIR` variable before
+running them if your Qt is somewhere else:
 
 ```cmd
-build_gui.bat
+set QT_DIR=D:\Qt\6.5.3\msvc2019_64
 ```
 
-The binary is generated at `release\SCAPMS_GUI.exe`.
+### Compilation
+The project is built with CMake. Run the build script for the graphical program:
 
-`build.bat` builds the console version (`build\SCAPMS.exe`), which walks through the exception
+```cmd
+tools\build_gui.bat
+```
+
+The binary is generated at `build\bin\SCAPMS_GUI.exe`, with the Qt runtime beside it.
+
+`tools\build.bat` builds the console version (`build\bin\SCAPMS.exe`), which walks through the exception
 handling, the polymorphic calls, the searching and sorting routines, the waiting room, the undo
 stack, the summary of the clinic and the four reports without needing the GUI.
 
+Both scripts call CMake for you. To drive CMake yourself:
+
+```cmd
+cmake -S . -B build -G "Visual Studio 17 2022" -A x64 -DCMAKE_PREFIX_PATH=C:\Qt\6.5.3\msvc2019_64
+cmake --build build --config Release --target SCAPMS_GUI
+```
+
 ### Data files
-`patients.csv` and `appointments.csv` hold the same records the application starts with, and are
-the files the import and export dialogs read and write. The program starts with the same records
-built into it, so it also runs when these two files are not there.
+`data/patients.csv` and `data/appointments.csv` hold the same records the application starts with,
+and are the files the import and export dialogs read and write. The program starts with the same
+records built into it, so it also runs when these two files are not there.
 
 ### The submission document
 `SCAPMS_Submission.pdf` is built from the sources, the screenshots, the diagrams and the report, so
@@ -222,7 +239,7 @@ tools\build_submission_pdf.bat
 The script needs Python with the `markdown` package, and Chrome or Edge to print the document. It
 writes the result straight over `SCAPMS_Submission.pdf`.
 
-`SUBMISSION_OVERVIEW.png` is a one screen contact sheet of that document, so the whole submission
+`docs/SUBMISSION_OVERVIEW.png` is a one screen contact sheet of that document, so the whole submission
 can be checked without turning through every page:
 
 ```cmd
@@ -230,12 +247,12 @@ python tools\build_submission_overview.py
 ```
 
 ### The screenshots
-The six pictures in `screenshots/` are taken from the program itself:
+The six pictures in `docs/screenshots/` are taken from the program itself:
 
 ```cmd
 powershell -ExecutionPolicy Bypass -File tools\capture_screenshots.ps1
 ```
 
 The script opens each panel of the program in turn and takes the picture of the window, so the
-pictures always show the program as it is now. Run `build_gui.bat` first, because the script
+pictures always show the program as it is now. Run `tools\build_gui.bat` first, because the script
 captures the built program.

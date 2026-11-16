@@ -4,21 +4,21 @@
         {
             "label": "Build Qt GUI Application",
             "type": "process",
-            "command": "${workspaceFolder}/build_gui.bat",
+            "command": "${workspaceFolder}/tools/build_gui.bat",
             "group": {
                 "kind": "build",
                 "isDefault": true
             },
             "problemMatcher": "$msCompile",
-            "detail": "Compile Qt GUI into release/SCAPMS_GUI.exe"
+            "detail": "Compile Qt GUI into build/bin/SCAPMS_GUI.exe"
         },
         {
             "label": "Build Console Application",
             "type": "process",
-            "command": "${workspaceFolder}/build.bat",
+            "command": "${workspaceFolder}/tools/build.bat",
             "group": "build",
             "problemMatcher": "$msCompile",
-            "detail": "Compile console application into SCAPMS.exe"
+            "detail": "Compile the console program into build/bin/SCAPMS.exe"
         }
     ]
 }

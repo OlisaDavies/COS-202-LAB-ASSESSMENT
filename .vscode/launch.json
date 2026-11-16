@@ -5,14 +5,14 @@
             "name": "Run SCAPMS GUI",
             "type": "cppvsdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/release/SCAPMS_GUI.exe",
+            "program": "${workspaceFolder}/build/bin/SCAPMS_GUI.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [
                 {
                     "name": "PATH",
-                    "value": "${workspaceFolder}/release;C:/Qt/6.5.3/msvc2019_64/bin;${env:PATH}"
+                    "value": "${workspaceFolder}/build/bin;C:/Qt/6.5.3/msvc2019_64/bin;${env:PATH}"
                 }
             ],
             "console": "integratedTerminal",

@@ -8,11 +8,21 @@
 $ErrorActionPreference = "Stop"
 
 $root = Split-Path -Parent $PSScriptRoot
-$exe  = Join-Path $root "release\SCAPMS_GUI.exe"
+$exe  = Join-Path $root "build\bin\SCAPMS_GUI.exe"
+$shotsDir = Join-Path $root "docs\screenshots"
 
 if (-not (Test-Path $exe)) {
     throw "The program was not built. Run build_gui.bat first."
 }
+
+if (-not (Test-Path $shotsDir)) {
+    New-Item -ItemType Directory -Force -Path $shotsDir | Out-Null
+}
+
+# A program that is still running would keep the binary locked, so any
+# leftover instance is closed before the pictures are taken.
+Get-Process SCAPMS_GUI -ErrorAction SilentlyContinue | Stop-Process -Force
+Start-Sleep -Milliseconds 500
 
 Add-Type -AssemblyName System.Drawing
 
@@ -102,7 +112,7 @@ foreach ($shot in $shots) {
     [WindowCapture]::SetForegroundWindow($handle) | Out-Null
     Start-Sleep -Milliseconds 2000
 
-    $target = Join-Path $root ("screenshots\" + $shot.file)
+    $target = Join-Path $shotsDir $shot.file
     [WindowCapture]::Capture($handle, $target)
 
     $process.CloseMainWindow() | Out-Null

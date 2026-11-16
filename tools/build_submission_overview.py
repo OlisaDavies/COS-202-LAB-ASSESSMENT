@@ -15,7 +15,7 @@ from PIL import Image, ImageDraw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 PDF = os.path.join(ROOT, "SCAPMS_Submission.pdf")
-OUT = os.path.join(ROOT, "SUBMISSION_OVERVIEW.png")
+OUT = os.path.join(ROOT, "docs", "SUBMISSION_OVERVIEW.png")
 
 BG = (36, 38, 44)
 FG = (238, 238, 240)
@@ -87,6 +87,8 @@ def build_pages(document):
 def main():
     document = pymupdf.open(PDF)
     pages = build_pages(document)
+    if not os.path.isdir(os.path.dirname(OUT)):
+        os.makedirs(os.path.dirname(OUT))
 
     tiles = []
     for number, caption in pages:

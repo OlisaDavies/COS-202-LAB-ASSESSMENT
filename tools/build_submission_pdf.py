@@ -54,27 +54,27 @@ GUI_FILES = [
     "gui/AdminPanel.cpp", "gui/AppointmentPanel.cpp", "gui/MainWindow.cpp",
     "gui/PatientPanel.cpp", "gui/QueuePanel.cpp", "gui/ReportPanel.cpp",
     "gui/SearchPanel.cpp", "gui_main.cpp", "gui/clinic.ico", "gui/resources.qrc",
-    "SCAPMS.pro", "build_gui.bat", "build.bat",
+    "CMakeLists.txt", "tools/build_gui.bat", "tools/build.bat",
     ".vscode/tasks.json", ".vscode/launch.json",
 ]
 
-DATA_FILES = ["patients.csv", "appointments.csv"]
+DATA_FILES = ["data/patients.csv", "data/appointments.csv"]
 
 SCREENSHOTS = [
-    ("screenshots/1_main_dashboard.png", "i.", "Main dashboard"),
-    ("screenshots/2_patient_registration.png", "ii.", "Patient registration"),
-    ("screenshots/3_appointment_management.png", "iii.", "Appointment management"),
-    ("screenshots/4_search_sort_interface.png", "iv.", "Search/sort interface"),
-    ("screenshots/5_waiting_queue.png", "v.", "Waiting queue"),
-    ("screenshots/6_reports.png", "vi.", "Reports"),
+    ("docs/screenshots/1_main_dashboard.png", "i.", "Main dashboard"),
+    ("docs/screenshots/2_patient_registration.png", "ii.", "Patient registration"),
+    ("docs/screenshots/3_appointment_management.png", "iii.", "Appointment management"),
+    ("docs/screenshots/4_search_sort_interface.png", "iv.", "Search/sort interface"),
+    ("docs/screenshots/5_waiting_queue.png", "v.", "Waiting queue"),
+    ("docs/screenshots/6_reports.png", "vi.", "Reports"),
 ]
 
 DIAGRAMS = [
-    ("UML_DIAGRAM.png", "Full class diagram (all layers)"),
-    ("uml/UML_1_model.png", "Model layer"),
-    ("uml/UML_2_controller.png", "Controller layer"),
-    ("uml/UML_3_screens.png", "GUI screens"),
-    ("uml/UML_4_utilities.png", "Utilities"),
+    ("docs/UML_DIAGRAM.png", "Full class diagram (all layers)"),
+    ("docs/uml/UML_1_model.png", "Model layer"),
+    ("docs/uml/UML_2_controller.png", "Controller layer"),
+    ("docs/uml/UML_3_screens.png", "GUI screens"),
+    ("docs/uml/UML_4_utilities.png", "Utilities"),
 ]
 
 STYLE = """
@@ -270,7 +270,7 @@ def build_html(path):
     parts.append(UML_KEY)
     parts.append("</div>")
 
-    with open(os.path.join(ROOT, "SUBMISSION_REPORT.md"), encoding="utf-8") as handle:
+    with open(os.path.join(ROOT, "docs", "SUBMISSION_REPORT.md"), encoding="utf-8") as handle:
         report = handle.read()
 
     # The document already has the heading "4. Project Report", so the title

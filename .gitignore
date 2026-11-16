@@ -2,30 +2,22 @@
 *.obj
 *.ilk
 *.pdb
-*.stash
 *.exp
 *.lib
-Makefile*
+*.stash
 
-# Output binaries
-*.exe
+# The folder that CMake builds into
+build/
+
+# The folders that qmake used to build into
 release/
 debug/
-build/
-*.obj
-*.pdb
-vc.pdb
 
 # VS Code & Cache
 .vscode/ipch/
 .vscode/.browse*
 
-
-# Local files used while assembling the submission document.
-SCAPMS_Submission.html
-
 # Personal VS Code settings (machine-specific paths)
 .vscode/c_cpp_properties.json
 .vscode/settings.json
-
 
