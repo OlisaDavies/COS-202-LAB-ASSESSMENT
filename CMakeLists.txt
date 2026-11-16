@@ -106,3 +106,4 @@ else()
         "Point CMake at the Qt folder with -DCMAKE_PREFIX_PATH=<path> "
         "to build the graphical program as well.")
 endif()
+

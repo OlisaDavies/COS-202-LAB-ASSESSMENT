@@ -65,3 +65,4 @@ bool isValidDate(const std::string& date) {
 
 } // namespace utils
 } // namespace scapms
+

@@ -100,3 +100,4 @@ std::vector<int> SearchEngine::searchByCategory(const std::vector<model::Patient
 
 } // namespace controller
 } // namespace scapms
+

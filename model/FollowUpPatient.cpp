@@ -36,3 +36,4 @@ void FollowUpPatient::restoreFrom(const PatientRecord& previous) {
 
 } // namespace model
 } // namespace scapms
+

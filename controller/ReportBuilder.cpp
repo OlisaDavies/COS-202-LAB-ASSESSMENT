@@ -227,3 +227,4 @@ std::string ReportBuilder::dashboardSummary(const ClinicManager& manager) {
 
 } // namespace controller
 } // namespace scapms
+

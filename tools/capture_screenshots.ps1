@@ -123,3 +123,4 @@ foreach ($shot in $shots) {
     $info = Get-Item $target
     "{0,-26} {1,8:N0} bytes" -f $shot.file, $info.Length
 }
+

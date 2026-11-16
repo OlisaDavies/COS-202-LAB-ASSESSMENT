@@ -59,3 +59,4 @@ inline std::string trim(const std::string& text) {
 
 } // namespace utils
 } // namespace scapms
+

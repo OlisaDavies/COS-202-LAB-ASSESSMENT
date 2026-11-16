@@ -52,3 +52,4 @@ std::string ScheduledPatient::describeBill() const {
 
 } // namespace model
 } // namespace scapms
+

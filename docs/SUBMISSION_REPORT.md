@@ -106,3 +106,4 @@ Every panel wraps the work it asks the controller to do in `try` / `catch` and s
 ---
 
 *The complete source code is listed in the Source Code section of this document.*
+

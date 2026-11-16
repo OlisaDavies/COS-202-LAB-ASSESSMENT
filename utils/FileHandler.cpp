@@ -388,3 +388,4 @@ std::vector<model::Appointment> FileHandler::loadAppointments(const std::string&
 
 } // namespace utils
 } // namespace scapms
+

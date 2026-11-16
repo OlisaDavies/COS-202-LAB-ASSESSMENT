@@ -151,3 +151,4 @@ void QueuePanel::refresh() {
 
 } // namespace gui
 } // namespace scapms
+

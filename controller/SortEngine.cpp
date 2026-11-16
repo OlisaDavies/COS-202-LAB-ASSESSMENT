@@ -111,3 +111,4 @@ void SortEngine::mergeHalves(std::vector<model::PatientRecord*>& records,
 
 } // namespace controller
 } // namespace scapms
+

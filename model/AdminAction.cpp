@@ -34,3 +34,4 @@ AdminAction::AdminAction(Type actionType, const std::string& text,
 
 } // namespace model
 } // namespace scapms
+

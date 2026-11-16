@@ -25,3 +25,4 @@ exit /b 1
 
 :found
 endlocal & set "CMAKE=%CMAKE%"
+

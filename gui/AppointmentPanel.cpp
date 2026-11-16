@@ -276,3 +276,4 @@ void AppointmentPanel::refresh() {
 
 } // namespace gui
 } // namespace scapms
+

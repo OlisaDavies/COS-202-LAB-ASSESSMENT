@@ -29,3 +29,4 @@ void Appointment::displayAppointment() const {
 
 } // namespace model
 } // namespace scapms
+

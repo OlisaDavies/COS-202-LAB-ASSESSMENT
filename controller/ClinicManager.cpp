@@ -244,3 +244,4 @@ void ClinicManager::loadFromFiles(const std::string& patientFile, const std::str
 
 } // namespace controller
 } // namespace scapms
+

@@ -93,3 +93,4 @@ std::string IDGenerator::nextPatientId(const std::string& prefix,
 
 } // namespace utils
 } // namespace scapms
+

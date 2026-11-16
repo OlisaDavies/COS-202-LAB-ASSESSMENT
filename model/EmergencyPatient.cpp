@@ -44,3 +44,4 @@ void EmergencyPatient::restoreFrom(const PatientRecord& previous) {
 
 } // namespace model
 } // namespace scapms
+

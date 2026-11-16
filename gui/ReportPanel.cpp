@@ -73,3 +73,4 @@ void ReportPanel::refresh() {
 
 } // namespace gui
 } // namespace scapms
+

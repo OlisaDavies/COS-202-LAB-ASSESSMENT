@@ -108,3 +108,4 @@ std::string AppointmentController::suggestAppointmentId() const {
 
 } // namespace controller
 } // namespace scapms
+

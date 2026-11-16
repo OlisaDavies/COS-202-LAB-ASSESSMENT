@@ -369,3 +369,4 @@ void SearchPanel::refresh() {
 
 } // namespace gui
 } // namespace scapms
+

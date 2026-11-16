@@ -256,3 +256,4 @@ powershell -ExecutionPolicy Bypass -File tools\capture_screenshots.ps1
 The script opens each panel of the program in turn and takes the picture of the window, so the
 pictures always show the program as it is now. Run `tools\build_gui.bat` first, because the script
 captures the built program.
+

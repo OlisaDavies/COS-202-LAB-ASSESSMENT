@@ -574,3 +574,4 @@ void ClinicDatabase::displayAllAppointments() const {
 
 } // namespace model
 } // namespace scapms
+
