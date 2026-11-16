@@ -42,8 +42,9 @@ AdminPanel::AdminPanel(controller::ClinicManager& manager, QWidget* parent)
     stepRow->addWidget(btnUndo);
     stepRow->addWidget(btnSave);
     stepRow->addWidget(btnLoad);
-    stepRow->addStretch();
+    stepRow->addSpacing(24);
     stepRow->addWidget(btnNew);
+    stepRow->addStretch();
 
     layout->addWidget(steps);
 

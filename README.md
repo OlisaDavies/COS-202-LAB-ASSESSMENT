@@ -179,12 +179,12 @@ submission asks for them:
 
 | File | View |
 | --- | --- |
-| `1_patient_records.png` | The registration form and the roster of the patients |
-| `2_appointments.png` | The booking form and the schedule of the clinic |
-| `3_waiting_queue.png` | The waiting room and the patients that are waiting |
-| `4_search_and_sort.png` | The search and the sort, with the result of a search |
-| `5_clinic_reports.png` | The report of the clinic |
-| `6_administration.png` | The administrative operations and the summary of the clinic |
+| `1_main_dashboard.png` | The clinic summary and the recently accessed records, with the undo, save and load actions |
+| `2_patient_registration.png` | The registration form and the roster of the patients |
+| `3_appointment_management.png` | The booking form and the schedule of the clinic |
+| `4_search_sort_interface.png` | The search and the sort, with the result of a search |
+| `5_waiting_queue.png` | The waiting room and the patients that are waiting |
+| `6_reports.png` | The report of the clinic |
 
 ## Build & Run
 

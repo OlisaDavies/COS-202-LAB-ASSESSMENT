@@ -61,12 +61,12 @@ GUI_FILES = [
 DATA_FILES = ["patients.csv", "appointments.csv"]
 
 SCREENSHOTS = [
-    ("screenshots/1_patient_records.png", "1. Patient Records"),
-    ("screenshots/2_appointments.png", "2. Appointments"),
-    ("screenshots/3_waiting_queue.png", "3. Waiting Queue"),
-    ("screenshots/4_search_and_sort.png", "4. Search & Sort"),
-    ("screenshots/5_clinic_reports.png", "5. Clinic Reports"),
-    ("screenshots/6_administration.png", "6. Administration"),
+    ("screenshots/1_main_dashboard.png", "i. Main dashboard"),
+    ("screenshots/2_patient_registration.png", "ii. Patient registration"),
+    ("screenshots/3_appointment_management.png", "iii. Appointment management"),
+    ("screenshots/4_search_sort_interface.png", "iv. Search/sort interface"),
+    ("screenshots/5_waiting_queue.png", "v. Waiting queue"),
+    ("screenshots/6_reports.png", "vi. Reports"),
 ]
 
 DIAGRAMS = [
@@ -106,6 +106,55 @@ code { font-family: Consolas, monospace; font-size: 10pt; font-variant-ligatures
 ul, ol { margin: 0 0 8pt 0; padding-left: 20pt; }
 li { margin-bottom: 3pt; }
 hr { border: 0; border-top: 1px solid #ccc; margin: 12pt 0; }
+
+/* The report is set a little tighter, so that it stays inside the three
+   pages the brief asks for. */
+.report { font-size: 10.5pt; line-height: 1.24; }
+.report h2 { font-size: 12.5pt; margin: 11pt 0 4pt 0; }
+.report p { margin: 0 0 5pt 0; }
+.report ul, .report ol { margin: 0 0 6pt 0; padding-left: 18pt; }
+.report li { margin-bottom: 2pt; }
+.report table { margin: 4pt 0 7pt 0; }
+.report th, .report td { padding: 2pt 5pt; font-size: 10pt; }
+table.umlkey { page-break-inside: avoid; }
+"""
+
+
+UML_KEY = """
+<table class="umlkey">
+<tr><th style="width: 26%">What the brief asks for</th><th>Where to see it in the diagram</th></tr>
+<tr>
+  <td><strong>Inheritance</strong></td>
+  <td>A solid line with a hollow arrow head runs from <code>GeneralPatient</code>,
+  <code>EmergencyPatient</code> and <code>FollowUpPatient</code> up to
+  <code>ScheduledPatient</code> and on to <code>PatientRecord</code>. The subclasses
+  therefore inherit the common fields and the shared behaviour of their parents.</td>
+</tr>
+<tr>
+  <td><strong>Abstract classes</strong></td>
+  <td><code>PatientRecord</code> and <code>ScheduledPatient</code> are marked
+  <code>&lt;&lt;abstract&gt;&gt;</code>. <code>PatientRecord</code> declares
+  <code>getTypeLabel()</code>, <code>getPatientReport()</code>,
+  <code>getSpecialDetail()</code> and <code>clone()</code> as pure virtual, so it can
+  never be created on its own.</td>
+</tr>
+<tr>
+  <td><strong>Polymorphism</strong></td>
+  <td>The same three calls are answered by a different version in each subclass, and
+  they are reached through a <code>PatientRecord*</code> in
+  <code>main.cpp</code> and in <code>gui/PatientPanel.cpp</code>, so the version that
+  runs is decided at run time. <code>Appointable</code> and <code>Billable</code> are
+  marked <code>&lt;&lt;interface&gt;&gt;</code> and are joined to the classes that
+  implement them by a dashed line with a filled arrow head.</td>
+</tr>
+<tr>
+  <td><strong>Composition / association</strong></td>
+  <td>A filled diamond joins <code>PatientRecord</code> to its
+  <code>appointments</code> and <code>ClinicDatabase</code> to its <code>patients</code>.
+  The owner creates and destroys what it holds, so a patient and its appointments are
+  created and destroyed together, and every record is freed exactly once.</td>
+</tr>
+</table>
 """
 
 
@@ -149,11 +198,13 @@ def build_html(path):
         "</div>",
         "<div class='contents'>",
         "<h2>Contents</h2>",
-        "<p>1. Source Code - i. Header files, ii. Source files, iii. GUI files and resources, "
-        "iv. Data files</p>",
-        "<p>2. Screenshots of the major GUI parts</p>",
-        "<p>3. UML / Class Diagrams (full diagram and four layer sections)</p>",
-        "<p>4. Project Report</p>",
+        "<p>1. Source Code &ndash; i. Header files, ii. Source files, "
+        "iii. GUI files and resources, iv. Data files required to run the application</p>",
+        "<p>2. Screenshots of the major parts of the GUI &ndash; i. Main dashboard, "
+        "ii. Patient registration, iii. Appointment management, iv. Search/sort interface, "
+        "v. Waiting queue, vi. Reports</p>",
+        "<p>3. UML / Class Diagram &ndash; the major classes and their relationships</p>",
+        "<p>4. Project Report &ndash; the twelve points of the brief</p>",
         "</div>",
         "<div class='break'><h1>1. Source Code</h1>",
         "<h2>i. Header files</h2>",
@@ -170,28 +221,49 @@ def build_html(path):
     for relative in GUI_FILES:
         parts.append(code_block(relative))
 
-    parts.append("<h2>iv. Data files</h2>")
+    parts.append("<h2>iv. Data files required to run the application</h2>")
     for relative in DATA_FILES:
         parts.append(code_block(relative))
 
     parts.append("</div>")
 
-    parts.append("<div class='break'><h1>2. Screenshots of the major GUI parts</h1>")
+    parts.append("<div class='break'><h1>2. Screenshots of the major parts of the GUI</h1>")
+    parts.append(
+        "<p>The dashboard of the program is the Administration tab: it shows the clinic "
+        "summary and the records that were used most recently, and it carries the undo, "
+        "save, load and new-database actions.</p>"
+    )
     for relative, caption in SCREENSHOTS:
         parts.append(image_block(relative, caption))
     parts.append("</div>")
 
-    parts.append("<div class='break'><h1>3. UML / Class Diagrams "
-                 "(full diagram and four layer sections)</h1>")
+    parts.append("<div class='break'><h1>3. UML / Class Diagram</h1>")
+    parts.append(
+        "<p>The diagram below shows the major classes of every layer and the "
+        "relationships between them. The key underneath it points at the part of the "
+        "picture that answers each item of the brief.</p>"
+    )
     for relative, caption in DIAGRAMS:
         parts.append(image_block(relative, caption))
+
+    parts.append("<h2>How the diagram shows each required relationship</h2>")
+    parts.append(UML_KEY)
     parts.append("</div>")
 
     with open(os.path.join(ROOT, "SUBMISSION_REPORT.md"), encoding="utf-8") as handle:
         report = handle.read()
+
+    # The document already has the heading "4. Project Report", so the title
+    # of the report itself is left out here.
+    lines = report.split("\n")
+    while lines and (not lines[0].strip() or lines[0].startswith("# ")):
+        lines.pop(0)
+    report = "\n".join(lines)
+
     report_html = markdown.markdown(report, extensions=["tables", "sane_lists"])
 
-    parts.append("<div class='break'><h1>4. Project Report</h1>%s</div>" % report_html)
+    parts.append("<div class='break'><h1>4. Project Report</h1><div class='report'>%s</div></div>"
+                 % report_html)
     parts.append("</body></html>")
 
     document = "\n".join(parts)

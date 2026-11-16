@@ -66,12 +66,12 @@ public class WindowCapture {
 "@
 
 $shots = @(
-    @{ args = @("0");              file = "1_patient_records.png" },
-    @{ args = @("1");              file = "2_appointments.png" },
-    @{ args = @("2", "GEN-101");   file = "3_waiting_queue.png" },
-    @{ args = @("3", "GEN-101", "0"); file = "4_search_and_sort.png" },
-    @{ args = @("4");              file = "5_clinic_reports.png" },
-    @{ args = @("5");              file = "6_administration.png" }
+    @{ args = @("5");                 file = "1_main_dashboard.png" },
+    @{ args = @("0");                 file = "2_patient_registration.png" },
+    @{ args = @("1");                 file = "3_appointment_management.png" },
+    @{ args = @("3", "GEN-101", "0"); file = "4_search_sort_interface.png" },
+    @{ args = @("2", "GEN-101");      file = "5_waiting_queue.png" },
+    @{ args = @("4");                 file = "6_reports.png" }
 )
 
 foreach ($shot in $shots) {
