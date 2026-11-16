@@ -1,4 +1,4 @@
-"""Builds SCAPMS_Submission.pdf.
+"""Builds the submission document of the project.
 
 The whole document is written as one HTML file and then printed to PDF by
 headless Chrome, so that the code listings, the screenshots, the diagrams and
@@ -18,7 +18,7 @@ import tempfile
 import markdown
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PDF_PATH = os.path.join(ROOT, "SCAPMS_Submission.pdf")
+PDF_PATH = os.path.join(ROOT, "COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf")
 
 CHROME_CANDIDATES = [
     r"C:\Program Files\Google\Chrome\Application\chrome.exe",
@@ -306,7 +306,7 @@ def main():
         print("Chrome or Edge was not found, so the PDF cannot be printed.")
         return 1
 
-    work = tempfile.mkdtemp(prefix="scapms_submission_")
+    work = tempfile.mkdtemp(prefix="cos202_report_")
     html_path = os.path.join(work, "submission.html")
 
     size = build_html(html_path)

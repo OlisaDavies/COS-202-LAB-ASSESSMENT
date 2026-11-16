@@ -123,7 +123,7 @@ not fit the panel is ignored.
 
 ## The submission document
 
-`SCAPMS_Submission.pdf` is the single document the assessment asks for. It holds the four sections
+`COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf` is the single document the assessment asks for. It holds the four sections
 the brief names: the complete source code under its four headings, the six screenshots of the GUI,
 the UML class diagrams and the two to three page report. `docs/SUBMISSION_REPORT.md` is the
 report on its own, and `docs/UML_DIAGRAM.png` is the diagram: every class of every layer drawn in the
@@ -229,7 +229,7 @@ and are the files the import and export dialogs read and write. The program star
 records built into it, so it also runs when these two files are not there.
 
 ### The submission document
-`SCAPMS_Submission.pdf` is built from the sources, the screenshots, the diagrams and the report, so
+`COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf` is built from the sources, the screenshots, the diagrams and the report, so
 it has to be rebuilt whenever one of those changes:
 
 ```cmd
@@ -237,7 +237,7 @@ tools\build_submission_pdf.bat
 ```
 
 The script needs Python with the `markdown` package, and Chrome or Edge to print the document. It
-writes the result straight over `SCAPMS_Submission.pdf`.
+writes the result straight over `COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf`.
 
 `docs/SUBMISSION_OVERVIEW.png` is a one screen contact sheet of that document, so the whole submission
 can be checked without turning through every page:

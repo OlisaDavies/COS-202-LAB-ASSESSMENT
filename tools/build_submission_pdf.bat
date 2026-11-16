@@ -1,5 +1,5 @@
 @echo off
-REM Rebuilds SCAPMS_Submission.pdf from the sources, the screenshots, the
+REM Rebuilds the submission document from the sources, the screenshots, the
 REM diagrams and the report. Needs Python with the markdown package, and
 REM Chrome or Edge to print the document.
 
