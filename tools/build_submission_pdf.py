@@ -26,7 +26,7 @@ import tempfile
 import markdown
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PDF_PATH = os.path.join(ROOT, "COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf")
+PDF_PATH = os.path.join(ROOT, "COS202 Project Report Olisaemeka Chinedu-Eze.pdf")
 WORK = os.path.join(ROOT, "docs", "SUBMISSION_OVERVIEW.png")
 
 REPOSITORY = "https://github.com/OlisaDavies/COS-202-LAB-ASSESSMENT"
@@ -34,10 +34,10 @@ BRANCH = "main"
 
 # --------------------------------------------------------------- the details
 NAME = "OlisaEmeka Davies Chinedu-Eze"
-EMAIL = "olisadavies37@gmail.com"
+EMAIL = "c.olisaemeka1477@miva.edu.ng"
 DEPARTMENT = "Cyber Security"
-MATRIC_NUMBER = "2025/A/CYB/0205"
-DATE = "November 16, 2026"
+MATRIC_NUMBER = "2025/A/CYB/0260"
+DATE = "November 15, 2026"
 
 # ------------------------------------------------------------- the file index
 SOURCE_INDEX = [

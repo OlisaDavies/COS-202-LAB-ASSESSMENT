@@ -2,6 +2,8 @@
 
 **Course:** COS202 Programming II - Lab Assessment Project  
 **Author:** OlisaEmeka Davies Chinedu-Eze  
+**Matric Number:** 2025/A/CYB/0260  
+**Email:** c.olisaemeka1477@miva.edu.ng  
 **Technologies:** C++17, Qt 6.5.3 (x64), MSVC 2022
 
 ## Project Overview
@@ -40,7 +42,7 @@ console demonstration (`main.cpp`) and in the graphical program (`gui_main.cpp`)
 ```
 controller/  ClinicManager, AppointmentController, SearchEngine, SortEngine, ReportBuilder
 data/        patients.csv, appointments.csv
-docs/        the report, the class diagram, the screenshots and the layer views
+docs/        the report text, the class diagram, the screenshots and the layer views
 gui/         MainWindow, PatientPanel, AppointmentPanel, QueuePanel,
              SearchPanel, ReportPanel, AdminPanel, clinic.ico, resources.qrc
 model/       PatientRecord, Appointable, Billable, ScheduledPatient, GeneralPatient,
@@ -50,6 +52,7 @@ tools/       the build scripts, and the scripts that make the submission documen
              the screenshots and the overview sheet
 main.cpp     the console demonstration
 gui_main.cpp the entry point of the graphical program
+COS202 Project Report Olisaemeka Chinedu-Eze.pdf  the submission document
 ```
 
 ### The source code under the headings of the submission
@@ -123,11 +126,11 @@ not fit the panel is ignored.
 
 ## The submission document
 
-`COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf` is the single document the assessment asks for. It holds four parts: the source files with the link to this repository, the project report, the screenshots of the program and the UML class diagram.
+`COS202 Project Report Olisaemeka Chinedu-Eze.pdf` is the single document the assessment asks for. Its cover carries the details of the student and the table of contents, and the rest of it is the four parts the brief lists: Part 1 Source Files/Code, Part 2 Project Report, Part 3 Screenshots of the program and Part 4 UML/Class Diagram.
 
-The source code is not printed out in the document, because it is long and this repository holds it. The first part lists every file with a short description, and every name is a link that opens the file on GitHub.
+The source code is not printed out in the document, because it is long and this repository holds it. Part 1 opens with the link to this repository, lists every file under the four headings of the brief with a short description beside it - every name a link that opens the file on GitHub - and closes with the build and run instructions.
 
-`docs/SUBMISSION_REPORT.md` is the report on its own, and `docs/UML_DIAGRAM.png` is the diagram: every class of every layer drawn in the
+`docs/SUBMISSION_REPORT.md` is Part 2 on its own, and `docs/UML_DIAGRAM.png` is the diagram of Part 4: every class of every layer drawn in the
 layered style of draw.io, with a legend, and with the inheritance, the interfaces, the compositions
 and the associations labelled. The document also carries the same diagram split by layer, so each
 one is readable on its own. Those four pictures are kept in the `docs/uml/` folder, and it was drawn
@@ -189,6 +192,8 @@ the submission asks for them:
 | `5_waiting_queue.png` | The waiting room and the patients that are waiting |
 | `6_reports.png` | The report of the clinic |
 
+Part 3 of the document shows the same six views, numbered i to vi with the caption under each one.
+
 ## Build & Run
 
 ### Prerequisites
@@ -230,7 +235,7 @@ and are the files the import and export dialogs read and write. The program star
 records built into it, so it also runs when these two files are not there.
 
 ### The submission document
-`COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf` is built from the sources, the screenshots, the diagrams and the report, so
+`COS202 Project Report Olisaemeka Chinedu-Eze.pdf` is built from the sources, the screenshots, the diagrams and the report, so
 it has to be rebuilt whenever one of those changes:
 
 ```cmd
@@ -238,7 +243,7 @@ tools\build_submission_pdf.bat
 ```
 
 The script needs Python with the `markdown` package, and Chrome or Edge to print the document. It
-writes the result straight over `COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf`.
+writes the result straight over `COS202 Project Report Olisaemeka Chinedu-Eze.pdf`.
 
 `docs/SUBMISSION_OVERVIEW.png` is a one screen contact sheet of that document, so the whole submission
 can be checked without turning through every page:

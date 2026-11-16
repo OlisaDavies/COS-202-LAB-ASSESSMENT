@@ -14,7 +14,7 @@ import pymupdf
 from PIL import Image, ImageDraw
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-PDF = os.path.join(ROOT, "COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf")
+PDF = os.path.join(ROOT, "COS202 Project Report Olisaemeka Chinedu-Eze.pdf")
 OUT = os.path.join(ROOT, "docs", "SUBMISSION_OVERVIEW.png")
 
 BG = (36, 38, 44)
@@ -96,7 +96,7 @@ def main():
 
     draw.text((GAP + 4, 18), "SCAPMS - submission overview", fill=FG)
     draw.text((GAP + 4, 44),
-              "COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf  |  %d pages  |  source index, three page report, six screenshots, UML diagram and key"
+              "COS202 Project Report Olisaemeka Chinedu-Eze.pdf  |  %d pages  |  source index, three page report, six screenshots, UML diagram and key"
               % document.page_count,
               fill=MUTED)
 
