@@ -40,46 +40,33 @@ def build_pages(document):
     """The pages worth showing, with their caption."""
     pages = []
 
-    pages.append((1, "Cover and contents"))
+    pages.append((1, "Cover, details and table of content"))
 
-    code = find_page(document, "i. Header files", 1)
-    if code:
-        pages.append((code, "1. Source Code - i. Header files"))
+    source = find_page(document, "Part 1: Source Files/Code", 1)
+    if source:
+        pages.append((source, "Part 1 - Source Files/Code"))
 
-    for needle, caption in [
-        ("ii. Source files", "ii. Source files"),
-        ("iii. GUI files and resources", "iii. GUI files and resources"),
-        ("iv. Data files required to run the application", "iv. Data files"),
-    ]:
-        number = find_page(document, needle, 1)
-        if number:
-            pages.append((number, caption))
-
-    # The three pages of the screenshots, so that all six views are shown.
-    shot_start = find_page(document, "2. Screenshots of the major parts of the GUI", 1)
-    if shot_start:
-        for offset in range(3):
-            number = shot_start + offset
-            if number <= document.page_count:
-                label = ("2. Screenshots - i, ii" if offset == 0
-                         else "2. Screenshots - iii, iv" if offset == 1
-                         else "2. Screenshots - v, vi")
-                pages.append((number, label))
-
-    uml = find_page(document, "3. UML / Class Diagram", 1)
-    if uml:
-        pages.append((uml, "3. UML / Class Diagram"))
-
-    key = find_page(document, "How the diagram shows each required relationship", 1)
-    if key:
-        pages.append((key, "UML key: the four relationships"))
-
-    report = find_page(document, "4. Project Report", 1)
+    report = find_page(document, "Part 2: Project Report", 1)
     if report:
         for offset in range(3):
             number = report + offset
             if number <= document.page_count:
-                pages.append((number, "4. Project Report - %d/3" % (offset + 1)))
+                pages.append((number, "Part 2 - Project Report %d/3" % (offset + 1)))
+
+    shots = find_page(document, "Part 3: Screenshots of the program", 1)
+    if shots:
+        for offset in range(3):
+            number = shots + offset
+            if number <= document.page_count:
+                pages.append((number, "Part 3 - Screenshots"))
+
+    uml = find_page(document, "Part 4: UML/Class Diagram", 1)
+    if uml:
+        pages.append((uml, "Part 4 - UML/Class Diagram"))
+
+    key = find_page(document, "How the diagram shows each required relationship", 1)
+    if key:
+        pages.append((key, "UML key: the four relationships"))
 
     return pages
 
@@ -109,7 +96,7 @@ def main():
 
     draw.text((GAP + 4, 18), "SCAPMS - submission overview", fill=FG)
     draw.text((GAP + 4, 44),
-              "COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf  |  %d pages  |  source code, six screenshots, UML diagram and key, three page report"
+              "COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf  |  %d pages  |  source index, three page report, six screenshots, UML diagram and key"
               % document.page_count,
               fill=MUTED)
 

@@ -123,10 +123,11 @@ not fit the panel is ignored.
 
 ## The submission document
 
-`COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf` is the single document the assessment asks for. It holds the four sections
-the brief names: the complete source code under its four headings, the six screenshots of the GUI,
-the UML class diagrams and the two to three page report. `docs/SUBMISSION_REPORT.md` is the
-report on its own, and `docs/UML_DIAGRAM.png` is the diagram: every class of every layer drawn in the
+`COS202_Project_Report_Olisaemeka_Chinedu-Eze.pdf` is the single document the assessment asks for. It holds four parts: the source files with the link to this repository, the project report, the screenshots of the program and the UML class diagram.
+
+The source code is not printed out in the document, because it is long and this repository holds it. The first part lists every file with a short description, and every name is a link that opens the file on GitHub.
+
+`docs/SUBMISSION_REPORT.md` is the report on its own, and `docs/UML_DIAGRAM.png` is the diagram: every class of every layer drawn in the
 layered style of draw.io, with a legend, and with the inheritance, the interfaces, the compositions
 and the associations labelled. The document also carries the same diagram split by layer, so each
 one is readable on its own. Those four pictures are kept in the `docs/uml/` folder, and it was drawn

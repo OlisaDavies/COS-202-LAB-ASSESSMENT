@@ -5,6 +5,7 @@
 *.exp
 *.lib
 *.stash
+__pycache__/
 
 # The folder that CMake builds into
 build/
