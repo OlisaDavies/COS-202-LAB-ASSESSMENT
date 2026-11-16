@@ -45,7 +45,7 @@ gui/         MainWindow, PatientPanel, AppointmentPanel, QueuePanel,
              SearchPanel, ReportPanel, AdminPanel, clinic.ico, resources.qrc
 utils/       ClinicExceptions, DateUtil, FileHandler, IDGenerator, StringUtil
 uml/         the class diagram split by layer, for the submission document
-tools/       the scripts that build the submission document and the screenshots
+tools/       the scripts that build the submission document, the screenshots and the overview sheet
 main.cpp     the console demonstration
 gui_main.cpp the entry point of the graphical program
 ```
@@ -221,6 +221,13 @@ tools\build_submission_pdf.bat
 
 The script needs Python with the `markdown` package, and Chrome or Edge to print the document. It
 writes the result straight over `SCAPMS_Submission.pdf`.
+
+`SUBMISSION_OVERVIEW.png` is a one screen contact sheet of that document, so the whole submission
+can be checked without turning through every page:
+
+```cmd
+python tools\build_submission_overview.py
+```
 
 ### The screenshots
 The six pictures in `screenshots/` are taken from the program itself:

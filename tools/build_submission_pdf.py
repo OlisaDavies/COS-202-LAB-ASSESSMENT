@@ -61,12 +61,12 @@ GUI_FILES = [
 DATA_FILES = ["patients.csv", "appointments.csv"]
 
 SCREENSHOTS = [
-    ("screenshots/1_main_dashboard.png", "i. Main dashboard"),
-    ("screenshots/2_patient_registration.png", "ii. Patient registration"),
-    ("screenshots/3_appointment_management.png", "iii. Appointment management"),
-    ("screenshots/4_search_sort_interface.png", "iv. Search/sort interface"),
-    ("screenshots/5_waiting_queue.png", "v. Waiting queue"),
-    ("screenshots/6_reports.png", "vi. Reports"),
+    ("screenshots/1_main_dashboard.png", "i.", "Main dashboard"),
+    ("screenshots/2_patient_registration.png", "ii.", "Patient registration"),
+    ("screenshots/3_appointment_management.png", "iii.", "Appointment management"),
+    ("screenshots/4_search_sort_interface.png", "iv.", "Search/sort interface"),
+    ("screenshots/5_waiting_queue.png", "v.", "Waiting queue"),
+    ("screenshots/6_reports.png", "vi.", "Reports"),
 ]
 
 DIAGRAMS = [
@@ -99,6 +99,20 @@ pre.code { font-family: Consolas, "Courier New", monospace; font-size: 7pt;
 figure { margin: 0 0 14pt 0; page-break-inside: avoid; text-align: center; }
 figure img { max-width: 165mm; max-height: 215mm; }
 figcaption { font-size: 10pt; margin-top: 5pt; }
+
+/* The header band and the labelled tiles, in the same style as the
+   submission overview sheet. */
+.band { background: #24262c; color: #eeeef0; padding: 15pt 14pt 13pt 14pt;
+        -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.band .title { font-size: 19pt; font-weight: bold; color: #ffffff; margin-bottom: 9pt; }
+.band .line { font-size: 10pt; color: #b2b6be; margin-bottom: 3pt; }
+.band .last { margin-bottom: 0; }
+
+.tile { margin: 0 0 15pt 0; page-break-inside: avoid; }
+.tile .frame { border: 1px solid #b8bcc6; padding: 5px; }
+.tile img { display: block; width: 100%; height: auto; }
+.tile .caption { font-size: 10pt; color: #111111; margin-top: 5pt; }
+.tile .chip { color: #1a6fd4; font-weight: bold; }
 table { border-collapse: collapse; margin: 6pt 0 10pt 0; }
 th, td { border: 1px solid #999; padding: 3pt 6pt; text-align: left; vertical-align: top; }
 th { background: #eeeeee; }
@@ -177,11 +191,18 @@ def code_block(relative):
             % (relative, html.escape(body)))
 
 
-def image_block(relative, caption):
-    return '<figure><img src="%s" alt="%s"><figcaption>%s</figcaption></figure>' % (
-        file_uri(relative),
-        html.escape(caption),
-        html.escape(caption),
+def image_block(relative, caption, chip=None):
+    """A labelled tile: the picture in a frame, and the caption under it."""
+    if chip is None:
+        label = html.escape(caption)
+    else:
+        label = ('<span class="chip">%s&nbsp;</span>%s'
+                 % (html.escape(chip), html.escape(caption)))
+    return (
+        '<div class="tile"><div class="frame">'
+        '<img src="%s" alt="%s"></div>'
+        '<div class="caption">%s</div></div>'
+        % (file_uri(relative), html.escape(caption), label)
     )
 
 
@@ -189,12 +210,12 @@ def build_html(path):
     parts = [
         "<!DOCTYPE html><html><head><meta charset='utf-8'><title>SCAPMS</title>",
         "<style>%s</style></head><body>" % STYLE,
-        "<div class='cover'>",
+        "<div class='band'>",
         "<div class='title'>Smart Clinic Appointment &amp; Patient Management System (SCAPMS)</div>",
         "<div class='line'>Course: COS202 Programming II - Lab Assessment Project</div>",
         "<div class='line'>Student: OlisaEmeka Davies Chinedu-Eze</div>",
         "<div class='line'>Language: C++17, Qt 6.5.3 (Qt Widgets), MSVC 2022</div>",
-        "<div class='line'>Build: qmake + nmake (build_gui.bat) / cl (build.bat) - both verified</div>",
+        "<div class='line last'>Build: qmake + nmake (build_gui.bat) / cl (build.bat) - both verified</div>",
         "</div>",
         "<div class='contents'>",
         "<h2>Contents</h2>",
@@ -233,8 +254,8 @@ def build_html(path):
         "summary and the records that were used most recently, and it carries the undo, "
         "save, load and new-database actions.</p>"
     )
-    for relative, caption in SCREENSHOTS:
-        parts.append(image_block(relative, caption))
+    for relative, chip, caption in SCREENSHOTS:
+        parts.append(image_block(relative, caption, chip))
     parts.append("</div>")
 
     parts.append("<div class='break'><h1>3. UML / Class Diagram</h1>")
@@ -245,7 +266,6 @@ def build_html(path):
     )
     for relative, caption in DIAGRAMS:
         parts.append(image_block(relative, caption))
-
     parts.append("<h2>How the diagram shows each required relationship</h2>")
     parts.append(UML_KEY)
     parts.append("</div>")
